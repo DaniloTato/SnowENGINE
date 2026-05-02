@@ -1,5 +1,5 @@
 #pragma once
-#include "Animator.hpp"
+#include "Animation.hpp"
 #include "BasicCollider.hpp"
 #include "Bullet.hpp"
 #include "QueuedManager.hpp"

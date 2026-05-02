@@ -11,8 +11,6 @@
 #include <memory>
 
 ParticleManager::ParticleManager() : GameObject({WindowTypes::MAIN}) {
-  cachedAnimations = Animator::getAsepriteJSONAnimations(
-      (Helper::getPath("assets/json/particles.json")));
   persistentAcrossScenes = true;
 }
 
@@ -28,14 +26,23 @@ void ParticleManager::attachPolyRederizer(PolyRenderizer *polyRenderizer) {
   Renderizer::registerPair(this, polyRenderizer, false);
 }
 
+void ParticleManager::loadAnimations(Animations &&anim) {
+  cachedAnimations = std::move(anim);
+}
+
 void ParticleManager::update(const GeneralContext &ctx) {
   updateParticles();
   updateRenderCommandBuffer();
 
+  static bool notified = false;
+
   if (attachedRenderizer) {
     attachedRenderizer->updateRenderCommands(renderCommandBuffer);
   } else {
-    std::cout << "[ParticleManager] Warning: No Renderizer Attached.\n";
+    if (!notified) {
+      std::cout << "[ParticleManager] Warning: No Renderizer Attached.\n";
+    }
+    notified = true;
   }
 }
 

@@ -3,6 +3,7 @@ from pathlib import Path
 
 TARGETS = {
     "GameCamera": {"include": "GameCamera.hpp", "var": "camera"},
+    "GameObject": {"include": "GameObject.hpp", "var": "object"},
     "AnimatedObject": {"include": "AnimatedObject.hpp", "var": "animated"},
     "RenderableObject": {"include": "RenderableObject.hpp", "var": "renderable"},
     "TangibleObject": {"include": "TangibleObject.hpp", "var": "tangible"},
@@ -46,7 +47,6 @@ cpp = f"""\
 #include "{func_name}.hpp"
 
 #include "{target_include}"
-#include "GameState.hpp"
 
 namespace Scripts {{
 

@@ -13,6 +13,10 @@ public:
   void updateX(sf::Vector2f &position);
   void updateY(sf::Vector2f &position);
 
+  void turnOnGravity();
+  void setGravity(float gravity);
+  void setFriction(sf::Vector2f friction);
+
   [[nodiscard]] const sf::Vector2f &getSpeed(SpeedType type) const;
   [[nodiscard]] float getSpdx(SpeedType type) const;
   [[nodiscard]] float getSpdy(SpeedType type) const;
@@ -27,11 +31,11 @@ public:
 
   GameObjectExposure::Value::Object describe();
 
+private:
   float gravity;
   sf::Vector2f friction;
-
-private:
   std::vector<sf::Vector2f> speeds;
   bool hasXFriction;
   bool hasYFriction;
+  bool hasGravity;
 };

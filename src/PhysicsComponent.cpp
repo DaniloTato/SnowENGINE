@@ -6,7 +6,7 @@
 
 PhysicsComponent::PhysicsComponent()
     : gravity(1100.f), friction({6.f, 6.f}), hasXFriction(true),
-      hasYFriction(false) {
+      hasYFriction(true), hasGravity(false) {
   speeds.resize(static_cast<std::size_t>(SpeedType::COUNT));
 }
 
@@ -27,7 +27,7 @@ void PhysicsComponent::updateY(sf::Vector2f &position) {
 
   for (size_t i = 0; i < speeds.size(); i++) {
 
-    if (i == static_cast<int>(SpeedType::MOVEMENT)) {
+    if (hasGravity && i == static_cast<int>(SpeedType::MOVEMENT)) {
       speeds[i].y += gravity * dt;
     }
 
@@ -92,4 +92,12 @@ GameObjectExposure::Value::Object PhysicsComponent::describe() {
   desc->fields["gravity"] = GameObjectExposure::makePublicField<float>(gravity);
 
   return desc;
+}
+
+void PhysicsComponent::turnOnGravity() { hasGravity = true; }
+
+void PhysicsComponent::setGravity(float gravity) { this->gravity = gravity; }
+
+void PhysicsComponent::setFriction(sf::Vector2f friction) {
+  this->friction = friction;
 }

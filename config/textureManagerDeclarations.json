@@ -13,6 +13,10 @@
     {
       "id": "snowFont",
       "path": "assets/sprites/misc/font.png"
+    },
+    {
+      "id": "particles",
+      "path": "assets/sprites/particles/particles.png"
     }
   ]
 }

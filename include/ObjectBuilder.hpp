@@ -1,0 +1,51 @@
+#pragma once
+
+#include "AnimationFactory.hpp"
+#include "GameState.hpp"
+#include "TextureManager.hpp"
+#include <string>
+
+template <typename T> class ObjectBuilder {
+public:
+  ObjectBuilder(const std::string &textureKey) {
+    auto &gs = GameState::getInstance();
+    params.window = gs.getMainWindow();
+    params.texture = &TextureManager::getInstance().get(textureKey);
+    params.camera = gs.getMainCamera();
+    params.layer = 0.f;
+    params.parallax = 1.f;
+  }
+
+  ObjectBuilder &at(float x, float y) {
+    position = {x, y};
+    return *this;
+  }
+
+  ObjectBuilder &withEmptyAnimation(int w, int h) {
+    animations = AnimationFactory::empty(w, h);
+    hasAnimation = true;
+    return *this;
+  }
+
+  ObjectBuilder &onCamera(CameraTypes cam) {
+    params.camera =
+        GameState::getInstance().getActiveCameras()[static_cast<int>(cam)];
+    return *this;
+  }
+
+  T *build() {
+    auto *obj = new T(params, animations);
+    obj->position = position;
+    if (hasAnimation) {
+      obj->animator.setAnimations(animations);
+      obj->animator.play("idle");
+    }
+    return obj;
+  }
+
+private:
+  bool hasAnimation;
+  sf::Vector2f position;
+  RenderizerParameters params;
+  Animations animations;
+};

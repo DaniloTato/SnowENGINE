@@ -16,7 +16,7 @@ Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
   if (type != Bullet::Type::BubbleGun) {
     physics.turnOffXFriction();
   } else {
-    physics.friction.x = 0.99f;
+    physics.setFriction({0.99f, 6.f});
   }
 
   renderizer.setColor(ColorPalette::LimeGreen);
@@ -25,20 +25,20 @@ Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
   case Bullet::Type::Normal:
     collider.setSize({7.f, 7.f});
     collider.setOffset({4.f, 4.f});
-    physics.gravity = 0.f;
+    physics.setGravity(0.f);
     break;
 
   case Bullet::Type::BubbleGun:
     collider.setSize({7.f, 7.f});
     collider.setOffset({4.f, 4.f});
-    physics.gravity = 0.3f;
+    physics.setGravity(0.3f);
     maxBounces = 10;
     maxLifeTime = 8.f;
     physics.setSpdy(-3.f, PhysicsComponent::SpeedType::MOVEMENT);
     break;
 
   case Bullet::Type::Bazooka:
-    physics.gravity = 0.f;
+    physics.setGravity(0.f);
     break;
   }
 

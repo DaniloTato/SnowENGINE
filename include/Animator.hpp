@@ -2,11 +2,8 @@
 #include <SFML/Graphics.hpp>
 #include <optional>
 #include <string>
-#include <unordered_map>
 
 #include "Animation.hpp"
-
-using Animations = std::unordered_map<std::string, struct Animation>;
 
 class Animator {
 public:

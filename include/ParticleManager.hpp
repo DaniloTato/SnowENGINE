@@ -52,6 +52,8 @@ public:
 
   static ParticleManager &getInstance();
 
+  void loadAnimations(Animations &&anim);
+
   void emitSnow(const sf::Vector2f &pos);
   void emitDust(const sf::Vector2f &pos);
   void emitExplosion(const sf::Vector2f &pos, int count = 12);

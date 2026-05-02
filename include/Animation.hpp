@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <unordered_map>
 
 struct Animation {
   struct Frame {
@@ -11,3 +12,5 @@ struct Animation {
   std::vector<Frame> frames;
   bool loop = true;
 };
+
+using Animations = std::unordered_map<std::string, struct Animation>;
