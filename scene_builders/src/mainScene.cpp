@@ -1,10 +1,8 @@
 #include "mainScene.hpp"
 
-#include "AnimationFactory.hpp"
 #include "GameState.hpp"
 #include "ScriptRunner.hpp"
 #include "TangibleObject.hpp"
-#include "TextureManager.hpp"
 
 #include "ObjectBuilder.hpp"
 
@@ -39,21 +37,14 @@ void mainScene() {
                     .withEmptyAnimation(16, 16)
                     .build();
 
-  //   RenderizerParameters params = {
-  //       .window = GameState::getInstance().getMainWindow(),
-  //       .texture = &TextureManager::getInstance().get("todd"),
-  //       .camera = GameState::getInstance().getMainCamera()};
-
-  //   auto *image = new TangibleObject(params, AnimationFactory::empty(16,
-  //   16)); image->position = {100.f, 100.f}; image->animator.play("idle");
-
   image->scripter.addScript("simpleMovement", Scripts::basicMovementScript);
 
+  // may need to refactor terminalCreation into a sytem for the engine
   ScriptRunner *sr =
       new ScriptRunner({WindowTypes::MAIN, WindowTypes::TERMINAL});
   sr->scripter.addScript("terminalCreation", Scripts::terminalCreationScript);
 
-  GeneralContext ctx = {.player = nullptr};
+  GeneralContext ctx = {.player = image};
   GameState::getInstance().updateGeneralContext(ctx);
 }
 } // namespace SceneBuilder

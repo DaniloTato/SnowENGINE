@@ -1,10 +1,24 @@
 #include "GameObject.hpp"
 #include "GameObjectExposure.hpp"
-#include "GameState.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <vector>
 
 unsigned int GameObject::nextId = 0;
+
+bool GameObject::UpdateDomain::matches(WindowManager &wm,
+                                       WindowManager::WindowID id) const {
+  if (std::ranges::find(windows, id) != windows.end()) {
+    return true;
+  }
+
+  auto domain = wm.getDomainOfWindow(id);
+
+  if (std::ranges::find(domains, domain) != domains.end()) {
+    return true;
+  }
+
+  return false;
+}
 
 GameObject::GameObject(UpdateDomain updateDomain, sf::Vector2f pos)
     : position(pos), updateDomain(std::move(updateDomain)) {
@@ -88,20 +102,13 @@ GameObjectExposure::Value::Object GameObject::describe() {
 }
 
 bool GameObject::isUpdateDomainPaused() {
-  for (const auto &i : updateDomain) {
-    if (!GameState::getInstance().getWindowByType(i).isPaused()) {
+  for (const auto id : updateDomain.windows) {
+    if (!WindowManager::getInstance().isWindowPaused(id)) {
       return false;
     }
   }
 
   return true;
-}
-
-GameObject::UpdateDomain GameObject::UniversalDomain() {
-  UpdateDomain domain;
-  for (size_t i = 0; i < static_cast<size_t>(WindowTypes::COUNT); ++i)
-    domain.push_back(static_cast<WindowTypes>(i));
-  return domain;
 }
 
 GameObject *GameObject::findGameObjectById(float id) {

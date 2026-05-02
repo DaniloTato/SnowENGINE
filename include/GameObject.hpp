@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObjectExposure.hpp"
 #include "SFML/System/Vector2.hpp"
-#include "WindowTypes.hpp"
+#include "WindowManager.hpp"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -9,8 +9,22 @@ struct GeneralContext;
 
 class GameObject {
 public:
-  using UpdateDomain = std::vector<WindowTypes>;
-  static UpdateDomain UniversalDomain();
+  struct UpdateDomain {
+    std::vector<WindowManager::WindowID> windows;
+    std::vector<WindowManager::Domain> domains;
+
+    bool matches(WindowManager &wm, WindowManager::WindowID id) const;
+
+    UpdateDomain(WindowManager::WindowID id) : windows({id}) {}
+
+    UpdateDomain(std::vector<WindowManager::WindowID> &&ids)
+        : windows(std::move(ids)) {}
+
+    UpdateDomain(WindowManager::Domain domain) : domains({domain}) {}
+
+    UpdateDomain(std::vector<WindowManager::Domain> &&doms)
+        : domains(std::move(doms)) {}
+  };
 
   GameObject(UpdateDomain updateDomain, sf::Vector2f pos = {0.f, 0.f});
   virtual ~GameObject();

@@ -3,13 +3,15 @@
 #include "AnimationFactory.hpp"
 #include "GameState.hpp"
 #include "TextureManager.hpp"
+#include "WindowManager.hpp"
 #include <string>
 
 template <typename T> class ObjectBuilder {
 public:
   ObjectBuilder(const std::string &textureKey) {
     auto &gs = GameState::getInstance();
-    params.window = gs.getMainWindow();
+    auto &wm = WindowManager::getInstance();
+    params.window = wm.getMain();
     params.texture = &TextureManager::getInstance().get(textureKey);
     params.camera = gs.getMainCamera();
     params.layer = 0.f;

@@ -47,6 +47,7 @@ sf::FloatRect makeRectFromPoints(float x1, float y1, float x2, float y2);
 std::filesystem::path getExecutableDir();
 std::string getPath(const std::string &relativePath);
 float randRange(float min, float max);
-std::optional<WindowTypes> windowPtrToType(const sf::RenderWindow *ptr);
+std::optional<WindowManager::Domain>
+windowPtrToType(const sf::RenderWindow *ptr);
 
 } // namespace Helper
