@@ -101,9 +101,9 @@ void SceneManager::initFadeOverlay() {
   sf::Texture dummyTexture;
 
   RenderizerParameters params{.window =
-                                  *GameState::getInstance().getMainWindow(),
-                              .texture = dummyTexture,
-                              .camera = GameState::getInstance().getUiCamera(),
+                                  GameState::getInstance().getMainWindow(),
+                              .texture = &dummyTexture,
+                              .camera = nullptr,
                               .layer = Constants::OVERLAY_LAYER,
                               .parallax = 1.f,
                               .registerAsRectShape = true};

@@ -4,6 +4,7 @@
 #include "GameCamera.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 #define ENUM_TO_STR =
 
@@ -104,7 +105,8 @@ sf::RenderWindow *GameState::getTerminalWindow() {
 void GameState::clearCameras() {
   for (size_t i = 0; i < activeCameras.size(); i++) {
     if (activeCameras[i] &&
-        static_cast<CameraTypes>(i) != CameraTypes::TERMINAL) {
+        static_cast<CameraTypes>(i) != CameraTypes::TERMINAL &&
+        !activeCameras[i]->isPersistentAcrossScenes()) {
       GameObject::destroy(activeCameras[i]);
     }
   }
@@ -130,6 +132,8 @@ GameCamera *GameState::getUiCamera() const {
   if (activeCameras.size() >= uiCameraIndex) {
     return activeCameras[uiCameraIndex];
   }
+  throw std::runtime_error(
+      "[GameState] [getUiCamera()] UI camera not yet initilized\n");
   return nullptr;
 }
 
@@ -138,6 +142,8 @@ GameCamera *GameState::getTerminalCamera() const {
   if (activeCameras.size() >= consoleCameraIndex) {
     return activeCameras[consoleCameraIndex];
   }
+  throw std::runtime_error(
+      "[GameState] [getTerminalCamera()] Terminal camera not yet initilized\n");
   return nullptr;
 }
 
@@ -219,9 +225,15 @@ GameWindow &GameState::getWindowByType(WindowTypes type) {
 void GameState::updateGeneralContext(GeneralContext &ctx) {
   generalContext = ctx;
 
-  exposedGameState.fields["player"] =
-      GameObjectExposure::makeUnmutableField<GameObjectExposure::Value::Object>(
-          [this] { return generalContext.player->describe(); });
+  exposedGameState.fields["player"] = GameObjectExposure::makeUnmutableField<
+      GameObjectExposure::Value::Object>([this] {
+    if (!generalContext.player) {
+      std::cout
+          << "[GameState] Warning: describing player, but player is nullptr\n";
+      return std::make_shared<GameObjectExposure::Descriptor>();
+    }
+    return generalContext.player->describe();
+  });
 
   exposedGameState.fields["hp"] =
       GameObjectExposure::makePublicField(playerHealth);

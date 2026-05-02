@@ -50,13 +50,17 @@ void GameObject::destroySceneObjects() {
   for (int i = static_cast<int>(objects.size()) - 1; i >= 0; --i) {
     GameObject *obj = objects[i];
 
-    if (!obj->persistentAcrossScenes) {
+    if (!obj->isPersistentAcrossScenes()) {
       destroy(obj);
     }
   }
 }
 
 void GameObject::makePersistentAcrossScenes() { persistentAcrossScenes = true; }
+
+bool GameObject::isPersistentAcrossScenes() const {
+  return persistentAcrossScenes;
+}
 
 unsigned int GameObject::getId() { return id; }
 

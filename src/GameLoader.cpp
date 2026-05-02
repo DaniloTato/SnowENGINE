@@ -9,6 +9,7 @@
 #include "SceneBuilderRegistry.hpp"
 #include "SceneManager.hpp"
 #include "SoundManager.hpp"
+#include "TextureManager.hpp"
 
 #include <fstream>
 #include <nlohmann/json.hpp>
@@ -80,6 +81,21 @@ void GameLoader::loadGameData(const std::string &configFolder) {
   loadCollectables(
       Helper::getPath(configFolder + "/collectableManagerDeclarations.json"));
   loadSounds(Helper::getPath(configFolder + "/soundManagerDeclarations.json"));
-
+  loadTextures(
+      Helper::getPath(configFolder + "/textureManagerDeclarations.json"));
   loadScenes(Helper::getPath(configFolder + "/sceneManagerDeclarations.json"));
+}
+
+void GameLoader::loadTextures(const std::string &path) {
+  std::ifstream file(path);
+  nlohmann::json data;
+  file >> data;
+
+  auto &textureManager = TextureManager::getInstance();
+
+  for (auto &texture : data["textures"]) {
+    std::string id = texture["id"];
+    std::string path = texture["path"];
+    textureManager.load(id, Helper::getPath(path));
+  }
 }

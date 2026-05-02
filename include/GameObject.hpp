@@ -17,6 +17,7 @@ public:
   virtual void update(const GeneralContext &ctx) = 0;
 
   void makePersistentAcrossScenes();
+  [[nodiscard]] bool isPersistentAcrossScenes() const;
 
   virtual std::shared_ptr<GameObjectExposure::Descriptor> describe();
   unsigned int getId();

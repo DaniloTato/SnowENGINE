@@ -1,0 +1,18 @@
+{
+  "format": [
+    {
+      "id": "todd",
+      "path": "assets/sprites/misc/todd.png"
+    }
+  ],
+  "textures": [
+    {
+      "id": "todd",
+      "path": "assets/sprites/misc/todd.png"
+    },
+    {
+      "id": "snowFont",
+      "path": "assets/sprites/misc/font.png"
+    }
+  ]
+}

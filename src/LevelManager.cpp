@@ -93,8 +93,8 @@ void LevelManager::loadLayer(sf::RenderWindow &window, GameCamera *camera,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    RenderizerParameters params{.window = window,
-                                .texture = tilesheet,
+    RenderizerParameters params{.window = &window,
+                                .texture = &tilesheet,
                                 .camera = camera,
                                 .layer = static_cast<float>(layerNo),
                                 .parallax = layers[layerNo].paralax};
@@ -133,8 +133,8 @@ void LevelManager::reloadLayer(sf::RenderWindow &window, GameCamera *camera,
       t.object = nullptr;
     }
 
-    RenderizerParameters params{.window = window,
-                                .texture = tilesheet,
+    RenderizerParameters params{.window = &window,
+                                .texture = &tilesheet,
                                 .camera = camera,
                                 .layer = layerValue,
                                 .parallax = layers[layerNo].paralax};
@@ -193,8 +193,8 @@ void LevelManager::createTile(sf::RenderWindow &window, GameCamera *camera,
 
       t.textureRect = rect;
 
-      RenderizerParameters params{.window = window,
-                                  .texture = tilesheet,
+      RenderizerParameters params{.window = &window,
+                                  .texture = &tilesheet,
                                   .camera = camera,
                                   .layer = layerValue,
                                   .parallax = layers[layerNo].paralax};
@@ -217,8 +217,8 @@ void LevelManager::createTile(sf::RenderWindow &window, GameCamera *camera,
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  RenderizerParameters params{.window = window,
-                              .texture = tilesheet,
+  RenderizerParameters params{.window = &window,
+                              .texture = &tilesheet,
                               .camera = camera,
                               .layer = layerValue,
                               .parallax = layers[layerNo].paralax};

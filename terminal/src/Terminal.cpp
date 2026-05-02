@@ -4,7 +4,6 @@
 #include "GameCamera.hpp"
 #include "GameState.hpp"
 #include "GameText.hpp"
-#include "Helpers.hpp"
 
 #include "SnowlangInstance.hpp"
 
@@ -36,14 +35,15 @@ static size_t countVisualLines(std::string_view s) {
   return lines;
 }
 
-Terminal::Terminal(sf::RenderWindow *window, GameCamera *camera)
+// font texture copied. Bad practice, but whatever. I'll change it eventually.
+Terminal::Terminal(sf::RenderWindow *window, GameCamera *camera,
+                   sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
-      text(new GameText(
-          {.window = *targetWindow,
-           .texture = Helper::loadTexture(Helper::getPath("assets/font.png")),
-           .camera = camera,
-           .layer = Constants::UI_LAYER,
-           .parallax = 1.f})) {
+      text(new GameText({.window = targetWindow,
+                         .texture = fontTexture,
+                         .camera = camera,
+                         .layer = Constants::UI_LAYER,
+                         .parallax = 1.f})) {
 
   s_activeTerminals.push_back(this);
   text->position = {10.f, 10.f};

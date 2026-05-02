@@ -8,7 +8,7 @@
 std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
-    : window(params.window), texture(params.texture), color(sf::Color::White),
+    : window(*params.window), texture(*params.texture), color(sf::Color::White),
       assignedCamera(params.camera), layer(params.layer),
       paralax(params.parallax), show(true), showCountDown(0.f),
       hasCulling(true) {
@@ -135,7 +135,8 @@ void Renderizer::setRect(const sf::IntRect &newRect, int direction) {
   directionRect.left =
       newRect.left + directionRect.width * ((direction - 1) / -2);
   directionRect.width = newRect.width * direction;
-  sprite.setTextureRect(directionRect);
+  rect = directionRect;
+  sprite.setTextureRect(rect);
 }
 
 void Renderizer::renderAll() {

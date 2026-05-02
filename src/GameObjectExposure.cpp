@@ -26,9 +26,11 @@ Value::Object Descriptor::describeActiveCameraList() {
     return Value{.value = GameState::getInstance().getMainCamera()->describe()};
   });
 
-  desc->fields["ui"] = makeConstFieldValue([]() -> Value {
-    return Value{.value = GameState::getInstance().getUiCamera()->describe()};
-  });
+  if (GameState::getInstance().getUiCamera()) {
+    desc->fields["ui"] = makeConstFieldValue([]() -> Value {
+      return Value{.value = GameState::getInstance().getUiCamera()->describe()};
+    });
+  }
 
   desc->fields["terminal"] = makeConstFieldValue([]() -> Value {
     return Value{.value =

@@ -7,7 +7,8 @@
 
 class Terminal {
 public:
-  Terminal(sf::RenderWindow *window, GameCamera *camera);
+  Terminal(sf::RenderWindow *window, GameCamera *camera,
+           sf::Texture *fontTexture);
   ~Terminal();
 
   void handleEvent(const sf::Event &event);

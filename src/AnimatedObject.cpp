@@ -3,7 +3,7 @@
 #include "GeneralContext.hpp"
 
 AnimatedObject::AnimatedObject(RenderizerParameters params)
-    : GameObject({GameState::getInstance().windowPtrToType(&params.window)}),
+    : GameObject({GameState::getInstance().windowPtrToType(params.window)}),
       renderizer(params) {
   Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);
 }

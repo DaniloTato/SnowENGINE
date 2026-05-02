@@ -7,7 +7,7 @@
 
 TangibleObject::TangibleObject(RenderizerParameters params,
                                Animations cachedAnimations)
-    : GameObject({GameState::getInstance().windowPtrToType(&params.window)}),
+    : GameObject({GameState::getInstance().windowPtrToType(params.window)}),
       renderizer(params) {
   animator.setAnimations(cachedAnimations);
   Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);

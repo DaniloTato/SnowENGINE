@@ -37,6 +37,9 @@ int main() {
   inputManager.loadBindingsFromJsonFile(
       (Helper::getPath("config/control_config.json")));
 
+  GameState::getInstance().createCamera(CameraTypes::UI, {WindowTypes::MAIN});
+  GameState::getInstance().getUiCamera()->makePersistentAcrossScenes();
+
   GameLoader loader;
   loader.loadGameData(Helper::getPath("config"));
 
