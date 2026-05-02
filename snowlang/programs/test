@@ -1,0 +1,50 @@
+let fib = (n){
+	if ($n <= 1) do[
+		return $n;
+ 	]done else do[
+		return ($fib($n-1) + $fib($n-2));
+	]done;
+};
+
+let dotimes = (block,n){
+	if ($n > 0) do[
+		$block();
+		$dotimes($block, $n - 1);
+	]done;
+};
+
+let countTo = (n){
+	let x = 0;
+	let b = {
+		$x = $x + 1;
+		print $x;
+	};
+	$dotimes($b,$n);
+	print $x;
+};
+
+let testWhile = () {
+  let i = 0;
+  let sum = 0;
+
+  while (true) do [
+    $i = $i + 1;
+
+    if ($i == 2) do [
+			print "continue";
+      continue;
+    ] done;
+
+    if ($i == 5) do [
+			print "break";
+      break;
+    ] done;
+
+		print "normal loop";
+    $sum = $sum + $i;
+  ] done;
+
+  return $sum;
+};
+
+let x = {return task --do={print "hello world"} --every=2 };

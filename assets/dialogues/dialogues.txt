@@ -1,0 +1,59 @@
+[Key=Greeting]
+#position 128 -30
+#boundary 500
+#effect typewriter 0.05
+#alignment left
+
+Today's a beautiful 
+\<anim=shake:1\> snowy \</anim\> day!
+\<anim=sin\>\<color=yellow\>Day \<color=red\> 6 \</color\> of developing\</color\>\<ln\>\<color=green\> this game.\</color\>\</anim\>
+
+[Key=NPC1]
+#position 0 200
+#boundary 400
+#alignment center
+
+Hola!!!!!!
+
+[Key=test]
+#position 1600 1600
+#boundary 400
+#alignment left
+
+Let's see if this works
+
+[Key=test2]
+#position 0 0
+#boundary 400
+#alignment left
+
+Let's see if this works
+
+[Key=kickTutorial]
+#position 6624 1136
+#boundary 400
+#alignment left
+
+You kick ass!!!
+Kick harder by pressing
+\<color=yellow\>\<anim=sin\>LEFT SHIFT\</anim\>\</color\>
+
+[Key=thanks]
+#position 5 10
+#boundary 258
+#alignment center
+#effect typewriter 0.1
+#soundpool {"assets/sounds/shard.wav"}
+
+So... That was it.
+\<ln\>
+\<color=yellow\>\<anim=shake:2\>for now!\</anim\>\</color\>
+\<ln\>
+expect much more in the \<ln\> future :D
+\<ln\>
+thanks to those who shared
+this \<anim=sin\>18\</sin\> day
+journey with me! 
+\<ln\>
+\<ln\>
+\<color=red\>-with love * - Danilo\</color\>

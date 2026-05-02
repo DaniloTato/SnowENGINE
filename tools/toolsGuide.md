@@ -1,0 +1,1 @@
+python3 tools/create_class.py EnemyRegistry

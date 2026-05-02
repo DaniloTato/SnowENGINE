@@ -1,0 +1,11 @@
+{
+  "format": [
+    {
+      "id": "toy",
+      "texture": "assets/toy.png",
+      "animation": "assets/json/toy.json",
+      "blueprint": "toy"
+    }
+  ],
+  "enemies": []
+}

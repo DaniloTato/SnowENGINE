@@ -1,0 +1,104 @@
+let txt_to_list = (txt){
+
+  let result = list --empty;
+
+  let len = length $txt;
+  let i = 0;
+  let pool = "";
+
+  while ($i < $len) do
+
+    if ($txt[$i] == ";") do
+      push $pool @result;
+      $pool = "";
+    done else do
+      $pool = $pool + $txt[$i];
+    done;
+
+    $i = $i + 1;
+  done;
+
+  push $pool @result;
+
+  return $result;
+};
+
+let make_matrix = (video_list, width, height){
+  let l = list "";
+  let image_index = 0;
+  let line_index = 0;
+  let source_index = 0;
+
+  let matrix = list list "";
+
+  let x = 0;
+  let y = 0;
+
+  let number_of_images = length $video_list;
+
+  while($image_index < $number_of_images) do
+
+    while($y < $height) do
+
+      while($x < $width) do
+        let current_char = $video_list[$image_index][$source_index];
+        $matrix[$image_index][$line_index] = $matrix[$image_index][$line_index] + $current_char;
+        $x = $x + 1;
+        $source_index = $source_index + 1;
+      done;
+
+      $matrix[$image_index] = $matrix[$image_index] + "";
+      $line_index = $line_index + 1;
+
+      $y = $y + 1;
+      $x = 0;
+
+    done;
+
+    push $l @matrix;
+    $image_index = $image_index + 1;
+    $source_index = 0;
+    $line_index = 0;
+    $y = 0;
+
+  done;
+
+  return $matrix;
+
+};
+
+let make_video = (path, width, height){
+  let string = read $path;
+  let video = $make_matrix($txt_to_list($string),$width,$height);
+
+  let frame_number = 0 - 1;
+
+  return {
+    $frame_number = $frame_number + 1;
+    print "frame number: " $frame_number;
+
+    let image = $video[$frame_number];
+    let image_len = length $image;
+
+    let i = 0;
+    while ($i < $image_len) do
+      let line = $image[$i];
+      let line_len = length $line;
+
+      let pixel = 0;
+      while ($pixel < $line_len) do
+
+        if ($line[$pixel] == "0") do
+          tile --at=(list (102 + $pixel) (93 + $i)) --rect=(list (4 * 16) (14 * 16)) ;
+        done else do
+          tile --at=(list (102 + $pixel) (93 + $i)) --rect=(list (7 * 16) (5 * 16)) ;
+        done;
+
+        $pixel = $pixel + 1;
+      done;
+
+      $i = $i + 1;
+
+    done;
+  };
+};

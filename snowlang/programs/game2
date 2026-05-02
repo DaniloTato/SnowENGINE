@@ -1,0 +1,134 @@
+let player_pos_x = 1;
+let player_pos_y = 0;
+
+let player_size_w = 2;
+let player_size_h = 2;
+
+let player_speed_x = 0;
+let player_speed_y = 0;
+
+let player_texture = "0";
+
+let moveX = {
+  $player_pos_x = $player_pos_x + $player_speed_x;
+};
+
+let moveY = {
+  $player_pos_y = $player_pos_y + $player_speed_y;
+};
+
+let updatePlayer = {
+  $moveX();
+
+  $player_speed_x = $player_speed_x * 0.8;
+  $player_speed_y = $player_speed_y + 0.3;
+
+  $moveY();
+
+  if ($player_pos_y >= 5) do
+    $player_pos_y = 5;
+    $player_speed_y = 0;
+  done;
+};
+
+let screen_width  = 20;
+let screen_height = 10;
+let screen_canvas = false;
+
+let clearScreen = {
+  let y = 0;
+  $screen_canvas = list;
+
+  while ($y < $screen_height) do
+    let line = list;
+
+    let x = 0;
+    while ($x < $screen_width) do
+      let space = " ";
+      push $space @line;
+      $x = $x + 1;
+    done;
+
+    push $line @screen_canvas;
+    $y = $y + 1;
+  done;
+};
+
+let displayScreen = {
+  if ($screen_canvas == false) do
+    return false;
+  done;
+
+  let y = 0;
+  while ($y < $screen_height) do
+    let x = 0;
+    while ($x < $screen_width) do
+      print $screen_canvas[$y][$x] --inline --type=false;
+      $x = $x + 1;
+    done;
+    print --jump;
+    $y = $y + 1;
+  done;
+
+  return true;
+};
+
+let drawRect = (pos_x, pos_y, w, h, texture) {
+  let y = $pos_y;
+
+  while ($y < ($pos_y + $h)) do
+    let x = $pos_x;
+    while ($x < ($pos_x + $w)) do
+
+      let insideX = ($x > 0 && $x < ($screen_width - 1));
+      let insideY = ($y > 0 && $y < ($screen_height - 1));
+
+      if ($insideX && $insideY) do
+        $screen_canvas[$y][$x] = $texture;
+      done;
+
+      $x = $x + 1;
+    done;
+    $y = $y + 1;
+  done;
+};
+
+let ground_pos_x = 0;
+let ground_pos_y = $screen_height - 3;
+
+let ground_w = $screen_width;
+let ground_h = 3;
+
+let ground_texture = "/";
+
+let frame = {
+  $clearScreen();
+
+  $drawRect(
+    $ground_pos_x,
+    $ground_pos_y,
+    $ground_w,
+    $ground_h,
+    $ground_texture
+  );
+
+  $updatePlayer();
+
+  $drawRect(
+    $player_pos_x,
+    $player_pos_y,
+    $player_size_w,
+    $player_size_h,
+    $player_texture
+  );
+
+  $displayScreen();
+};
+
+let l = { $player_speed_x = 0 - 2 };
+let r = { $player_speed_x = 2 };
+let j = { $player_speed_y = 0 - 2 };
+
+let start_game = {
+  return task --do=$frame --every=0.1;
+};

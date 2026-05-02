@@ -1,0 +1,11 @@
+{
+  "format": [
+    {
+      "id": "crystal",
+      "texture": "assets/crystal.png",
+      "animation": "assets/json/crystal.json",
+      "blueprint": "crystalBlueprint"
+    }
+  ],
+  "collectables": []
+}

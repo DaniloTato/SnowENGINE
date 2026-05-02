@@ -1,0 +1,24 @@
+{
+    "bindings": {
+        "left": "A",
+        "right": "D",
+        "up": "W",
+        "down": "S",
+        "jump": "M",
+        "zoomIn": "O",
+        "zoomOut": "L",
+        "startAlarm": "Num1",
+        "dramaticZoom": "Num2",
+        "saveLevel": "Num0",
+        "createTile": "Space",
+        "deleteTile": "LControl",
+        "tilePicker": "T",
+        "shoot": "N",
+        "crash": "U",
+        "kick": "LShift",
+        "godMode": "G",
+        "changeGun": "F",
+        "start": "Enter",
+        "terminal": "P"
+    }
+}

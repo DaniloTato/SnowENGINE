@@ -1,0 +1,74 @@
+let txt_to_list = (txt){
+
+  let result = list --empty;
+
+  let len = length $txt;
+  let i = 0;
+  let pool = "";
+
+  while ($i < $len) do
+
+    if ($txt[$i] == ";") do
+      push $pool @result;
+      $pool = "";
+    done else do
+      $pool = $pool + $txt[$i];
+    done;
+
+    $i = $i + 1;
+  done;
+
+  push $pool @result;
+
+  return $result;
+};
+
+let make_video = (path, width, height){
+
+  let string = read $path;
+  let video = $txt_to_list($string);
+
+  let frame_number = 0-1;
+
+  let black = list 64 224 ;
+  let white = list 112 80 ;
+
+  return {
+
+    $frame_number = $frame_number + 1;
+
+    let frame = $video[$frame_number];
+    let frame_len = length $frame;
+
+    let pixel = 0;
+
+    while ($pixel < $frame_len) do
+
+      let x = $pixel % $width;
+      let y = $pixel / $width;
+
+      if ($frame[$pixel] == "0") do
+        tile --at=(list (102 + $x) (93 + $y)) --rect=$white ;
+      done else do
+        tile --at=(list (102 + $x) (93 + $y)) --rect=$black ;
+      done;
+
+      $pixel = $pixel + 1;
+
+    done;
+
+    return $frame_number;
+  };
+};
+
+let apple = {
+  $state.camera.main.zoom = 0.5;
+  let next = $make_video("snowlang/programs/apple3.txt",40,40);
+  let id = task --do={
+    let frame = $next();
+    print $frame;
+    if ($frame == 199) do
+      task --kill=$id;
+    done;
+  } --every=0.15;
+}

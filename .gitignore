@@ -1,0 +1,65 @@
+# --- Build files / binaries ---
+build/
+bin/
+obj/
+out/
+dist/
+*.exe
+*.out
+*.app
+
+# --- Compiled object files ---
+*.o
+*.obj
+*.lo
+*.a
+*.la
+*.lib
+*.dll
+*.so
+*.dylib
+
+# --- SFML / Libraries ---
+# (No need to ignore SFML itself unless you're storing it inside the repo)
+extlibs/
+
+# --- IDE / Editors ---
+# VS Code
+.vscode/
+.code-workspace
+
+# CLion / JetBrains
+.idea/
+
+# Xcode
+*.xcworkspace
+*.xcuserdatad
+*.xcuserdata
+DerivedData/
+
+# --- MacOS metadata ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# --- Logs / temp files ---
+*.log
+*.tmp
+*.temp
+
+# --- Cache ---
+cache/
+*.cache
+
+*.iml
+
+.clangd
+.clang-tidy
+compile_commands.json
+
+snowgun
+
+windowsmake.txt
+
+*.py
+*.zip

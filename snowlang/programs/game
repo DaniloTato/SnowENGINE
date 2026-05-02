@@ -1,0 +1,142 @@
+let abs = (n){
+	if ($n < 0) do[
+		return 0 - $n;
+	]done;
+	return $n;
+};
+
+let player = obj[
+	pos = obj[
+		x = 1;
+		y = 0;
+	]end;
+
+	size = obj[
+		width = 2;
+		height = 2;
+	]end;
+
+	speed = obj[
+		x = 0;
+		y = 0;
+	]end;
+
+	texture = "0";
+
+	update = {
+		this.moveX();
+		this.speed.x = this.speed.x * 0.8;
+
+		this.speed.y = this.speed.y + 0.3;
+		this.moveY();
+
+		if (this.pos.y >= 5) do 
+			this.pos.y = 5;
+			this.speed.y = 0;
+		done;
+	};
+
+	moveX = {
+		this.pos.x = this.pos.x + this.speed.x;
+	};
+
+	moveY = {
+		this.pos.y = this.pos.y + this.speed.y;
+	};
+]end;
+
+let screen = obj[
+	width = 20;
+	height = 10;
+	canvas = false;
+
+	clear = {
+		let x = 0;
+		let y = 0;
+
+		this.canvas = list;
+
+		while ($y < this.height) do
+			this.canvas = this.canvas + 0;
+			this.canvas[$y] = list;
+
+			let x = 0;
+			while ($x < this.width) do
+				this.canvas[$y] = this.canvas[$y] + " ";
+				$x = $x + 1;
+			done;
+
+			$y = $y + 1;
+		done;
+	};
+
+	display = {
+		if(this.canvas == false) do
+			return false;
+		done;
+
+		let y = 0;
+
+		while ($y < this.height) do
+			let x = 0;
+			while ($x < this.width) do
+        print this.canvas[$y][$x] --inline --type=false ;
+        $x = $x + 1;
+      done;
+			print --jump ;
+			$y = $y + 1;
+		done; 
+
+		return true;
+	};
+
+	draw = (drawable){
+    let y = $drawable.pos.y;
+    while ($y < ($drawable.size.height + $drawable.pos.y)) do
+      let x = $drawable.pos.x;
+      while ($x < ($drawable.size.width + $drawable.pos.x)) do
+
+				let insideCanvasX = ($x > 0 && $x < (this.width - 1));
+				let insideCanvasY = ($y > 0 && $y < (this.height - 1));
+
+				if ($insideCanvasX && $insideCanvasY) do
+					this.canvas[$y][$x] = $drawable.texture;
+				done;
+
+				$x = $x + 1;
+      done;
+			$y = $y + 1;
+    done;  
+  };
+] end;
+
+let groundBox = obj[
+
+	size = obj[
+		width = $screen.width;
+		height = 3;
+	]end;
+
+	pos = obj[
+		x = 0;
+		y = $screen.height - 3;
+	]end;
+
+	texture = "/";
+]end;
+
+let frame = {
+	$screen.clear(); 
+	$screen.draw($groundBox); 
+	$player.update(); 
+	$screen.draw($player); 
+	$screen.display()
+};
+
+let l = {$player.speed.x = 0-2};
+let r = {$player.speed.x = 2};
+let j = {$player.speed.y = 0-2};
+
+let start_game = {
+	return task --do=$frame --every=0.1 ;
+};

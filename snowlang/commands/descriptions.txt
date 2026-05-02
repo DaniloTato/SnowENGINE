@@ -1,0 +1,191 @@
+[echo]
+\<color=yellow\>usage: echo <values...>\</color\>
+\<ln\>
+\<color=cyan\>Prints all arguments to stdout.\</color\>
+\<ln\>
+Each argument is converted to a string representation.
+\<ln\>
+Example:
+  echo "Hello" 42 true
+
+
+[list]
+\<color=yellow\>usage: list <values...>\</color\>
+\<ln\>
+\<color=cyan\>Returns a Snowlang::List Runtime Value containing all of the values.\</color\>
+
+[run]
+\<color=yellow\>usage: run <file>\</color\>
+\<ln\>
+Executes a Snowlang script file.
+\<ln\>
+The file is read entirely and evaluated in the current runtime context.
+\<ln\>
+Example:
+  run "init.snow"
+
+
+[print]
+\<color=yellow\>usage: print [--type=<bool>] [--inline] [--jump] <values...>\</color\>
+\<ln\>
+\<color=cyan\>Prints runtime values.\</color\>
+\<ln\>
+Flags:
+  --type        Show runtime type information (default: true)
+  --inline      Print without line breaks
+  --jump        Print a blank line before output
+
+
+[write]
+\<color=yellow\>usage: write <path> <text> [--append=<bool> | --noappend] [--jump]\</color\>
+\<ln\>
+\<color=cyan\>Writes text to a file.\</color\>
+\<ln\>
+Options:
+  --append      Append to file (default)
+  --noappend    Overwrite file
+  --jump        Append a newline after text
+
+
+[watch]
+\<color=yellow\>usage: watch <cell> <lambda>\</color\>
+\<ln\>
+\<color=cyan\>Registers a watcher on a cell.\</color\>
+\<ln\>
+The lambda is executed every time the cell value changes.
+
+
+[task]
+\<color=yellow\>usage: task --do=<lambda> --every=<seconds>\</color\>
+       task --list
+       task --kill=<id>
+       task --killall
+       task --pause=<id>
+\<ln\>
+\<color=cyan\>Manages scheduled tasks.\</color\>
+\<ln\>
+Options:
+  --do          Lambda to execute
+  --every       Interval in seconds
+  --list        List all scheduled tasks
+  --kill        Kill a task by id
+  --killall     Kill all tasks
+  --pause       Toggle pause on a task
+
+
+[game_get]
+\<color=yellow\>usage: game_get <id>\</color\>
+\<ln\>
+\<color=cyan\>Returns a game object descriptor by id.\</color\>
+\<ln\>
+If no object exists with the given id, an error is raised.
+
+
+[find_class]
+\<color=yellow\>usage: find_class <class_name> [--print] [--max=n]\</color\>
+\<ln\>
+\<color=cyan\>Finds all game objects of a given class.\</color\>
+\<ln\>
+Supported classes:
+  - game_object
+  - script_runner
+  - tangible_object
+  - game_camera
+  - renderable_object
+\<ln\>
+Options:
+  --print             Print all found ids
+  --max=<number>      Limit number of returned ids
+\<ln\>
+Example:
+  find_class "script_runner" --print --max=10
+
+
+
+[push]
+\<color=yellow\>usage: push <value> <@list>\</color\>
+\<ln\>
+\<color=cyan\>Appends a value to the end of a list by reference.\</color\>
+\<ln\>
+Notes:
+  - The second argument must be a reference to a list (use @)
+  - The list is modified in place
+  - Any value type can be pushed
+\<ln\>
+Example:
+  let l = list 1 2 3
+  push 4 @l
+
+
+
+[scene]
+\<color=yellow\>usage: scene <scene_name> | scene --reload\</color\>
+\<ln\>
+\<color=cyan\>Loads a new scene or reloads the current one.\</color\>
+\<ln\>
+Arguments:
+  \<scene_name\>        Name of a registered scene to load
+\<ln\>
+Options:
+  --reload            Reload the currently active scene
+\<ln\>
+Notes:
+  - Scene names must be registered before use
+  - If a scene does not exist, the command returns false
+  - Scene transitions respect the current transition state
+\<ln\>
+Example:
+  scene "tutorial"
+  scene "level2"
+  scene --reload
+
+
+
+[share]
+\<color=yellow\>usage: share <field_name> <value>\</color\>
+\<ln\>
+\<color=cyan\>Writes a value into shared memory.\</color\>
+\<ln\>
+Arguments:
+  <field_name>        Name of the shared field (string)
+  <value>             Runtime value to store
+\<ln\>
+Notes:
+  - The field must already exist in shared memory
+  - Overwrites the current value stored in the field
+  - Returns true on success
+  - Raises an error if the field does not exist
+\<ln\>
+Example:
+  share "score" 150
+  share "player_name" "Alice"
+
+
+[tile]
+\<color=yellow\>usage: tile --at=<list[x,y]> [--rect=<list[x,y]>] [--layer=<number>] [--destroy]\</color\>
+\<ln\>
+\<color=cyan\>Creates or destroys a tile in the level grid.\</color\>
+\<ln\>
+Required flags:
+  --at                List containing tile position [x, y]
+\<ln\>
+Optional flags:
+  --rect              Texture rectangle offset [x, y] (default: [0, 0])
+  --layer             Tile layer index (default: 0)
+  --destroy           Deletes the tile instead of creating one
+\<ln\>
+Behavior:
+  - If --destroy is present, the tile at the given position and layer is removed
+  - Otherwise, a tile is created using the specified texture rectangle
+  - Rectangle width and height use the engine's TILE_SIZE constant
+\<ln\>
+Notes:
+  - Positions and rectangle values must be numeric
+  - Layer is converted to an integer internally
+  - Returns true after queuing the operation
+\<ln\>
+Examples:
+  tile --at=(list 5 3)
+  tile --at=(list 10 4) --rect=(list 32 0)
+  tile --at=(list 8 2) --layer=1
+  tile --at=(list 8 2) --layer=1 --destroy

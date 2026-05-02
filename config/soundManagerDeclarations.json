@@ -1,0 +1,9 @@
+{
+  "format": [
+    {
+      "id": "shoot",
+      "path": "assets/sounds/buster.wav"
+    }
+  ],
+  "sounds": []
+}
