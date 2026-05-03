@@ -9,11 +9,10 @@
 template <typename T> class ObjectBuilder {
 public:
   ObjectBuilder(const std::string &textureKey) {
-    auto &gs = GameState::getInstance();
-    auto &wm = WindowManager::getInstance();
+    WindowManager &wm = WindowManager::getInstance();
     params.window = wm.getMain();
     params.texture = &TextureManager::getInstance().get(textureKey);
-    params.camera = gs.getMainCamera();
+    params.camera = nullptr;
     params.layer = 0.f;
     params.parallax = 1.f;
   }

@@ -53,6 +53,9 @@ WindowManager::getAll() const {
   return windows;
 }
 
+// Right now, inefficient. It allocates a vector each frame.
+// Better approaach would be to update and cache the sets only when a window is
+// created
 std::vector<WindowManager::WindowID> WindowManager::getByDomain(Set set) {
 
   std::vector<WindowID> result;

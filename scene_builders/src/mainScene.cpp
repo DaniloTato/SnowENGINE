@@ -1,9 +1,11 @@
 #include "mainScene.hpp"
 
 #include "GameState.hpp"
+#include "LevelManager.hpp"
 #include "ScriptRunner.hpp"
 #include "TangibleObject.hpp"
 
+#include "Helpers.hpp"
 #include "ObjectBuilder.hpp"
 
 /*Scripts*/
@@ -34,8 +36,15 @@ void mainScene() {
           Helper::getPath("assets/animations/particles.json")));
   */
 
+  LevelManager::getInstance().loadLevel(
+      WindowManager::getInstance().getMain(),
+      GameState::getInstance().getMainCamera(),
+      Helper::getPath("assets/levels/Level1.json"));
+
+  // add a window param in Object Builder
   auto *image = ObjectBuilder<TangibleObject>("todd")
                     .at(100, 100)
+                    .onCamera(CameraTypes::MAIN)
                     .withEmptyAnimation(16, 16)
                     .build();
 

@@ -1,0 +1,18 @@
+{
+    "tile_size": 16,
+    "tileset": "assets/sprites/tilesets/level1Tileset.png",
+    "layers": [
+        {
+            "name": "default",
+            "parallax": 1.0,
+            "tiles": [
+                {
+                    "tex_x": 0,
+                    "tex_y": 0,
+                    "x": 100,
+                    "y": 100
+                }
+            ]
+        }
+    ]
+}

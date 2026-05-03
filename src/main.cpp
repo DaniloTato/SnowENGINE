@@ -103,6 +103,8 @@ int main() {
       }
     }
 
+    // IDEA: Group objects by domain like windows and only call a certain domain
+    // to update.
     for (GameObject *gameObject : GameObject::getGameObjects()) {
       if (gameObject && !gameObject->isUpdateDomainPaused()) {
         gameObject->update(gameState.getGeneralContext());

@@ -12,7 +12,7 @@
 using json = nlohmann::json;
 
 LevelManager::LevelManager()
-    : activeLayer(0),
+    : activeLayer(0), isLevelLoaded(false),
       cameraPlayerRelation(Constants::STARTING_PLAYER_CAMERA_RELATION),
       backgroundColor(ColorPalette::Black) {}
 
@@ -25,11 +25,14 @@ sf::Color &LevelManager::getBackgroundColor() { return backgroundColor; }
 
 void LevelManager::loadLevel(WindowManager::WindowID window, GameCamera *camera,
                              const std::string &path) {
+
   layers.clear();
 
   std::ifstream file(path);
-  if (!file.is_open())
-    throw std::runtime_error("Failed to open level file: " + path);
+  if (!file.is_open()) {
+    throw LevelManager::Error("[LevelManager] Failed to open level file: " +
+                              path);
+  }
 
   loadedLevelpath = path;
 
@@ -37,7 +40,12 @@ void LevelManager::loadLevel(WindowManager::WindowID window, GameCamera *camera,
 
   tilesetPath = data["tileset"].get<std::string>();
 
-  tilesheet.loadFromFile(Helper::getPath(tilesetPath));
+  if (!tilesheet.loadFromFile(Helper::getPath(tilesetPath))) {
+    std::cerr << "[LevelManager] Failed to open tileset texture path: " +
+                     tilesetPath + ". Check the path closely for errors.\n";
+    return;
+  }
+
   int tileSize = data["tile_size"];
 
   auto &jsonLayers = data["layers"];
@@ -59,6 +67,8 @@ void LevelManager::loadLevel(WindowManager::WindowID window, GameCamera *camera,
       }
     }
   }
+
+  isLevelLoaded = true;
 }
 
 void LevelManager::deleteLayerObjects(int layerNo) {
@@ -113,12 +123,16 @@ void LevelManager::loadLayer(WindowManager::WindowID window, GameCamera *camera,
 
 void LevelManager::reloadAllLayers(WindowManager::WindowID window,
                                    GameCamera *camera) {
+  ensureLevelLoaded();
   for (size_t i = 0; i < layers.size(); ++i)
     reloadLayer(window, camera, i);
 }
 
 void LevelManager::reloadLayer(WindowManager::WindowID window,
                                GameCamera *camera, size_t layerNo) {
+
+  ensureLevelLoaded();
+
   auto &tiles = layers[layerNo].tiles;
 
   auto layerValue = static_cast<float>(layerNo);
@@ -148,27 +162,30 @@ void LevelManager::reloadLayer(WindowManager::WindowID window,
 void LevelManager::createTile(WindowManager::WindowID window,
                               GameCamera *camera, int layerNo, int x, int y,
                               sf::IntRect rect) {
+  ensureLevelLoaded();
 
   size_t unsignedX = x;
   size_t unsignedY = y;
 
   if (layerNo < 0 || layerNo >= (int)layers.size()) {
-    std::cerr << "[createTile] ERROR: Invalid layerNo: " << layerNo << "\n";
+    std::cerr << "[LevelManager][createTile] ERROR: Invalid layerNo: "
+              << layerNo << "\n";
     return;
   }
 
   if (layerNo == 0) {
     if (x < 0 || y < 0) {
-      std::cerr << "[createTile] ERROR: Negative tile coordinates: (" << x
-                << ", " << y << ")\n";
+      std::cerr
+          << "[LevelManager][createTile] ERROR: Negative tile coordinates: ("
+          << x << ", " << y << ")\n";
       return;
     }
 
     if ((unsignedY >= levelLayout.size() ||
          unsignedX >= levelLayout[y].size())) {
-      std::cerr
-          << "[createTile] ERROR: Tile coordinates out of levelLayout bounds: ("
-          << x << ", " << y << ")\n";
+      std::cerr << "[LevelManager][createTile] ERROR: Tile coordinates out of "
+                   "levelLayout bounds: ("
+                << x << ", " << y << ")\n";
       return;
     }
   }
@@ -234,6 +251,8 @@ void LevelManager::createTile(WindowManager::WindowID window,
 
 void LevelManager::deleteTile(int layerNo, int x, int y) {
 
+  ensureLevelLoaded();
+
   size_t unsignedX = x;
   size_t unsignedY = y;
 
@@ -260,6 +279,9 @@ void LevelManager::deleteTile(int layerNo, int x, int y) {
 }
 
 void LevelManager::saveLevel(const std::string &path) {
+
+  ensureLevelLoaded();
+
   json data;
 
   data["tile_size"] = Constants::TILE_SIZE;
@@ -285,7 +307,7 @@ void LevelManager::saveLevel(const std::string &path) {
 
   std::ofstream file(path);
   if (!file.is_open()) {
-    std::cerr << "Failed to open " << path << " for writing!\n";
+    std::cerr << "[LevelManager] Failed to open " << path << " for writing!\n";
     return;
   }
 
@@ -294,22 +316,33 @@ void LevelManager::saveLevel(const std::string &path) {
 }
 
 const std::vector<std::vector<int>> &LevelManager::getLevelLayout() const {
+  ensureLevelLoaded();
   return levelLayout;
 }
 
-sf::Texture &LevelManager::getTilesheet() { return tilesheet; }
+sf::Texture &LevelManager::getTilesheet() {
+  ensureLevelLoaded();
+  return tilesheet;
+}
 
 const LayerInfo LevelManager::getLayerInfo(int layerNo) const {
+  ensureLevelLoaded();
+  if (layerNo >= static_cast<int>(layers.size())) {
+    throw("[LevelManager] Accessing non existing layer\n");
+  }
+
   return layers[layerNo];
 }
 
 void LevelManager::queueCreateTile(WindowManager::WindowID window,
                                    GameCamera *camera, int layer, int x, int y,
                                    const sf::IntRect &rect) {
+  ensureLevelLoaded();
   createQueue.push_back({window, camera, layer, x, y, rect});
 }
 
 void LevelManager::queueDeleteTile(int layer, int x, int y) {
+  ensureLevelLoaded();
   deleteQueue.push_back({layer, x, y});
 }
 
@@ -359,10 +392,12 @@ void LevelManager::setBackgroundColor(sf::Color newColor) {
 }
 
 const std::string &LevelManager::getLoadedLevelPath() const {
+  ensureLevelLoaded();
   return loadedLevelpath;
 }
 
 void LevelManager::setSecretLayerOppacity(float oppacity) {
+  ensureLevelLoaded();
   auto it = std::ranges::find_if(
       layers, [](const LayerInfo &layer) { return layer.name == "secret"; });
 
@@ -375,5 +410,12 @@ void LevelManager::setSecretLayerOppacity(float oppacity) {
             sf::Color(255, 255, 255, static_cast<sf::Uint8>(oppacity)));
       }
     }
+  }
+}
+
+void LevelManager::ensureLevelLoaded() const {
+  if (!isLevelLoaded) {
+    throw LevelManager::Error(
+        "[LevelManager] Can't execute action. No level loaded");
   }
 }

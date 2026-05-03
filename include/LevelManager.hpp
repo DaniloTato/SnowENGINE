@@ -37,28 +37,26 @@ struct LayerInfo {
 
 class LevelManager : public SceneAware {
 public:
+  // Later Expand to error pipeline for the whole engine.
+  struct Error {
+    Error(std::string &&message) : message(message) {}
+    std::string message;
+  };
+
   static LevelManager &getInstance();
 
   void loadLevel(WindowManager::WindowID window, GameCamera *camera,
                  const std::string &path);
-  void loadLayer(WindowManager::WindowID window, GameCamera *camera,
-                 size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
-
-  void createTile(WindowManager::WindowID window, GameCamera *camera,
-                  int layerNo, int x, int y, sf::IntRect rect);
-
-  void deleteTile(int layerNo, int x, int y);
   void saveLevel(const std::string &path);
-
-  void deleteLayerObjects(int layerNo);
-  void reloadAllLayers(WindowManager::WindowID window, GameCamera *camera);
-  void reloadLayer(WindowManager::WindowID window, GameCamera *camera,
-                   size_t layerNo);
 
   void queueCreateTile(WindowManager::WindowID window, GameCamera *camera,
                        int layer, int x, int y, const sf::IntRect &rect);
   void queueDeleteTile(int layer, int x, int y);
   void applyQueuedTileChanges();
+
+  void reloadAllLayers(WindowManager::WindowID window, GameCamera *camera);
+  void reloadLayer(WindowManager::WindowID window, GameCamera *camera,
+                   size_t layerNo);
 
   void setSecretLayerOppacity(float oppacity);
 
@@ -75,6 +73,8 @@ public:
   const std::vector<std::vector<int>> &getLevelLayout() const;
 
   sf::Texture &getTilesheet();
+
+  // MUST Refactor later to turn them into private members
   std::vector<LayerInfo> layers;
   int activeLayer;
 
@@ -85,7 +85,19 @@ public:
   LevelManager &operator=(LevelManager &&) = delete;
 
 private:
+  void createTile(WindowManager::WindowID window, GameCamera *camera,
+                  int layerNo, int x, int y, sf::IntRect rect);
+  void deleteTile(int layerNo, int x, int y);
+  void deleteLayerObjects(int layerNo);
+
+  void loadLayer(WindowManager::WindowID window, GameCamera *camera,
+                 size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
+
+  void ensureLevelLoaded() const;
+
   LevelManager();
+
+  bool isLevelLoaded;
 
   sf::Texture tilesheet;
   sf::Vector2f cameraPlayerRelation;
