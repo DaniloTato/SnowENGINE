@@ -142,7 +142,8 @@ bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos) {
   return collided;
 }
 
-void BasicCollider::debugRender(sf::RenderWindow &window, GameCamera &camera,
+void BasicCollider::debugRender(WindowManager::WindowID window,
+                                GameCamera &camera,
                                 const sf::Vector2f &objectPos) {
 
   sf::Vector2f posWithCamera = camera.worldToScreen(objectPos + offset);
@@ -156,5 +157,5 @@ void BasicCollider::debugRender(sf::RenderWindow &window, GameCamera &camera,
   rect.setOutlineColor(sf::Color(255, 0, 0, 150));
   rect.setOutlineThickness(1.f);
 
-  window.draw(rect);
+  WindowManager::getInstance().drawOnWindow(window, rect);
 }

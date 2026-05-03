@@ -29,14 +29,18 @@ public:
 
   WindowID create(Set set, int w, int h, const std::string &name);
 
-  sf::RenderWindow *get(WindowID id);
-  [[nodiscard]] const sf::RenderWindow *get(WindowID id) const;
   void destroy(WindowID id);
 
   [[nodiscard]] const std::unordered_map<WindowID, WindowEntry> &getAll() const;
 
   std::vector<WindowID> getByDomain(Set set);
   [[nodiscard]] Set getDomainOfWindow(WindowID id) const;
+
+  void drawOnWindow(WindowID id, const sf::Sprite &toDraw);
+  void drawOnWindow(WindowID id, const sf::RectangleShape &toDraw);
+  void drawOnWindow(WindowID id, const sf::Text &toDraw);
+
+  void clearWindow(WindowID id, sf::Color backgroundColor = sf::Color::Black);
 
   void pauseWindow(WindowID id);
   void resumeWindow(WindowID id);
@@ -49,4 +53,6 @@ public:
 
   WindowID getMain();
   [[nodiscard]] bool isMainWindowAlive() const;
+
+  bool pollEventOnWindow(WindowID id, sf::Event &event);
 };

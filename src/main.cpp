@@ -60,7 +60,7 @@ int main() {
       if (entry.set == WindowManager::Set::TERMINAL)
         continue;
 
-      while (windowManager.get(id)->pollEvent(event)) {
+      while (windowManager.pollEventOnWindow(id, event)) {
         if (entry.set == WindowManager::Set::MAIN) {
           inputManager.handleEvent(event);
         }
@@ -96,10 +96,10 @@ int main() {
     for (const auto &[id, entry] : windows) {
 
       if (entry.set == WindowManager::Set::MAIN) {
-        windowManager.get(id)->clear(
-            LevelManager::getInstance().getBackgroundColor());
+        windowManager.clearWindow(
+            id, LevelManager::getInstance().getBackgroundColor());
       } else {
-        windowManager.get(id)->clear();
+        windowManager.clearWindow(id);
       }
     }
 

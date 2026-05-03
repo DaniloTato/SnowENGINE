@@ -30,26 +30,15 @@ WindowManager::WindowID WindowManager::create(Set set, int w, int h,
   return id;
 }
 
-sf::RenderWindow *WindowManager::get(WindowID id) {
-  auto it = windows.find(id);
-  if (it == windows.end()) {
-    return nullptr;
-  }
-  return it->second.window.getWindow();
-}
-
-const sf::RenderWindow *WindowManager::get(WindowID id) const {
-  return fetchGameWindow(id)->getWindow();
-}
-
 void WindowManager::destroy(WindowID id) {
   auto it = windows.find(id);
   if (it == windows.end())
     return;
 
+  // Maybe fetch Game Window should return a iterator
   auto *win = it->second.window.getWindow();
 
-  Renderizer::unregisterByWindow(win);
+  Renderizer::unregisterByWindow(id);
 
   if (win && win->isOpen()) {
     win->close();
@@ -169,4 +158,28 @@ void WindowManager::checkRenderFlag(WindowID id) {
     window->getWindow()->display();
     window->markAsRendered();
   }
+}
+
+void WindowManager::drawOnWindow(WindowID id, const sf::Sprite &toDraw) {
+  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  window->draw(toDraw);
+}
+
+void WindowManager::drawOnWindow(WindowID id,
+                                 const sf::RectangleShape &toDraw) {
+  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  window->draw(toDraw);
+}
+
+void WindowManager::drawOnWindow(WindowID id, const sf::Text &toDraw) {
+  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  window->draw(toDraw);
+}
+
+bool WindowManager::pollEventOnWindow(WindowID id, sf::Event &event) {
+  return fetchGameWindow(id)->getWindow()->pollEvent(event);
+}
+
+void WindowManager::clearWindow(WindowID id, sf::Color backgroundColor) {
+  fetchGameWindow(id)->getWindow()->clear(backgroundColor);
 }

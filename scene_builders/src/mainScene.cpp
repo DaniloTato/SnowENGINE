@@ -9,6 +9,7 @@
 /*Scripts*/
 #include "basicMovementScript.hpp"
 #include "terminalCreationScript.hpp"
+#include "tilePickerCreationScript.hpp"
 
 #include "RegistryMacros.hpp"
 #include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
@@ -44,6 +45,8 @@ void mainScene() {
   ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
       {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}));
   sr->scripter.addScript("terminalCreation", Scripts::terminalCreationScript);
+  sr->scripter.addScript("tilePickerCreation",
+                         Scripts::tilePickerCreationScript);
 
   GeneralContext ctx = {.player = nullptr};
   GameState::getInstance().updateGeneralContext(ctx);

@@ -8,8 +8,7 @@
 std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
-    : window(*WindowManager::getInstance().get(params.window)),
-      texture(*params.texture), color(sf::Color::White),
+    : window(params.window), texture(*params.texture), color(sf::Color::White),
       assignedCamera(params.camera), layer(params.layer),
       paralax(params.parallax), show(true), showCountDown(0.f),
       hasCulling(true) {
@@ -32,13 +31,13 @@ void Renderizer::unregisterPair(Renderizer *rend) {
                 [&](const RenderEntry &e) { return e.renderizer == rend; });
 }
 
-void Renderizer::unregisterByWindow(sf::RenderWindow *window) {
+void Renderizer::unregisterByWindow(WindowManager::WindowID window) {
   std::erase_if(registry, [&](const RenderEntry &e) {
-    return &e.renderizer->getWindow() == window;
+    return e.renderizer->getWindow() == window;
   });
 }
 
-const sf::RenderWindow &Renderizer::getWindow() const { return window; }
+WindowManager::WindowID Renderizer::getWindow() const { return window; }
 
 void Renderizer::assignCamera(GameCamera *cam) { assignedCamera = cam; }
 
@@ -66,6 +65,8 @@ bool Renderizer::isVisible() const {
 
 void Renderizer::render(GameObject *obj) {
 
+  WindowManager &windowManager = WindowManager::getInstance();
+
   sf::Vector2f position = obj->position + obj->offset;
 
   sprite.setColor(color);
@@ -85,7 +86,7 @@ void Renderizer::render(GameObject *obj) {
     sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
   }
 
-  window.draw(sprite);
+  windowManager.drawOnWindow(window, sprite);
 
   if (GameState::getInstance().getPrintingObjectIds()) {
     static sf::Font idTextFont;
@@ -102,7 +103,7 @@ void Renderizer::render(GameObject *obj) {
     idText.setFillColor(sf::Color::White);
     idText.setOutlineColor(sf::Color::Black);
     idText.setOutlineThickness(1.5f);
-    window.draw(idText);
+    windowManager.drawOnWindow(window, idText);
   }
 }
 
@@ -123,7 +124,7 @@ void Renderizer::renderRectShape(GameObject *obj) {
                       assignedCamera->getZoom());
   }
 
-  window.draw(rectShape);
+  WindowManager::getInstance().drawOnWindow(window, rectShape);
 }
 
 void Renderizer::setColor(sf::Color newColor) { color = newColor; }

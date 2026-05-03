@@ -32,7 +32,7 @@ public:
   bool shouldIRender();
   void turnOffCulling();
 
-  const sf::RenderWindow &getWindow() const;
+  WindowManager::WindowID getWindow() const;
 
   void hide();
 
@@ -40,13 +40,13 @@ public:
 
   static void registerPair(GameObject *obj, Renderizer *rend, bool isRectShape);
   static void unregisterPair(Renderizer *rend);
-  static void unregisterByWindow(sf::RenderWindow *window);
+  static void unregisterByWindow(WindowManager::WindowID window);
 
   static void renderAll();
   void showSprite();
 
 protected:
-  sf::RenderWindow &window;
+  WindowManager::WindowID window;
   sf::Sprite sprite;
   sf::Texture &texture;
   sf::IntRect rect;

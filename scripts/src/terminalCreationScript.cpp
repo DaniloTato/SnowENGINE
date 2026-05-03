@@ -28,9 +28,8 @@ void terminalCreationScript(ScriptRunner &renderable,
 
   if (s_terminal) {
     sf::Event event;
-    while (WindowManager::getInstance()
-               .get(s_terminal->getTargetWindow())
-               ->pollEvent(event)) {
+    while (WindowManager::getInstance().pollEventOnWindow(
+        s_terminal->getTargetWindow(), event)) {
 
       if (event.type == sf::Event::Closed) {
         if (s_terminal->isOpen()) {

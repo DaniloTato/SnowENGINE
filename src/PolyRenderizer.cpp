@@ -29,6 +29,6 @@ void PolyRenderizer::render(GameObject *obj) {
         assignedCamera->worldToScreen(command.pos, finalParalax);
     sprite.setPosition(screenPos);
     sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
-    window.draw(sprite);
+    WindowManager::getInstance().drawOnWindow(window, sprite);
   }
 }
