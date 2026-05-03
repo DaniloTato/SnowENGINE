@@ -37,7 +37,14 @@ RuntimeValue sceneCommand(const CommandContext &ctx) {
 
   const auto &sceneName = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[0]);
 
-  return {sceneManager.loadScene(sceneName)};
+  bool success = sceneManager.loadScene(sceneName);
+
+  if (!success) {
+    throwError(SnowErr::Phase::Evaluator,
+               "[scene] Could not load the following scene: " + sceneName, ctx.cmd.span);
+  }
+
+  return {success};
 }
 
 } // namespace Snowlang::Commands
