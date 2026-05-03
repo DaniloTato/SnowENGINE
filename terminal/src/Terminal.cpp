@@ -11,7 +11,7 @@
 #include <ranges>
 #include <string_view>
 
-static constexpr size_t MAX_LINES = 55;
+static constexpr size_t MAX_LINES = 37;
 
 std::vector<Terminal *> Terminal::s_activeTerminals;
 
@@ -48,7 +48,7 @@ Terminal::Terminal(WindowManager::WindowID window, GameCamera *camera,
   text->position = {10.f, 10.f};
   text->makePersistentAcrossScenes();
 
-  history.emplace_back(R"(\<color=cyan\>Snowgun Developer Console\</color\>)");
+  history.emplace_back(R"(\<color=cyan\>SNOWLANG Developer Console\</color\>)");
   history.emplace_back(
       R"(Type \<color=yellow\>print_commands\</color\> for command listing\<ln\>)");
 

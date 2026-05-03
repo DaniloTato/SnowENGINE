@@ -16,7 +16,7 @@ void terminalCreationScript(ScriptRunner &renderable,
     if (!s_terminal) {
       std::cout << "creating terminal\n";
       const WindowManager::WindowID id = WindowManager::getInstance().create(
-          WindowManager::Set::TERMINAL, 900, 600, "Snowgun Terminal");
+          WindowManager::Set::TERMINAL, 900, 500, "Snowgun Terminal");
       GameState::getInstance().createCamera(
           CameraTypes::TERMINAL,
           GameObject::UpdateDomain(WindowManager::Set::TERMINAL));
