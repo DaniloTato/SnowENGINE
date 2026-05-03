@@ -28,8 +28,9 @@ RuntimeValue tileCommand(const CommandContext &ctx) {
     LevelManager::getInstance().queueDeleteTile(static_cast<int>(layer), static_cast<int>(x),
                                                 static_cast<int>(y));
   } else {
+    // MUST CHANGE. TIGHTLY COUPLED
     LevelManager::getInstance().queueCreateTile(
-        *GameState::getInstance().getMainWindow(), GameState::getInstance().getMainCamera(),
+        WindowManager::getInstance().getMain(), GameState::getInstance().getMainCamera(),
         static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y),
         sf::IntRect({
             static_cast<int>(Rx),

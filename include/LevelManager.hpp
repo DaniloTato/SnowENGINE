@@ -9,7 +9,7 @@
 #include <vector>
 
 struct TileCreationRequest {
-  sf::RenderWindow &window;
+  WindowManager::WindowID window;
   GameCamera *camera;
   int layer;
   int x;
@@ -39,24 +39,24 @@ class LevelManager : public SceneAware {
 public:
   static LevelManager &getInstance();
 
-  void loadLevel(sf::RenderWindow &window, GameCamera *camera,
+  void loadLevel(WindowManager::WindowID window, GameCamera *camera,
                  const std::string &path);
-  void loadLayer(sf::RenderWindow &window, GameCamera *camera, size_t layerNo,
-                 const nlohmann::json &layerJSON, int tileSize);
+  void loadLayer(WindowManager::WindowID window, GameCamera *camera,
+                 size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
 
-  void createTile(sf::RenderWindow &window, GameCamera *camera, int layerNo,
-                  int x, int y, sf::IntRect rect);
+  void createTile(WindowManager::WindowID window, GameCamera *camera,
+                  int layerNo, int x, int y, sf::IntRect rect);
 
   void deleteTile(int layerNo, int x, int y);
   void saveLevel(const std::string &path);
 
   void deleteLayerObjects(int layerNo);
-  void reloadAllLayers(sf::RenderWindow &window, GameCamera *camera);
-  void reloadLayer(sf::RenderWindow &window, GameCamera *camera,
+  void reloadAllLayers(WindowManager::WindowID window, GameCamera *camera);
+  void reloadLayer(WindowManager::WindowID window, GameCamera *camera,
                    size_t layerNo);
 
-  void queueCreateTile(sf::RenderWindow &window, GameCamera *camera, int layer,
-                       int x, int y, const sf::IntRect &rect);
+  void queueCreateTile(WindowManager::WindowID window, GameCamera *camera,
+                       int layer, int x, int y, const sf::IntRect &rect);
   void queueDeleteTile(int layer, int x, int y);
   void applyQueuedTileChanges();
 

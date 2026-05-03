@@ -16,7 +16,8 @@
 namespace SceneBuilder {
 void mainScene() {
 
-  GameState::getInstance().createCamera(CameraTypes::MAIN, {WindowTypes::MAIN});
+  GameState::getInstance().createCamera(
+      CameraTypes::MAIN, GameObject::UpdateDomain(WindowManager::Domain::MAIN));
 
   /* Setup in case we'd like to have particles in the scene.
 
@@ -40,11 +41,11 @@ void mainScene() {
   image->scripter.addScript("simpleMovement", Scripts::basicMovementScript);
 
   // may need to refactor terminalCreation into a sytem for the engine
-  ScriptRunner *sr =
-      new ScriptRunner({WindowTypes::MAIN, WindowTypes::TERMINAL});
+  ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
+      {WindowManager::Domain::MAIN, WindowManager::Domain::TERMINAL}));
   sr->scripter.addScript("terminalCreation", Scripts::terminalCreationScript);
 
-  GeneralContext ctx = {.player = image};
+  GeneralContext ctx = {.player = nullptr};
   GameState::getInstance().updateGeneralContext(ctx);
 }
 } // namespace SceneBuilder

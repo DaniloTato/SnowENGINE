@@ -35,8 +35,7 @@ static size_t countVisualLines(std::string_view s) {
   return lines;
 }
 
-// font texture copied. Bad practice, but whatever. I'll change it eventually.
-Terminal::Terminal(sf::RenderWindow *window, GameCamera *camera,
+Terminal::Terminal(WindowManager::WindowID window, GameCamera *camera,
                    sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
       text(new GameText({.window = targetWindow,
@@ -234,7 +233,9 @@ void Terminal::executeSnowlang() {
   }
 }
 
-sf::RenderWindow *Terminal::getTargetWindow() const { return targetWindow; }
+WindowManager::WindowID Terminal::getTargetWindow() const {
+  return targetWindow;
+}
 
 bool Terminal::destroysWindowOnClose() const { return destroyWindowOnClose; }
 
@@ -244,7 +245,7 @@ void Terminal::destroyKilledTerminals() {
   auto isKilled = [](Terminal *t) {
     if (!t->isOpen()) {
       if (t->destroysWindowOnClose()) {
-        GameState::getInstance().removeWindow(t->getTargetWindow());
+        WindowManager::getInstance().destroy(t->getTargetWindow());
       }
       delete t;
       return true;

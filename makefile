@@ -1,7 +1,7 @@
 CXX ?= clang++
 CXXFLAGS = -std=c++20 -Wall -Wextra -Wno-unused-parameter -O2
 
-APP_NAME := snowgun
+APP_NAME := snow
 VERSION  := 0.1.0-alpha
 ZIP_NAME := $(APP_NAME)-macos-$(VERSION).zip
 

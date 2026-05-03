@@ -1,10 +1,8 @@
 #include "RenderableObject.hpp"
-#include "GameState.hpp"
 #include "GeneralContext.hpp"
 
 RenderableObject::RenderableObject(const RenderizerParameters &params)
-    : GameObject({GameState::getInstance().windowPtrToType(params.window)}),
-      renderizer(params) {
+    : GameObject(UpdateDomain(params.window)), renderizer(params) {
   Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);
 }
 

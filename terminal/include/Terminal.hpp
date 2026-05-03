@@ -7,13 +7,13 @@
 
 class Terminal {
 public:
-  Terminal(sf::RenderWindow *window, GameCamera *camera,
+  Terminal(WindowManager::WindowID window, GameCamera *camera,
            sf::Texture *fontTexture);
   ~Terminal();
 
   void handleEvent(const sf::Event &event);
 
-  [[nodiscard]] sf::RenderWindow *getTargetWindow() const;
+  [[nodiscard]] WindowManager::WindowID getTargetWindow() const;
 
   void kill();
   void close();
@@ -39,7 +39,7 @@ private:
   void commitLine();
 
 private:
-  sf::RenderWindow *targetWindow;
+  WindowManager::WindowID targetWindow;
 
   std::unordered_map<std::string, std::string> aliases;
 

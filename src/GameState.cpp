@@ -1,6 +1,5 @@
 #include "GameState.hpp"
 #include "Bullet.hpp"
-#include "Constants.hpp"
 #include "GameCamera.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <SFML/Graphics.hpp>

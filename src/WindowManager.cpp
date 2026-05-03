@@ -149,3 +149,11 @@ float WindowManager::getFrameRate(WindowID id) const {
   const GameWindow *window = fetchGameWindow(id);
   return window->getFrameRate();
 }
+
+void WindowManager::checkRenderFlag(WindowID id) {
+  GameWindow *window = fetchGameWindow(id);
+  if (window->renderFlag()) {
+    window->getWindow()->display();
+    window->markAsRendered();
+  }
+}

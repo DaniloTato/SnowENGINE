@@ -3,12 +3,9 @@
 #include "SoundManager.hpp"
 #include <SFML/Audio.hpp>
 
-#include "GameState.hpp"
-
 TangibleObject::TangibleObject(RenderizerParameters params,
                                Animations cachedAnimations)
-    : GameObject({GameState::getInstance().windowPtrToType(params.window)}),
-      renderizer(params) {
+    : GameObject(UpdateDomain(params.window)), renderizer(params) {
   animator.setAnimations(cachedAnimations);
   Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);
 }

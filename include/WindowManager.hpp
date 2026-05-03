@@ -12,12 +12,12 @@ public:
   using WindowID = size_t;
   enum class Domain : std::uint8_t { MAIN, TERMINAL, DEVUI };
 
-private:
   struct WindowEntry {
     Domain domain;
     GameWindow window;
   };
 
+private:
   std::unordered_map<WindowID, WindowEntry> windows;
   WindowID nextId = 0;
 
@@ -41,6 +41,8 @@ public:
   void pauseWindow(WindowID id);
   void resumeWindow(WindowID id);
   [[nodiscard]] bool isWindowPaused(WindowID id);
+
+  void checkRenderFlag(WindowID id);
 
   void setFrameRate(WindowID id, float value);
   [[nodiscard]] float getFrameRate(WindowID id) const;

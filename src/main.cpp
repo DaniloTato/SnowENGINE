@@ -21,59 +21,61 @@
 /*SceneBuilders*/
 #include "Helpers.hpp"
 
+#include "Constants.hpp"
+
 #include <cstddef>
 #include <cstdlib>
 #include <ctime>
-
-#include <cstdio>
 
 using namespace Helper;
 
 int main() {
   InputManager &inputManager = InputManager::getInstance();
   SceneManager &sceneManager = SceneManager::getInstance();
+  WindowManager &windowManager = WindowManager::getInstance();
   GameState &gameState = GameState::getInstance();
+
+  windowManager.create(WindowManager::Domain::MAIN, Constants::SCREEN_WIDTH,
+                       Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
 
   inputManager.loadBindingsFromJsonFile(
       (Helper::getPath("config/control_config.json")));
-
-  GameState::getInstance().createCamera(CameraTypes::UI, {WindowTypes::MAIN});
-  GameState::getInstance().getUiCamera()->makePersistentAcrossScenes();
 
   GameLoader loader;
   loader.loadGameData(Helper::getPath("config"));
 
   sf::Clock clock;
 
-  while (gameState.getMainWindow() && gameState.getMainWindow()->isOpen()) {
+  while (windowManager.get(windowManager.getMain())->isOpen()) {
 
     sf::Event event;
     inputManager.update();
 
-    std::vector<GameWindow> &windows = gameState.getWindows();
-    for (WindowTypes i = WindowTypes::MAIN; i != WindowTypes::COUNT;
-         i = static_cast<WindowTypes>(static_cast<int>(i) + 1)) {
+    const std::unordered_map<WindowManager::WindowID,
+                             WindowManager::WindowEntry> &windows =
+        windowManager.getAll();
 
-      auto windowType = static_cast<size_t>(i);
-      if (!windows[windowType].getWindow() || i == WindowTypes::TERMINAL)
+    for (const auto &[id, entry] : windows) {
+
+      if (entry.domain == WindowManager::Domain::TERMINAL)
         continue;
 
-      while (windows[windowType].getWindow()->pollEvent(event)) {
-        if (i == WindowTypes::MAIN) {
+      while (windowManager.get(id)->pollEvent(event)) {
+        if (entry.domain == WindowManager::Domain::MAIN) {
           inputManager.handleEvent(event);
         }
 
         if (event.type == sf::Event::Closed) {
-          GameState::getInstance().removeWindow(i);
+          WindowManager::getInstance().destroy(id);
           break;
         }
 
         if (event.type == sf::Event::LostFocus) {
-          gameState.pauseWindow(i);
+          windowManager.pauseWindow(id);
         }
 
         if (event.type == sf::Event::GainedFocus) {
-          gameState.resumeWindow(i);
+          windowManager.resumeWindow(id);
         }
       }
     }
@@ -91,18 +93,13 @@ int main() {
       Terminal::destroyKilledTerminals();
     }
 
-    for (WindowTypes i = WindowTypes::MAIN; i != WindowTypes::COUNT;
-         i = static_cast<WindowTypes>(static_cast<int>(i) + 1)) {
+    for (const auto &[id, entry] : windows) {
 
-      auto windowType = static_cast<size_t>(i);
-      if (!windows[windowType].getWindow())
-        continue;
-
-      if (i == WindowTypes::MAIN) {
-        windows[windowType].getWindow()->clear(
+      if (entry.domain == WindowManager::Domain::MAIN) {
+        windowManager.get(id)->clear(
             LevelManager::getInstance().getBackgroundColor());
       } else {
-        windows[windowType].getWindow()->clear();
+        windowManager.get(id)->clear();
       }
     }
 
@@ -114,14 +111,8 @@ int main() {
 
     Renderizer::renderAll();
 
-    for (auto &gameWindow : gameState.getWindows()) {
-      if (!gameWindow.getWindow())
-        continue;
-
-      if (gameWindow.renderFlag()) {
-        gameWindow.getWindow()->display();
-        gameWindow.markAsRendered();
-      }
+    for (const auto &[id, entry] : windows) {
+      windowManager.checkRenderFlag(id);
     }
 
     sf::sleep(sf::milliseconds(1));

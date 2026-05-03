@@ -10,7 +10,8 @@
 #include <iostream>
 #include <memory>
 
-ParticleManager::ParticleManager() : GameObject({WindowTypes::MAIN}) {
+ParticleManager::ParticleManager()
+    : GameObject(UpdateDomain{WindowManager::Domain::MAIN}) {
   persistentAcrossScenes = true;
 }
 

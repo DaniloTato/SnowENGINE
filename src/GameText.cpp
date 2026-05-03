@@ -18,9 +18,8 @@ std::string trimLeadingSpace(std::string s) {
 }
 
 GameText::GameText(RenderizerParameters params)
-    : GameObject({GameState::getInstance().windowPtrToType(params.window)}),
-      renderizer(params), fontAtlas(Constants::DEFAULT_FONT_ATLAS),
-      lineSpacing(2) {
+    : GameObject(UpdateDomain(params.window)), renderizer(params),
+      fontAtlas(Constants::DEFAULT_FONT_ATLAS), lineSpacing(2) {
 
   Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);
 
