@@ -14,10 +14,12 @@ void terminalCreationScript(ScriptRunner &renderable,
 
   if (InputManager::getInstance().isJustPressed("terminal")) {
     if (!s_terminal) {
+      std::cout << "creating terminal\n";
       const WindowManager::WindowID id = WindowManager::getInstance().create(
-          WindowManager::Domain::TERMINAL, 900, 600, "Snowgun Terminal");
-      GameState::getInstance().createCamera(CameraTypes::TERMINAL,
-                                            WindowManager::Domain::TERMINAL);
+          WindowManager::Set::TERMINAL, 900, 600, "Snowgun Terminal");
+      GameState::getInstance().createCamera(
+          CameraTypes::TERMINAL,
+          GameObject::UpdateDomain(WindowManager::Set::TERMINAL));
       s_terminal =
           new Terminal(id, GameState::getInstance().getTerminalCamera(),
                        &TextureManager::getInstance().get("snowFont"));

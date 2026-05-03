@@ -9,12 +9,12 @@ WindowManager &WindowManager::getInstance() {
   return instance;
 }
 
-WindowManager::WindowID WindowManager::create(Domain domain, int w, int h,
+WindowManager::WindowID WindowManager::create(Set set, int w, int h,
                                               const std::string &name) {
 
-  if (domain == Domain::MAIN) {
+  if (set == Set::MAIN) {
     for (const auto &[id, entry] : windows) {
-      if (entry.domain == Domain::MAIN) {
+      if (entry.set == Set::MAIN) {
         throw std::runtime_error("[WindowManager] MAIN window already exists");
       }
     }
@@ -25,7 +25,7 @@ WindowManager::WindowID WindowManager::create(Domain domain, int w, int h,
   GameWindow gw(nullptr, Constants::FRAME_RATE);
   gw.setWindow(new sf::RenderWindow(sf::VideoMode(w, h), name));
 
-  windows.emplace(id, WindowEntry{.domain = domain, .window = gw});
+  windows.emplace(id, WindowEntry{.set = set, .window = gw});
 
   return id;
 }
@@ -49,6 +49,8 @@ void WindowManager::destroy(WindowID id) {
 
   auto *win = it->second.window.getWindow();
 
+  Renderizer::unregisterByWindow(win);
+
   if (win && win->isOpen()) {
     win->close();
   }
@@ -62,12 +64,12 @@ WindowManager::getAll() const {
   return windows;
 }
 
-std::vector<WindowManager::WindowID> WindowManager::getByDomain(Domain domain) {
+std::vector<WindowManager::WindowID> WindowManager::getByDomain(Set set) {
 
   std::vector<WindowID> result;
 
   for (const auto &[id, entry] : windows) {
-    if (entry.domain == domain) {
+    if (entry.set == set) {
       result.push_back(id);
     }
   }
@@ -77,12 +79,23 @@ std::vector<WindowManager::WindowID> WindowManager::getByDomain(Domain domain) {
 
 WindowManager::WindowID WindowManager::getMain() {
   for (const auto &[id, entry] : windows) {
-    if (entry.domain == Domain::MAIN) {
+    if (entry.set == Set::MAIN) {
       return id;
     }
   }
 
   throw std::runtime_error("[WindowManager] No MAIN window found");
+}
+
+// Very inefficient hahahah.
+bool WindowManager::isMainWindowAlive() const {
+  for (const auto &[id, entry] : windows) {
+    if (entry.set == Set::MAIN) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 GameWindow *WindowManager::fetchGameWindow(WindowID id) {
@@ -125,19 +138,19 @@ bool WindowManager::isWindowPaused(WindowManager::WindowID id) {
   if (!ptr) {
     std::cerr << "[WindowManager] failed to get pause state from a "
                  "non-fetchable window\n";
-    return false;
+    return true;
   }
   return ptr->isPaused();
 }
 
-WindowManager::Domain WindowManager::getDomainOfWindow(WindowID id) const {
+WindowManager::Set WindowManager::getDomainOfWindow(WindowID id) const {
   auto it = windows.find(id);
   if (it == windows.end()) {
     std::cerr << "[WindowManager] failed to get domain of non-fetchable "
                  "window. Defaulting to MAIN\n";
-    return Domain::MAIN;
+    return Set::MAIN;
   }
-  return it->second.domain;
+  return it->second.set;
 }
 
 void WindowManager::setFrameRate(WindowID id, float value) {

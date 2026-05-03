@@ -11,7 +11,7 @@
 #include <memory>
 
 ParticleManager::ParticleManager()
-    : GameObject(UpdateDomain{WindowManager::Domain::MAIN}) {
+    : GameObject(UpdateDomain{WindowManager::Set::MAIN}) {
   persistentAcrossScenes = true;
 }
 

@@ -102,8 +102,22 @@ GameObjectExposure::Value::Object GameObject::describe() {
 }
 
 bool GameObject::isUpdateDomainPaused() {
-  for (const auto id : updateDomain.windows) {
-    if (!WindowManager::getInstance().isWindowPaused(id)) {
+  auto &wm = WindowManager::getInstance();
+
+  auto isAnyWindowActive = [&](auto &&ids) {
+    for (auto id : ids) {
+      if (!wm.isWindowPaused(id))
+        return true;
+    }
+    return false;
+  };
+
+  if (isAnyWindowActive(updateDomain.windows)) {
+    return false;
+  }
+
+  for (auto domain : updateDomain.domains) {
+    if (isAnyWindowActive(wm.getByDomain(domain))) {
       return false;
     }
   }

@@ -11,7 +11,7 @@ class GameObject {
 public:
   struct UpdateDomain {
     std::vector<WindowManager::WindowID> windows;
-    std::vector<WindowManager::Domain> domains;
+    std::vector<WindowManager::Set> domains;
 
     bool matches(WindowManager &wm, WindowManager::WindowID id) const;
 
@@ -20,9 +20,9 @@ public:
     UpdateDomain(std::vector<WindowManager::WindowID> &&ids)
         : windows(std::move(ids)) {}
 
-    UpdateDomain(WindowManager::Domain domain) : domains({domain}) {}
+    UpdateDomain(WindowManager::Set domain) : domains({domain}) {}
 
-    UpdateDomain(std::vector<WindowManager::Domain> &&doms)
+    UpdateDomain(std::vector<WindowManager::Set> &&doms)
         : domains(std::move(doms)) {}
   };
 

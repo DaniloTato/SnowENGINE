@@ -35,7 +35,7 @@ int main() {
   WindowManager &windowManager = WindowManager::getInstance();
   GameState &gameState = GameState::getInstance();
 
-  windowManager.create(WindowManager::Domain::MAIN, Constants::SCREEN_WIDTH,
+  windowManager.create(WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
                        Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
 
   inputManager.loadBindingsFromJsonFile(
@@ -46,7 +46,7 @@ int main() {
 
   sf::Clock clock;
 
-  while (windowManager.get(windowManager.getMain())->isOpen()) {
+  while (windowManager.isMainWindowAlive()) {
 
     sf::Event event;
     inputManager.update();
@@ -57,17 +57,12 @@ int main() {
 
     for (const auto &[id, entry] : windows) {
 
-      if (entry.domain == WindowManager::Domain::TERMINAL)
+      if (entry.set == WindowManager::Set::TERMINAL)
         continue;
 
       while (windowManager.get(id)->pollEvent(event)) {
-        if (entry.domain == WindowManager::Domain::MAIN) {
+        if (entry.set == WindowManager::Set::MAIN) {
           inputManager.handleEvent(event);
-        }
-
-        if (event.type == sf::Event::Closed) {
-          WindowManager::getInstance().destroy(id);
-          break;
         }
 
         if (event.type == sf::Event::LostFocus) {
@@ -76,6 +71,11 @@ int main() {
 
         if (event.type == sf::Event::GainedFocus) {
           windowManager.resumeWindow(id);
+        }
+
+        if (event.type == sf::Event::Closed) {
+          WindowManager::getInstance().destroy(id);
+          break;
         }
       }
     }
@@ -95,7 +95,7 @@ int main() {
 
     for (const auto &[id, entry] : windows) {
 
-      if (entry.domain == WindowManager::Domain::MAIN) {
+      if (entry.set == WindowManager::Set::MAIN) {
         windowManager.get(id)->clear(
             LevelManager::getInstance().getBackgroundColor());
       } else {

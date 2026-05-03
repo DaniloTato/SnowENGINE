@@ -10,10 +10,10 @@
 class WindowManager {
 public:
   using WindowID = size_t;
-  enum class Domain : std::uint8_t { MAIN, TERMINAL, DEVUI };
+  enum class Set : std::uint8_t { MAIN, TERMINAL, DEVUI };
 
   struct WindowEntry {
-    Domain domain;
+    Set set;
     GameWindow window;
   };
 
@@ -27,7 +27,7 @@ private:
 public:
   static WindowManager &getInstance();
 
-  WindowID create(Domain domain, int w, int h, const std::string &name);
+  WindowID create(Set set, int w, int h, const std::string &name);
 
   sf::RenderWindow *get(WindowID id);
   [[nodiscard]] const sf::RenderWindow *get(WindowID id) const;
@@ -35,8 +35,8 @@ public:
 
   [[nodiscard]] const std::unordered_map<WindowID, WindowEntry> &getAll() const;
 
-  std::vector<WindowID> getByDomain(Domain domain);
-  [[nodiscard]] Domain getDomainOfWindow(WindowID id) const;
+  std::vector<WindowID> getByDomain(Set set);
+  [[nodiscard]] Set getDomainOfWindow(WindowID id) const;
 
   void pauseWindow(WindowID id);
   void resumeWindow(WindowID id);
@@ -48,4 +48,5 @@ public:
   [[nodiscard]] float getFrameRate(WindowID id) const;
 
   WindowID getMain();
+  [[nodiscard]] bool isMainWindowAlive() const;
 };
