@@ -55,28 +55,22 @@ int main() {
                              WindowManager::WindowEntry> &windows =
         windowManager.getAll();
 
-    for (const auto &[id, entry] : windows) {
+    const auto mainWindow = windowManager.getMain();
 
-      if (entry.set == WindowManager::Set::TERMINAL)
-        continue;
+    while (windowManager.pollEventOnWindow(mainWindow, event)) {
+      inputManager.handleEvent(mainWindow, event);
 
-      while (windowManager.pollEventOnWindow(id, event)) {
-        if (entry.set == WindowManager::Set::MAIN) {
-          inputManager.handleEvent(event);
-        }
+      if (event.type == sf::Event::LostFocus) {
+        windowManager.pauseWindow(mainWindow);
+      }
 
-        if (event.type == sf::Event::LostFocus) {
-          windowManager.pauseWindow(id);
-        }
+      if (event.type == sf::Event::GainedFocus) {
+        windowManager.resumeWindow(mainWindow);
+      }
 
-        if (event.type == sf::Event::GainedFocus) {
-          windowManager.resumeWindow(id);
-        }
-
-        if (event.type == sf::Event::Closed) {
-          WindowManager::getInstance().destroy(id);
-          break;
-        }
+      if (event.type == sf::Event::Closed) {
+        WindowManager::getInstance().destroy(mainWindow);
+        break;
       }
     }
 

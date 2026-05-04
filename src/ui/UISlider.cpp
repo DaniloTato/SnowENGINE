@@ -1,4 +1,5 @@
 #include "UISlider.hpp"
+#include "InputManager.hpp"
 
 UISlider::UISlider(const sf::Vector2f &position, float width, float minValue,
                    float maxValue, float *boundValue)
@@ -52,16 +53,19 @@ float UISlider::getValue() const {
   return (valuePtr ? *valuePtr : internalValue);
 }
 
-void UISlider::draw(sf::RenderWindow &window) {
+void UISlider::draw(WindowManager::WindowID window) {
   // make sure knob follows current value
   setValue(getValue());
 
-  window.draw(track);
-  window.draw(knob);
+  WindowManager &windowManager = WindowManager::getInstance();
+
+  windowManager.drawOnWindow(window, track);
+  windowManager.drawOnWindow(window, knob);
 }
 
-void UISlider::handleEvent(const sf::Event &ev, sf::RenderWindow &window) {
-  sf::Vector2i mp = sf::Mouse::getPosition(window);
+void UISlider::handleEvent(const sf::Event &ev,
+                           WindowManager::WindowID window) {
+  sf::Vector2i mp = InputManager::getInstance().getMousePosition(window);
 
   // start dragging if press on knob (distance threshold)
   if (ev.type == sf::Event::MouseButtonPressed &&

@@ -1,4 +1,5 @@
 #pragma once
+#include "WindowManager.hpp"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <string>
@@ -13,7 +14,7 @@ public:
     return instance;
   }
 
-  void handleEvent(const sf::Event &event);
+  void handleEvent(WindowManager::WindowID window, const sf::Event &event);
   void update();
 
   [[nodiscard]] bool isPressed(const std::string &action) const;
@@ -27,7 +28,7 @@ public:
   [[nodiscard]] bool isMouseJustPressed(MouseButton button) const;
   [[nodiscard]] bool isMouseJustReleased(MouseButton button) const;
 
-  [[nodiscard]] sf::Vector2i getMousePosition() const;
+  [[nodiscard]] sf::Vector2i getMousePosition(WindowManager::WindowID id) const;
   [[nodiscard]] sf::Keyboard::Key
   keyFromString(const std::string &keyName) const;
 
@@ -45,6 +46,8 @@ private:
 
   std::unordered_map<MouseButton, bool> mouseCurrent;
   std::unordered_map<MouseButton, bool> mousePrevious;
+
+  std::unordered_map<WindowManager::WindowID, sf::Vector2i> mousePositions;
 
   sf::Vector2i lastMouseClickPosition;
 

@@ -1,161 +1,289 @@
 #include "TilePicker.hpp"
 #include "EnemyManager.hpp"
 #include "Helpers.hpp"
+#include "InputManager.hpp"
 #include "UIButton.hpp"
 #include <algorithm>
 
+static auto createFont = [] {
+  auto font = sf::Font();
+  font.loadFromFile(Helper::getPath("assets/fonts/ARIAL.TTF"));
+  return font;
+};
+
 TilePicker::TilePicker(sf::Texture &tileset, int tileSize)
-    : tileset(tileset), tileSize(tileSize) {
+    : font(createFont()), tileset(tileset), tileSize(tileSize) {
   selectedRect = {0, 0, tileSize, tileSize};
   selection.tileRect = selectedRect;
+  parallaxSlider = std::make_unique<UISlider>(
+      sf::Vector2f{10.f, float(tileset.getSize().y) + 100.f}, 500.f, -50.f,
+      300.f, activeLayer >= 0 ? &(*layers)[activeLayer].paralax : nullptr);
 }
 
-PickerSelection TilePicker::open(std::vector<LayerInfo> &layers,
-                                 int &activeLayer) {
-  unsigned int winW = tileset.getSize().x + 260;
-  unsigned int winH = tileset.getSize().y + 170;
+void TilePicker::open() {
+  if (opened)
+    return;
 
-  sf::RenderWindow window(sf::VideoMode(winW, winH), "Tile / Enemy Picker");
-  window.setFramerateLimit(60);
+  WindowManager &wm = WindowManager::getInstance();
 
-  sf::Font font;
-  font.loadFromFile((Helper::getPath("assets/fonts/ARIAL.TTF")));
+  const unsigned int winW = tileset.getSize().x + 260;
+  const unsigned int winH = tileset.getSize().y + 170;
 
-  if (layers.empty())
-    activeLayer = -1;
-  else if (activeLayer < 0 || activeLayer >= (int)layers.size())
-    activeLayer = 0;
+  window = wm.create(WindowManager::Set::DEVUI, winW, winH, "TilePicker");
+  wm.setFrameRate(window, 60);
 
-  float dummyMin = 0.1f;
-  float dummyMax = 50.0f;
+  selectedRect = {0, 0, tileSize, tileSize};
+  selection.tileRect = selectedRect;
 
-  UISlider parallaxSlider(
-      {10.f, float(tileset.getSize().y) + 100.f}, 300.f, dummyMin, dummyMax,
-      activeLayer >= 0 ? &layers[activeLayer].paralax : nullptr);
+  dragging = false;
 
-  while (window.isOpen()) {
-    sf::Event ev;
-    while (window.pollEvent(ev)) {
-      if (ev.type == sf::Event::Closed)
-        window.close();
+  opened = true;
+}
 
-      drawModeTabs(window, font, ev);
+void TilePicker::update() {
+  if (!opened)
+    return;
 
-      // Tiles Mode
-      if (selection.mode == PickerMode::Tiles) {
-        if (ev.type == sf::Event::MouseButtonPressed &&
-            ev.mouseButton.button == sf::Mouse::Left) {
-          sf::Vector2i mp = sf::Mouse::getPosition(window);
-          if (mp.x >= 0 && mp.x < (int)tileset.getSize().x && mp.y >= 40 &&
-              mp.y < (int)tileset.getSize().y + 40) {
-            dragging = true;
-            dragStart = {mp.x, mp.y - 40};
+  if (parallaxSlider && activeLayer >= 0 && layers) {
+    parallaxSlider->bindTo(&(*layers)[activeLayer].paralax);
+  }
+}
 
-            int tx = dragStart.x / tileSize;
-            int ty = dragStart.y / tileSize;
+void TilePicker::close() {
+  if (!opened)
+    return;
 
-            selectedRect = {tx * tileSize, ty * tileSize, tileSize, tileSize};
-            selection.tileRect = selectedRect;
-          }
-        }
+  WindowManager::getInstance().destroy(window);
+  opened = false;
+}
 
-        if (ev.type == sf::Event::MouseMoved && dragging) {
-          sf::Vector2i mp = sf::Mouse::getPosition(window);
-          mp.y -= 40;
+bool TilePicker::isOpen() const { return opened; }
 
-          int x1 = std::min(dragStart.x, mp.x) / tileSize * tileSize;
-          int y1 = std::min(dragStart.y, mp.y) / tileSize * tileSize;
-          int x2 = (std::max(dragStart.x, mp.x) / tileSize + 1) * tileSize;
-          int y2 = (std::max(dragStart.y, mp.y) / tileSize + 1) * tileSize;
+PickerSelection TilePicker::getSelection() const { return selection; }
 
-          selectedRect = {x1, y1, x2 - x1, y2 - y1};
-          selection.tileRect = selectedRect;
-        }
+void TilePicker::handleEvent(WindowManager::WindowID id, const sf::Event &ev) {
+  if (!opened || id != window)
+    return;
 
-        if (ev.type == sf::Event::MouseButtonReleased &&
-            ev.mouseButton.button == sf::Mouse::Left)
-          dragging = false;
-      }
+  auto &im = InputManager::getInstance();
 
-      if (selection.mode == PickerMode::Enemies)
-        drawEnemyPicker(window, font, ev);
-
-      drawLayerList(window, layers, activeLayer, font, ev);
-
-      if (activeLayer >= 0 && activeLayer < (int)layers.size())
-        parallaxSlider.bindTo(&layers[activeLayer].paralax);
-
-      if (activeLayer >= 0)
-        parallaxSlider.handleEvent(ev, window);
-    }
-
-    window.clear(sf::Color(30, 30, 30));
-
-    drawModeTabs(window, font, sf::Event{});
-
-    if (selection.mode == PickerMode::Tiles)
-      drawTileset(window, selectedRect);
-
-    if (selection.mode == PickerMode::Enemies)
-      drawEnemyPicker(window, font, sf::Event{});
-
-    drawLayerList(window, layers, activeLayer, font, sf::Event{});
-
-    if (activeLayer >= 0)
-      drawParallaxUI(window, layers[activeLayer], font, parallaxSlider);
-
-    window.display();
+  if (ev.type == sf::Event::Closed) {
+    close();
+    return;
   }
 
-  return selection;
+  // =========================
+  // MODE TABS (INPUT ONLY)
+  // =========================
+  {
+    UIButton tilesBtn({10, 5}, {100, 26}, "Tiles", font);
+    UIButton enemyBtn({120, 5}, {100, 26}, "Enemies", font);
+
+    if (tilesBtn.isClicked(ev, window))
+      selection.mode = PickerMode::Tiles;
+
+    if (enemyBtn.isClicked(ev, window))
+      selection.mode = PickerMode::Enemies;
+  }
+
+  // =========================
+  // TILE DRAGGING
+  // =========================
+  if (selection.mode == PickerMode::Tiles) {
+
+    if (ev.type == sf::Event::MouseButtonPressed &&
+        ev.mouseButton.button == sf::Mouse::Left) {
+
+      sf::Vector2i mp = im.getMousePosition(window);
+
+      if (mp.x >= 0 && mp.x < (int)tileset.getSize().x && mp.y >= 40 &&
+          mp.y < (int)tileset.getSize().y + 40) {
+
+        dragging = true;
+        dragStart = {mp.x, mp.y - 40};
+
+        int tx = dragStart.x / tileSize;
+        int ty = dragStart.y / tileSize;
+
+        selectedRect = {tx * tileSize, ty * tileSize, tileSize, tileSize};
+        selection.tileRect = selectedRect;
+      }
+    }
+
+    if (ev.type == sf::Event::MouseMoved && dragging) {
+      sf::Vector2i mp = im.getMousePosition(window);
+      mp.y -= 40;
+
+      int x1 = std::min(dragStart.x, mp.x) / tileSize * tileSize;
+      int y1 = std::min(dragStart.y, mp.y) / tileSize * tileSize;
+      int x2 = (std::max(dragStart.x, mp.x) / tileSize + 1) * tileSize;
+      int y2 = (std::max(dragStart.y, mp.y) / tileSize + 1) * tileSize;
+
+      selectedRect = {x1, y1, x2 - x1, y2 - y1};
+      selection.tileRect = selectedRect;
+    }
+
+    if (ev.type == sf::Event::MouseButtonReleased &&
+        ev.mouseButton.button == sf::Mouse::Left)
+      dragging = false;
+  }
+
+  // =========================
+  // ENEMY PICKER
+  // =========================
+  if (selection.mode == PickerMode::Enemies) {
+    std::vector<std::string> enemies =
+        EnemyManager::getInstance().getEnemyList();
+
+    float x = 10.f;
+    float y = 70.f;
+
+    for (const auto &e : enemies) {
+      UIButton btn({x, y}, {200, 24}, e, font);
+
+      if (btn.isClicked(ev, window)) {
+        selection.enemyId = e;
+      }
+
+      y += 32.f;
+    }
+  }
+
+  // =========================
+  // SLIDER
+  // =========================
+  if (parallaxSlider)
+    parallaxSlider->handleEvent(ev, window);
+
+  // =========================
+  // LAYER UI INPUT
+  // =========================
+  if (layers) {
+    float panelX = static_cast<float>(tileset.getSize().x) + 10.f;
+    float y = 10.f;
+
+    UIButton addBtn({panelX, y}, {240, 24}, "+ Add Layer", font);
+
+    if (addBtn.isClicked(ev, window)) {
+      LayerInfo n;
+      n.name = "Layer " + std::to_string(layers->size());
+      n.paralax = 1.0f;
+      layers->push_back(n);
+
+      if (activeLayer < 0)
+        activeLayer = 0;
+
+      return;
+    }
+
+    y += 40.f;
+
+    for (int i = 0; i < (int)layers->size(); i++) {
+
+      if (ev.type == sf::Event::MouseButtonReleased &&
+          ev.mouseButton.button == sf::Mouse::Left) {
+
+        sf::Vector2i mp = im.getMousePosition(window);
+
+        if ((float)mp.x >= panelX && (float)mp.x <= panelX + 240 &&
+            (float)mp.y >= y && (float)mp.y <= y + 28) {
+          activeLayer = i;
+        }
+      }
+
+      UIButton up({panelX + 195, y}, {20, 12}, "", font);
+      UIButton down({panelX + 195, y + 14}, {20, 12}, "", font);
+      UIButton del({panelX + 220, y}, {20, 24}, "X", font);
+
+      if (up.isClicked(ev, window) && i > 0) {
+        std::swap((*layers)[i], (*layers)[i - 1]);
+        activeLayer = i - 1;
+        return;
+      }
+
+      if (down.isClicked(ev, window) && i < (int)layers->size() - 1) {
+        std::swap((*layers)[i], (*layers)[i + 1]);
+        activeLayer = i + 1;
+        return;
+      }
+
+      if (del.isClicked(ev, window)) {
+        LevelManager::getInstance().deleteLayerObjects(i);
+        layers->erase(layers->begin() + i);
+
+        if (layers->empty())
+          activeLayer = -1;
+        else if (activeLayer >= (int)layers->size())
+          activeLayer = (int)layers->size() - 1;
+
+        return;
+      }
+
+      y += 36;
+    }
+  }
 }
 
-void TilePicker::drawModeTabs(sf::RenderWindow &window, sf::Font &font,
-                              const sf::Event &ev) {
-  UIButton tilesBtn({10, 5}, {100, 26}, "Tiles", font);
-  UIButton enemyBtn({120, 5}, {100, 26}, "Enemies", font);
+void TilePicker::draw() {
+  if (!opened)
+    return;
 
-  tilesBtn.draw(window);
-  enemyBtn.draw(window);
+  auto &wm = WindowManager::getInstance();
+  wm.clearWindow(window, sf::Color(30, 30, 30));
 
-  if (tilesBtn.isClicked(ev, window))
-    selection.mode = PickerMode::Tiles;
+  // MODE TABS (ONLY DRAW)
+  {
+    UIButton tilesBtn({10, 5}, {100, 26}, "Tiles", font);
+    UIButton enemyBtn({120, 5}, {100, 26}, "Enemies", font);
 
-  if (enemyBtn.isClicked(ev, window))
-    selection.mode = PickerMode::Enemies;
+    tilesBtn.draw(window);
+    enemyBtn.draw(window);
+  }
+
+  if (selection.mode == PickerMode::Tiles)
+    drawTileset(selectedRect);
+
+  if (selection.mode == PickerMode::Enemies)
+    drawEnemyPicker();
+
+  if (layers) {
+    drawLayerList(*layers, activeLayer);
+  }
+
+  if (activeLayer >= 0 && layers && parallaxSlider)
+    drawParallaxUI((*layers)[activeLayer], *parallaxSlider);
+
+  wm.checkRenderFlag(window);
 }
 
-void TilePicker::drawEnemyPicker(sf::RenderWindow &window, sf::Font &font,
-                                 const sf::Event &ev) {
-  std::vector<std::string> enemies = EnemyManager::getInstance().getEnemyList();
+void TilePicker::drawEnemyPicker() {
+  auto enemies = EnemyManager::getInstance().getEnemyList();
 
   float x = 10.f;
   float y = 40.f;
 
   sf::Text title("Select Enemy:", font, 16);
   title.setPosition(x, y);
-  window.draw(title);
+  WindowManager::getInstance().drawOnWindow(window, title);
 
   y += 30.f;
 
   for (const auto &e : enemies) {
     UIButton btn({x, y}, {200, 24}, e, font);
-    btn.draw(window);
-
-    if (btn.isClicked(ev, window)) {
-      selection.enemyId = e;
-      selection.mode = PickerMode::Enemies;
-    }
+    btn.draw(window); // ONLY DRAW
 
     y += 32.f;
   }
 }
 
-void TilePicker::drawTileset(sf::RenderWindow &window,
-                             const sf::IntRect &selectedRect) {
+void TilePicker::drawTileset(const sf::IntRect &selectedRect) {
+
+  WindowManager &windowManager = WindowManager::getInstance();
+
   sf::Sprite spr(tileset);
   spr.setPosition(0.f, 40.f);
-  window.draw(spr);
+
+  windowManager.drawOnWindow(window, spr);
 
   int cols = static_cast<int>(tileset.getSize().x / tileSize);
   int rows = static_cast<int>(tileset.getSize().y / tileSize);
@@ -177,7 +305,7 @@ void TilePicker::drawTileset(sf::RenderWindow &window,
                        sf::Color(150, 150, 150));
   }
 
-  window.draw(lines.data(), lines.size(), sf::Lines);
+  windowManager.drawOnWindow(window, lines.data(), lines.size(), sf::Lines);
 
   sf::RectangleShape sel(
       {(float)selectedRect.width, (float)selectedRect.height});
@@ -185,27 +313,19 @@ void TilePicker::drawTileset(sf::RenderWindow &window,
   sel.setFillColor(sf::Color::Transparent);
   sel.setOutlineColor(sf::Color::Yellow);
   sel.setOutlineThickness(2.f);
-  window.draw(sel);
+  windowManager.drawOnWindow(window, sel);
 }
 
-void TilePicker::drawLayerList(sf::RenderWindow &window,
-                               std::vector<LayerInfo> &layers, int &activeLayer,
-                               sf::Font &font, const sf::Event &ev) {
+void TilePicker::drawLayerList(std::vector<LayerInfo> &layers,
+                               int &activeLayer) {
+
+  auto &wm = WindowManager::getInstance();
+
   float panelX = static_cast<float>(tileset.getSize().x) + 10.f;
   float y = 10.f;
 
   UIButton addBtn({panelX, y}, {240, 24}, "+ Add Layer", font);
   addBtn.draw(window);
-
-  if (addBtn.isClicked(ev, window)) {
-    LayerInfo n;
-    n.name = "Layer " + std::to_string(layers.size());
-    n.paralax = 1.0f;
-    layers.push_back(n);
-    if (activeLayer < 0)
-      activeLayer = 0;
-    return;
-  }
 
   y += 40.f;
 
@@ -216,67 +336,46 @@ void TilePicker::drawLayerList(sf::RenderWindow &window,
     entry.setPosition(panelX, y);
     entry.setFillColor(selected ? sf::Color(120, 120, 120)
                                 : sf::Color(60, 60, 60));
-    window.draw(entry);
+    wm.drawOnWindow(window, entry);
 
     sf::Text t(layers[i].name, font, 14);
     t.setPosition(panelX + 10, y + 5);
-    window.draw(t);
+    wm.drawOnWindow(window, t);
 
-    if (ev.type == sf::Event::MouseButtonReleased &&
-        ev.mouseButton.button == sf::Mouse::Left) {
-      sf::Vector2i mp = sf::Mouse::getPosition(window);
-      if (static_cast<float>(mp.x) >= panelX &&
-          static_cast<float>(mp.x) <= panelX + 240 &&
-          static_cast<float>(mp.y) >= y && static_cast<float>(mp.y) <= y + 28)
-        activeLayer = i;
-    }
-
-    UIButton up({panelX + 195, y}, {20, 12}, "", font, sf::Color::Yellow);
-    up.draw(window);
-    if (up.isClicked(ev, window) && i > 0) {
-      std::swap(layers[i], layers[i - 1]);
-      activeLayer = i - 1;
-      return;
-    }
-
-    UIButton down({panelX + 195, y + 14}, {20, 12}, "", font,
-                  sf::Color::Yellow);
-    down.draw(window);
-    if (down.isClicked(ev, window) && i < (int)layers.size() - 1) {
-      std::swap(layers[i], layers[i + 1]);
-      activeLayer = i + 1;
-      return;
-    }
-
+    UIButton up({panelX + 195, y}, {20, 12}, "", font);
+    UIButton down({panelX + 195, y + 14}, {20, 12}, "", font);
     UIButton del({panelX + 220, y}, {20, 24}, "X", font);
+
+    up.draw(window);
+    down.draw(window);
     del.draw(window);
-    if (del.isClicked(ev, window)) {
-      LevelManager::getInstance().deleteLayerObjects(i);
-      layers.erase(layers.begin() + i);
-      if (layers.empty())
-        activeLayer = -1;
-      else if (activeLayer >= (int)layers.size())
-        activeLayer = static_cast<int>(layers.size()) - 1;
-      return;
-    }
 
     y += 36;
   }
 }
 
-void TilePicker::drawParallaxUI(sf::RenderWindow &window, LayerInfo &layer,
-                                sf::Font &font, UISlider &slider) {
+void TilePicker::drawParallaxUI(LayerInfo &layer, UISlider &slider) {
   float panelX = 10.f;
   float y = static_cast<float>(tileset.getSize().y) + 50.f;
 
+  WindowManager &windowManager = WindowManager::getInstance();
+
   sf::Text label("Parallax:", font, 14);
   label.setPosition(panelX, y);
-  window.draw(label);
+  windowManager.drawOnWindow(window, label);
 
   slider.draw(window);
 
   float rounded = float(int(layer.paralax * 100)) / 100.f;
   sf::Text v(std::to_string(rounded), font, 12);
   v.setPosition(10.f, y + 22);
-  window.draw(v);
+  windowManager.drawOnWindow(window, v);
+}
+
+WindowManager::WindowID TilePicker::getWindow() const { return window; }
+
+void TilePicker::setLayers(std::vector<LayerInfo> *l) {
+  layers = l;
+  if (layers && !layers->empty() && activeLayer < 0)
+    activeLayer = 0;
 }

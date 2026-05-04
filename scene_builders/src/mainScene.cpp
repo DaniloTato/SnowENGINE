@@ -52,7 +52,8 @@ void mainScene() {
 
   // may need to refactor terminalCreation into a sytem for the engine
   ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
-      {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}));
+      {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL,
+       WindowManager::Set::DEVUI}));
   sr->scripter.addScript("terminalCreation", Scripts::terminalCreationScript);
   sr->scripter.addScript("tilePickerCreation",
                          Scripts::tilePickerCreationScript);

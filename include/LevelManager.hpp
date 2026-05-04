@@ -69,6 +69,7 @@ public:
   void setBackgroundColor(sf::Color newColor);
 
   const LayerInfo getLayerInfo(int layerNo) const;
+  void deleteLayerObjects(int layerNo);
 
   const std::vector<std::vector<int>> &getLevelLayout() const;
 
@@ -88,7 +89,6 @@ private:
   void createTile(WindowManager::WindowID window, GameCamera *camera,
                   int layerNo, int x, int y, sf::IntRect rect);
   void deleteTile(int layerNo, int x, int y);
-  void deleteLayerObjects(int layerNo);
 
   void loadLayer(WindowManager::WindowID window, GameCamera *camera,
                  size_t layerNo, const nlohmann::json &layerJSON, int tileSize);

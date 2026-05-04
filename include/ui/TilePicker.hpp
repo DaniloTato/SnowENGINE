@@ -17,23 +17,31 @@ class TilePicker {
 public:
   TilePicker(sf::Texture &tileset, int tileSize);
 
-  PickerSelection open(std::vector<LayerInfo> &layers, int &activeLayer);
+  void open();
+  void close();
+
+  void handleEvent(WindowManager::WindowID id, const sf::Event &ev);
+  void update();
+  void draw();
+
+  void setLayers(std::vector<LayerInfo> *l);
+
+  WindowManager::WindowID getWindow() const;
+
+  [[nodiscard]] bool isOpen() const;
+  [[nodiscard]] PickerSelection getSelection() const;
 
 private:
-  void drawTileset(sf::RenderWindow &window, const sf::IntRect &selectedRect);
-
-  void drawLayerList(sf::RenderWindow &window, std::vector<LayerInfo> &layers,
-                     int &activeLayer, sf::Font &font, const sf::Event &ev);
-
-  void drawParallaxUI(sf::RenderWindow &window, LayerInfo &layer,
-                      sf::Font &font, UISlider &slider);
-
-  void drawModeTabs(sf::RenderWindow &window, sf::Font &font,
-                    const sf::Event &ev);
-  void drawEnemyPicker(sf::RenderWindow &window, sf::Font &font,
-                       const sf::Event &ev);
+  void drawTileset(const sf::IntRect &selectedRect);
+  void drawLayerList(std::vector<LayerInfo> &layers, int &activeLayer);
+  void drawParallaxUI(LayerInfo &layer, UISlider &slider);
+  void drawEnemyPicker();
 
 private:
+  WindowManager::WindowID window;
+  bool opened = false;
+
+  sf::Font font;
   sf::Texture &tileset;
   int tileSize;
 
@@ -42,4 +50,9 @@ private:
   bool dragging = false;
   sf::Vector2i dragStart;
   sf::IntRect selectedRect;
+
+  int activeLayer = -1;
+  std::vector<LayerInfo> *layers = nullptr;
+
+  std::unique_ptr<UISlider> parallaxSlider;
 };

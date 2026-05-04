@@ -9,7 +9,8 @@ WindowManager &WindowManager::getInstance() {
   return instance;
 }
 
-WindowManager::WindowID WindowManager::create(Set set, int w, int h,
+WindowManager::WindowID WindowManager::create(Set set, unsigned int w,
+                                              unsigned int h,
                                               const std::string &name) {
 
   if (set == Set::MAIN) {
@@ -174,13 +175,27 @@ void WindowManager::drawOnWindow(WindowID id,
   window->draw(toDraw);
 }
 
+void WindowManager::drawOnWindow(WindowID id, const sf::CircleShape &toDraw) {
+  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  window->draw(toDraw);
+}
+
 void WindowManager::drawOnWindow(WindowID id, const sf::Text &toDraw) {
   sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
   window->draw(toDraw);
 }
 
+void WindowManager::drawOnWindow(WindowID id, const sf::Vertex *vertices,
+                                 std::size_t count, sf::PrimitiveType type) {
+  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  window->draw(vertices, count, type);
+}
+
 bool WindowManager::pollEventOnWindow(WindowID id, sf::Event &event) {
-  return fetchGameWindow(id)->getWindow()->pollEvent(event);
+  auto *gw = fetchGameWindow(id);
+  if (!gw)
+    return false;
+  return gw->getWindow()->pollEvent(event);
 }
 
 void WindowManager::clearWindow(WindowID id, sf::Color backgroundColor) {

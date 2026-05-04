@@ -27,7 +27,8 @@ private:
 public:
   static WindowManager &getInstance();
 
-  WindowID create(Set set, int w, int h, const std::string &name);
+  WindowID create(Set set, unsigned int w, unsigned int h,
+                  const std::string &name);
 
   void destroy(WindowID id);
 
@@ -38,7 +39,10 @@ public:
 
   void drawOnWindow(WindowID id, const sf::Sprite &toDraw);
   void drawOnWindow(WindowID id, const sf::RectangleShape &toDraw);
+  void drawOnWindow(WindowID id, const sf::CircleShape &toDraw);
   void drawOnWindow(WindowID id, const sf::Text &toDraw);
+  void drawOnWindow(WindowID id, const sf::Vertex *vertices, std::size_t count,
+                    sf::PrimitiveType type);
 
   void clearWindow(WindowID id, sf::Color backgroundColor = sf::Color::Black);
 

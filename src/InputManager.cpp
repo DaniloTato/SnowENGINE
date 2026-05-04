@@ -78,7 +78,8 @@ void InputManager::bindKey(const std::string &action, sf::Keyboard::Key key) {
   bindings[action] = key;
 }
 
-void InputManager::handleEvent(const sf::Event &event) {
+void InputManager::handleEvent(WindowManager::WindowID id,
+                               const sf::Event &event) {
 
   if (event.type == sf::Event::KeyPressed) {
     currentState[event.key.code] = true;
@@ -94,7 +95,7 @@ void InputManager::handleEvent(const sf::Event &event) {
     if (event.mouseButton.button == sf::Mouse::Middle)
       mouseCurrent[MouseButton::Middle] = true;
 
-    lastMouseClickPosition = {event.mouseButton.x, event.mouseButton.y};
+    mousePositions[id] = {event.mouseButton.x, event.mouseButton.y};
   }
 
   else if (event.type == sf::Event::MouseButtonReleased) {
@@ -107,7 +108,7 @@ void InputManager::handleEvent(const sf::Event &event) {
   }
 
   if (event.type == sf::Event::MouseMoved) {
-    lastMouseClickPosition = {event.mouseMove.x, event.mouseMove.y};
+    mousePositions[id] = {event.mouseMove.x, event.mouseMove.y};
   }
 }
 
@@ -154,8 +155,11 @@ bool InputManager::isMouseJustReleased(MouseButton button) const {
   return !mouseCurrent.at(button) && mousePrevious.at(button);
 }
 
-sf::Vector2i InputManager::getMousePosition() const {
-  return lastMouseClickPosition;
+sf::Vector2i InputManager::getMousePosition(WindowManager::WindowID id) const {
+  auto it = mousePositions.find(id);
+  if (it == mousePositions.end())
+    return {0, 0};
+  return it->second;
 }
 
 bool InputManager::loadBindingsFromJsonFile(const std::string &filePath) {
