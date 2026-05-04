@@ -10,6 +10,7 @@
 
 /*Scripts*/
 #include "basicMovementScript.hpp"
+#include "cameraBehaviourScript.hpp"
 #include "terminalCreationScript.hpp"
 #include "tilePickerCreationScript.hpp"
 
@@ -21,6 +22,9 @@ void mainScene() {
 
   GameState::getInstance().createCamera(
       CameraTypes::MAIN, GameObject::UpdateDomain(WindowManager::Set::MAIN));
+
+  GameState::getInstance().getMainCamera()->scripter.addScript(
+      "cameraBehaviour", Scripts::cameraBehaviourScript);
 
   /* Setup in case we'd like to have particles in the scene.
 
@@ -58,7 +62,7 @@ void mainScene() {
   sr->scripter.addScript("tilePickerCreation",
                          Scripts::tilePickerCreationScript);
 
-  GeneralContext ctx = {.player = nullptr};
+  GeneralContext ctx = {.player = image};
   GameState::getInstance().updateGeneralContext(ctx);
 }
 } // namespace SceneBuilder

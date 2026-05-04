@@ -61,7 +61,6 @@ public:
   void setSecretLayerOppacity(float oppacity);
 
   const std::string &getLoadedLevelPath() const;
-  const sf::Vector2f &getCameraPlayerRelation() const;
 
   void onSceneUnload() override;
 
@@ -100,7 +99,6 @@ private:
   bool isLevelLoaded;
 
   sf::Texture tilesheet;
-  sf::Vector2f cameraPlayerRelation;
 
   std::vector<std::vector<int>> levelLayout;
   std::vector<TileCreationRequest> createQueue;
@@ -109,4 +107,6 @@ private:
   sf::Color backgroundColor;
   std::string loadedLevelpath;
   std::string tilesetPath;
+
+  // SHOULD MAKE WINDOW AND CAMERA MEMBERS OF THE MANAGER SOMEHOW
 };

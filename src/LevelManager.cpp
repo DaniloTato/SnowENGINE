@@ -13,7 +13,6 @@ using json = nlohmann::json;
 
 LevelManager::LevelManager()
     : activeLayer(0), isLevelLoaded(false),
-      cameraPlayerRelation(Constants::STARTING_PLAYER_CAMERA_RELATION),
       backgroundColor(ColorPalette::Black) {}
 
 LevelManager &LevelManager::getInstance() {
@@ -359,10 +358,6 @@ void LevelManager::applyQueuedTileChanges() {
   createQueue.clear();
 }
 
-const sf::Vector2f &LevelManager::getCameraPlayerRelation() const {
-  return cameraPlayerRelation;
-}
-
 void LevelManager::onSceneUnload() {
   for (auto &layer : layers) {
     for (auto &tile : layer.tiles) {
@@ -383,7 +378,6 @@ void LevelManager::onSceneUnload() {
   levelLayout.clear();
 
   activeLayer = 0;
-  cameraPlayerRelation = Constants::STARTING_PLAYER_CAMERA_RELATION;
   backgroundColor = ColorPalette::DarkCyanBlue;
 }
 
