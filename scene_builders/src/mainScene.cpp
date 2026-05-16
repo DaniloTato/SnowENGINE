@@ -5,14 +5,14 @@
 #include "ScriptRunner.hpp"
 #include "TangibleObject.hpp"
 
-#include "Helpers.hpp"
-#include "ObjectBuilder.hpp"
-
-/*Scripts*/
-#include "basicMovementScript.hpp"
 #include "cameraBehaviourScript.hpp"
 #include "terminalCreationScript.hpp"
 #include "tilePickerCreationScript.hpp"
+#include "basicMovementScript.hpp"
+
+#include "Helpers.hpp"
+#include "ObjectBuilder.hpp"
+#include "ScriptRegistry.hpp"
 
 #include "RegistryMacros.hpp"
 #include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
@@ -24,7 +24,7 @@ void mainScene() {
       CameraTypes::MAIN, GameObject::UpdateDomain(WindowManager::Set::MAIN));
 
   GameState::getInstance().getMainCamera()->scripter.addScript(
-      "cameraBehaviour", Scripts::cameraBehaviourScript);
+      Scripts::cameraBehaviourScript);
 
   /* Setup in case we'd like to have particles in the scene.
 
@@ -52,15 +52,17 @@ void mainScene() {
                     .withEmptyAnimation(16, 16)
                     .build();
 
-  image->scripter.addScript("simpleMovement", Scripts::basicMovementScript);
+    //Change addScript to recieve the function reference, not a string.
+  image->scripter.addScript(Scripts::basicMovementScript);
 
   // may need to refactor terminalCreation into a sytem for the engine
   ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
       {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL,
        WindowManager::Set::DEVUI}));
-  sr->scripter.addScript("terminalCreation", Scripts::terminalCreationScript);
-  sr->scripter.addScript("tilePickerCreation",
-                         Scripts::tilePickerCreationScript);
+  sr->scripter.addScript(
+      Scripts::terminalCreationScript);
+  sr->scripter.addScript(
+      Scripts::tilePickerCreationScript);
 
   GeneralContext ctx = {.player = image};
   GameState::getInstance().updateGeneralContext(ctx);

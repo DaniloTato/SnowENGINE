@@ -48,6 +48,10 @@ cpp = f"""\
 
 #include "{target_include}"
 
+#include "RegistryMacros.hpp"
+#include "ScriptRegistry.hpp"
+#include "Scripter.hpp"
+
 namespace Scripts {{
 
 namespace {{
@@ -77,6 +81,9 @@ void {func_name}({target} &{target_var}, const GeneralContext &ctx) {{
 }}
 
 }} // namespace script
+
+REGISTER_SCRIPT("{func_name}", Scripts::{func_name},
+                {target});
 """
 
 include_path = Path(f"scripts/include/{func_name}.hpp")

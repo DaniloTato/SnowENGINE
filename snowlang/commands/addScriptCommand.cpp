@@ -1,6 +1,7 @@
 #include "Commands.hpp"
 #include "GameObject.hpp"
 #include "RuntimeValue.hpp"
+#include "Scripter.hpp"
 #include "TangibleObject.hpp"
 
 namespace Snowlang::Commands {
@@ -41,10 +42,11 @@ RuntimeValue addScriptCommand(const CommandContext &ctx) {
                    "[find_class] " + scriptName + " not found on registry.", ctx.cmd.span);
       }
 
+      // TIGHT COUPLING
       Scripter<TangibleObject>::ScriptFunc fn = it->second;
 
-      ptr->scripter.addScript(std::string_view(ctx.getFlag("name", std::string("injected_script"))),
-                              fn);
+      ptr->scripter.addScript(Scripter<TangibleObject>::NamedScript{
+          .name = ctx.getFlag("name", std::string("injected_script")), .function = fn});
     } else {
       throwError(SnowErr::Phase::Evaluator,
                  "[find_class] passed along an id belonging to a non-" + objectType + " class.",
@@ -62,8 +64,8 @@ RuntimeValue addScriptCommand(const CommandContext &ctx) {
 
       Scripter<GameCamera>::ScriptFunc fn = it->second;
 
-      ptr->scripter.addScript(std::string_view(ctx.getFlag("name", std::string("injected_script"))),
-                              fn);
+      ptr->scripter.addScript(Scripter<GameCamera>::NamedScript{
+          .name = ctx.getFlag("name", std::string("injected_script")), .function = fn});
     } else {
       throwError(SnowErr::Phase::Evaluator,
                  "[find_class] passed along an id belonging to a non-" + objectType + " class.",

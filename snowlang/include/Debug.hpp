@@ -14,7 +14,7 @@
 of the stuct*/
 template <typename, typename = void> struct has_toString : std::false_type {};
 
-/*we make a compiler-time-only object of Type const T, then chek if it has .toString() method.
+/*we make a compiler-time-only object of Type const T, then check if it has .toString() method.
 If the process is successful, decltype returns the type of our compiler-time-only object. And, thus,
 we turn it into a void type to satisfy the template's needs*/
 template <typename T>

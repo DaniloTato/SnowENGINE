@@ -8,6 +8,7 @@
 #include "Helpers.hpp"
 #include "SceneBuilderRegistry.hpp"
 #include "SceneManager.hpp"
+#include "ScriptRegistry.hpp"
 #include "SoundManager.hpp"
 #include "TextureManager.hpp"
 

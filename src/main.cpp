@@ -47,7 +47,6 @@ int main() {
   sf::Clock clock;
 
   while (windowManager.isMainWindowAlive()) {
-
     sf::Event event;
     inputManager.update();
 

@@ -7,6 +7,10 @@
 #include "TilePicker.hpp"
 #include <iostream>
 
+#include "RegistryMacros.hpp"
+#include "ScriptRegistry.hpp"
+#include "Scripter.hpp"
+
 namespace Scripts {
 
 namespace {
@@ -156,3 +160,6 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
   }
 }
 } // namespace Scripts
+
+REGISTER_SCRIPT("tilePickerCreationScript", Scripts::tilePickerCreationScript,
+                ScriptRunner);

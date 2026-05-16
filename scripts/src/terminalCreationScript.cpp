@@ -5,6 +5,10 @@
 #include "Terminal.hpp"
 #include "TextureManager.hpp"
 
+#include "RegistryMacros.hpp"
+#include "ScriptRegistry.hpp"
+#include "Scripter.hpp"
+
 namespace Scripts {
 
 static Terminal *s_terminal = nullptr;
@@ -50,3 +54,6 @@ void terminalCreationScript(ScriptRunner &renderable,
 }
 
 } // namespace Scripts
+
+REGISTER_SCRIPT("terminalCreationScript", Scripts::terminalCreationScript,
+                ScriptRunner);

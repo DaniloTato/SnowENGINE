@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "GameObjectExposure.hpp"
+#include "ScriptRegistry.hpp"
 
 struct GeneralContext;
 
@@ -30,11 +31,8 @@ public:
   }
   /*Script States*/
 
-  void addScript(std::string_view name, const ScriptFunc &func) {
-    auto s = std::string(name);
-    toLowercase(s);
-    scripts.push_back(NamedScript{.name = std::move(s), .function = func});
-  }
+  void addScript(Scripter::ScriptFunc function) { 
+    scripts.push_back(ScriptRegistry<OwnerType>::get()); }
 
   void runScripts(OwnerType &owner, const GeneralContext &ctx) {
     for (auto &script : scripts) {

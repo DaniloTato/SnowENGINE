@@ -9,6 +9,8 @@
 #include "LevelManager.hpp"
 #include "ParticleManager.hpp"
 
+#include <iostream>
+
 SceneManager &SceneManager::getInstance() {
   static SceneManager instance;
   return instance;

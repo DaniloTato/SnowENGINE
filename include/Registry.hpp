@@ -29,6 +29,23 @@ public:
     return getRegistry();
   }
 
+  static const auto& findSecond(const Func& target) {
+    auto& registry = getRegistry();
+
+    auto it = std::find_if(
+        registry.begin(),
+        registry.end(),
+        [&](const auto& pair) {
+            return pair.second == target;
+        });
+
+    if (it == registry.end()){
+      throw std::runtime_error("Function not found");
+    }
+
+    return *it;
+  }
+
 protected:
   static std::unordered_map<std::string, Func> &getRegistry() {
     static std::unordered_map<std::string, Func> registry;

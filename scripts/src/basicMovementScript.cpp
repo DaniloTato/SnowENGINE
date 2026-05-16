@@ -3,6 +3,10 @@
 #include "InputManager.hpp"
 #include "TangibleObject.hpp"
 
+#include "RegistryMacros.hpp"
+#include "ScriptRegistry.hpp"
+#include "Scripter.hpp"
+
 namespace Scripts {
 
 namespace {
@@ -33,3 +37,6 @@ void basicMovementScript(TangibleObject &tangible, const GeneralContext &ctx) {
 }
 
 } // namespace Scripts
+
+REGISTER_SCRIPT("basicMovementScript", Scripts::basicMovementScript,
+                TangibleObject);

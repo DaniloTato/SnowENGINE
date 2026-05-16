@@ -3,6 +3,10 @@
 #include "Constants.hpp"
 #include "GameCamera.hpp"
 
+#include "RegistryMacros.hpp"
+#include "ScriptRegistry.hpp"
+#include "Scripter.hpp"
+
 namespace Scripts {
 
 void cameraBehaviourScript(GameCamera &camera, const GeneralContext &ctx) {
@@ -18,3 +22,6 @@ void cameraBehaviourScript(GameCamera &camera, const GeneralContext &ctx) {
 }
 
 } // namespace Scripts
+
+REGISTER_SCRIPT("cameraBehaviourScript", Scripts::cameraBehaviourScript,
+                GameCamera);
