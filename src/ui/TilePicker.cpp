@@ -58,7 +58,7 @@ void TilePicker::close() {
       WindowManager::getInstance().getMain(),
       GameState::getInstance().getMainCamera());
 
-  WindowManager::getInstance().destroy(window);
+  WindowManager::getInstance().queueDestroy(window);
   opened = false;
 }
 
@@ -66,11 +66,13 @@ bool TilePicker::isOpen() const { return opened; }
 
 PickerSelection TilePicker::getSelection() const { return selection; }
 
-void TilePicker::handleEvent(WindowManager::WindowID id, const sf::Event &ev) {
+void TilePicker::handleEvent(WindowID id, const sf::Event &ev) {
   if (!opened || id != window)
     return;
 
   auto &im = InputManager::getInstance();
+
+  im.handleEvent(id, ev);
 
   if (ev.type == sf::Event::Closed) {
     close();
@@ -377,7 +379,7 @@ void TilePicker::drawParallaxUI(LayerInfo &layer, UISlider &slider) {
   windowManager.drawOnWindow(window, v);
 }
 
-WindowManager::WindowID TilePicker::getWindow() const { return window; }
+WindowID TilePicker::getWindow() const { return window; }
 
 void TilePicker::setLayers(std::vector<LayerInfo> *l) {
   layers = l;

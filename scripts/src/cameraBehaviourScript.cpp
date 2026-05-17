@@ -4,7 +4,7 @@
 #include "GameCamera.hpp"
 
 #include "RegistryMacros.hpp"
-#include "ScriptRegistry.hpp"
+#include "ScriptRegistry.hpp" // IWYU pragma: keep
 #include "Scripter.hpp"
 
 namespace Scripts {

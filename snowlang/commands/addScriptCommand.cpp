@@ -45,8 +45,7 @@ RuntimeValue addScriptCommand(const CommandContext &ctx) {
       // TIGHT COUPLING
       Scripter<TangibleObject>::ScriptFunc fn = it->second;
 
-      ptr->scripter.addScript(Scripter<TangibleObject>::NamedScript{
-          .name = ctx.getFlag("name", std::string("injected_script")), .function = fn});
+      ptr->scripter.addScript(fn);
     } else {
       throwError(SnowErr::Phase::Evaluator,
                  "[find_class] passed along an id belonging to a non-" + objectType + " class.",
@@ -64,8 +63,7 @@ RuntimeValue addScriptCommand(const CommandContext &ctx) {
 
       Scripter<GameCamera>::ScriptFunc fn = it->second;
 
-      ptr->scripter.addScript(Scripter<GameCamera>::NamedScript{
-          .name = ctx.getFlag("name", std::string("injected_script")), .function = fn});
+      ptr->scripter.addScript(fn);
     } else {
       throwError(SnowErr::Phase::Evaluator,
                  "[find_class] passed along an id belonging to a non-" + objectType + " class.",

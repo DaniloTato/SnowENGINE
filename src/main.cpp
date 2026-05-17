@@ -14,6 +14,7 @@
 #include "Renderizer.hpp"
 #include "SceneManager.hpp"
 #include "Terminal.hpp"
+#include "WindowLifecycleListener.hpp"
 
 /*Helpers*/
 #include "Helpers.hpp"
@@ -35,8 +36,13 @@ int main() {
   WindowManager &windowManager = WindowManager::getInstance();
   GameState &gameState = GameState::getInstance();
 
-  windowManager.create(WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
-                       Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
+  WindowID mainWindow = windowManager.create(
+      WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
+      Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
+  WindowLifecycleListener lifecycleListener;
+
+  windowManager.subscribe(mainWindow, &inputManager);
+  windowManager.subscribe(mainWindow, &lifecycleListener);
 
   inputManager.loadBindingsFromJsonFile(
       (Helper::getPath("config/control_config.json")));
@@ -47,31 +53,12 @@ int main() {
   sf::Clock clock;
 
   while (windowManager.isMainWindowAlive()) {
-    sf::Event event;
+
     inputManager.update();
+    windowManager.pollEvents();
 
-    const std::unordered_map<WindowManager::WindowID,
-                             WindowManager::WindowEntry> &windows =
+    const std::unordered_map<WindowID, WindowManager::WindowEntry> &windows =
         windowManager.getAll();
-
-    const auto mainWindow = windowManager.getMain();
-
-    while (windowManager.pollEventOnWindow(mainWindow, event)) {
-      inputManager.handleEvent(mainWindow, event);
-
-      if (event.type == sf::Event::LostFocus) {
-        windowManager.pauseWindow(mainWindow);
-      }
-
-      if (event.type == sf::Event::GainedFocus) {
-        windowManager.resumeWindow(mainWindow);
-      }
-
-      if (event.type == sf::Event::Closed) {
-        WindowManager::getInstance().destroy(mainWindow);
-        break;
-      }
-    }
 
     sceneManager.update();
     gameState.updateDt();
@@ -84,6 +71,7 @@ int main() {
       CollectableManager::getInstance().applyQueues();
       BulletManager::getInstance().update();
       Terminal::destroyKilledTerminals();
+      windowManager.applyDestroyQueue();
     }
 
     for (const auto &[id, entry] : windows) {

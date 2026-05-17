@@ -14,7 +14,6 @@
 
 #define REGISTER_SCRIPT(name, script, type)                                    \
   static bool _script_register_reg_##__COUNTER__ = []() {                      \
-    ScriptRegistry<type>::registerItem(                                        \
-        name, (Scripter<type>::NamedScript{name, script}));                    \
+    ScriptRegistry<type>::registerItem(name, NamedScript<type>{name, script}); \
     return true;                                                               \
   }()

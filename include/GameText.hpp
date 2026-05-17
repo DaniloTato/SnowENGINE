@@ -75,8 +75,8 @@ public:
 
   void updateRenderCommandBuffer();
 
-  size_t totalChars() const { return glyphs.size(); }
-  size_t visibleChars() const { return revealedCount; }
+  [[nodiscard]] size_t totalChars() const { return glyphs.size(); }
+  [[nodiscard]] size_t visibleChars() const { return revealedCount; }
 
 public:
   PolyRenderizer renderizer;
@@ -86,9 +86,10 @@ private:
   void parseBody(const std::string &body);
   void pushTextChar(char c, const sf::Color &color, Glyph::Anim anim,
                     float animParam);
-  sf::Color parseColorSpec(const std::string &s) const;
+  [[nodiscard]] sf::Color parseColorSpec(const std::string &s) const;
   void rebuildLayout();
-  float measureLineWidth(const std::vector<size_t> &lineIndices) const;
+  [[nodiscard]] float
+  measureLineWidth(const std::vector<size_t> &lineIndices) const;
 
   void advanceTypewriter();
   void playTypeSound();

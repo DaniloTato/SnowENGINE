@@ -142,8 +142,7 @@ bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos) {
   return collided;
 }
 
-void BasicCollider::debugRender(WindowManager::WindowID window,
-                                GameCamera &camera,
+void BasicCollider::debugRender(WindowID window, GameCamera &camera,
                                 const sf::Vector2f &objectPos) {
 
   sf::Vector2f posWithCamera = camera.worldToScreen(objectPos + offset);

@@ -1,4 +1,5 @@
 #pragma once
+#include "IEventListener.hpp"
 #include "WindowManager.hpp"
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -7,14 +8,14 @@
 
 enum class MouseButton : std::uint8_t { Left, Right, Middle };
 
-class InputManager {
+class InputManager : public IEventListener {
 public:
   static InputManager &getInstance() {
     static InputManager instance;
     return instance;
   }
 
-  void handleEvent(WindowManager::WindowID window, const sf::Event &event);
+  void handleEvent(WindowID window, const sf::Event &event) override;
   void update();
 
   [[nodiscard]] bool isPressed(const std::string &action) const;
@@ -28,7 +29,7 @@ public:
   [[nodiscard]] bool isMouseJustPressed(MouseButton button) const;
   [[nodiscard]] bool isMouseJustReleased(MouseButton button) const;
 
-  [[nodiscard]] sf::Vector2i getMousePosition(WindowManager::WindowID id) const;
+  [[nodiscard]] sf::Vector2i getMousePosition(WindowID id) const;
   [[nodiscard]] sf::Keyboard::Key
   keyFromString(const std::string &keyName) const;
 
@@ -47,7 +48,7 @@ private:
   std::unordered_map<MouseButton, bool> mouseCurrent;
   std::unordered_map<MouseButton, bool> mousePrevious;
 
-  std::unordered_map<WindowManager::WindowID, sf::Vector2i> mousePositions;
+  std::unordered_map<WindowID, sf::Vector2i> mousePositions;
 
   sf::Vector2i lastMouseClickPosition;
 

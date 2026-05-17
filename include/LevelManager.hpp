@@ -9,7 +9,7 @@
 #include <vector>
 
 struct TileCreationRequest {
-  WindowManager::WindowID window;
+  WindowID window;
   GameCamera *camera;
   int layer;
   int x;
@@ -45,18 +45,16 @@ public:
 
   static LevelManager &getInstance();
 
-  void loadLevel(WindowManager::WindowID window, GameCamera *camera,
-                 const std::string &path);
+  void loadLevel(WindowID window, GameCamera *camera, const std::string &path);
   void saveLevel(const std::string &path);
 
-  void queueCreateTile(WindowManager::WindowID window, GameCamera *camera,
-                       int layer, int x, int y, const sf::IntRect &rect);
+  void queueCreateTile(WindowID window, GameCamera *camera, int layer, int x,
+                       int y, const sf::IntRect &rect);
   void queueDeleteTile(int layer, int x, int y);
   void applyQueuedTileChanges();
 
-  void reloadAllLayers(WindowManager::WindowID window, GameCamera *camera);
-  void reloadLayer(WindowManager::WindowID window, GameCamera *camera,
-                   size_t layerNo);
+  void reloadAllLayers(WindowID window, GameCamera *camera);
+  void reloadLayer(WindowID window, GameCamera *camera, size_t layerNo);
 
   void setSecretLayerOppacity(float oppacity);
 
@@ -85,12 +83,12 @@ public:
   LevelManager &operator=(LevelManager &&) = delete;
 
 private:
-  void createTile(WindowManager::WindowID window, GameCamera *camera,
-                  int layerNo, int x, int y, sf::IntRect rect);
+  void createTile(WindowID window, GameCamera *camera, int layerNo, int x,
+                  int y, sf::IntRect rect);
   void deleteTile(int layerNo, int x, int y);
 
-  void loadLayer(WindowManager::WindowID window, GameCamera *camera,
-                 size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
+  void loadLayer(WindowID window, GameCamera *camera, size_t layerNo,
+                 const nlohmann::json &layerJSON, int tileSize);
 
   void ensureLevelLoaded() const;
 

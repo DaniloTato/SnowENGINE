@@ -78,8 +78,7 @@ void InputManager::bindKey(const std::string &action, sf::Keyboard::Key key) {
   bindings[action] = key;
 }
 
-void InputManager::handleEvent(WindowManager::WindowID id,
-                               const sf::Event &event) {
+void InputManager::handleEvent(WindowID id, const sf::Event &event) {
 
   if (event.type == sf::Event::KeyPressed) {
     currentState[event.key.code] = true;
@@ -155,7 +154,7 @@ bool InputManager::isMouseJustReleased(MouseButton button) const {
   return !mouseCurrent.at(button) && mousePrevious.at(button);
 }
 
-sf::Vector2i InputManager::getMousePosition(WindowManager::WindowID id) const {
+sf::Vector2i InputManager::getMousePosition(WindowID id) const {
   auto it = mousePositions.find(id);
   if (it == mousePositions.end())
     return {0, 0};

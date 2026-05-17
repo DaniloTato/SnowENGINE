@@ -22,7 +22,7 @@ LevelManager &LevelManager::getInstance() {
 
 sf::Color &LevelManager::getBackgroundColor() { return backgroundColor; }
 
-void LevelManager::loadLevel(WindowManager::WindowID window, GameCamera *camera,
+void LevelManager::loadLevel(WindowID window, GameCamera *camera,
                              const std::string &path) {
 
   layers.clear();
@@ -81,7 +81,7 @@ void LevelManager::deleteLayerObjects(int layerNo) {
   }
 }
 
-void LevelManager::loadLayer(WindowManager::WindowID window, GameCamera *camera,
+void LevelManager::loadLayer(WindowID window, GameCamera *camera,
                              size_t layerNo, const json &layerJSON,
                              int tileSize) {
 
@@ -120,15 +120,14 @@ void LevelManager::loadLayer(WindowManager::WindowID window, GameCamera *camera,
   }
 }
 
-void LevelManager::reloadAllLayers(WindowManager::WindowID window,
-                                   GameCamera *camera) {
+void LevelManager::reloadAllLayers(WindowID window, GameCamera *camera) {
   ensureLevelLoaded();
   for (size_t i = 0; i < layers.size(); ++i)
     reloadLayer(window, camera, i);
 }
 
-void LevelManager::reloadLayer(WindowManager::WindowID window,
-                               GameCamera *camera, size_t layerNo) {
+void LevelManager::reloadLayer(WindowID window, GameCamera *camera,
+                               size_t layerNo) {
 
   ensureLevelLoaded();
 
@@ -158,9 +157,8 @@ void LevelManager::reloadLayer(WindowManager::WindowID window,
   }
 }
 
-void LevelManager::createTile(WindowManager::WindowID window,
-                              GameCamera *camera, int layerNo, int x, int y,
-                              sf::IntRect rect) {
+void LevelManager::createTile(WindowID window, GameCamera *camera, int layerNo,
+                              int x, int y, sf::IntRect rect) {
   ensureLevelLoaded();
 
   size_t unsignedX = x;
@@ -333,8 +331,8 @@ const LayerInfo LevelManager::getLayerInfo(int layerNo) const {
   return layers[layerNo];
 }
 
-void LevelManager::queueCreateTile(WindowManager::WindowID window,
-                                   GameCamera *camera, int layer, int x, int y,
+void LevelManager::queueCreateTile(WindowID window, GameCamera *camera,
+                                   int layer, int x, int y,
                                    const sf::IntRect &rect) {
   ensureLevelLoaded();
   createQueue.push_back({window, camera, layer, x, y, rect});

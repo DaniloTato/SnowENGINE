@@ -23,7 +23,7 @@ public:
   bool horizontalLevelCollision(sf::Vector2f &objectPos);
   bool verticalLevelCollision(sf::Vector2f &objectPos);
   void computeCollisionGrid(const sf::Vector2f &objectPos);
-  void debugRender(WindowManager::WindowID window, GameCamera &camera,
+  void debugRender(WindowID window, GameCamera &camera,
                    const sf::Vector2f &objectPos);
 
   static bool objectsColliding(TangibleObject *object1,

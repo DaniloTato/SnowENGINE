@@ -21,7 +21,7 @@ void UIButton::setPosition(const sf::Vector2f &p) {
   label.setPosition(p.x + 10, p.y + 5);
 }
 
-void UIButton::draw(WindowManager::WindowID window) {
+void UIButton::draw(WindowID window) {
   WindowManager &windowManager = WindowManager::getInstance();
   sf::Vector2i mp = InputManager::getInstance().getMousePosition(window);
   bool hover =
@@ -36,8 +36,7 @@ void UIButton::draw(WindowManager::WindowID window) {
   windowManager.drawOnWindow(window, label);
 }
 
-bool UIButton::isClicked(const sf::Event &event,
-                         WindowManager::WindowID window) {
+bool UIButton::isClicked(const sf::Event &event, WindowID window) {
   if (event.type != sf::Event::MouseButtonReleased)
     return false;
 

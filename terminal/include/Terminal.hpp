@@ -2,18 +2,19 @@
 #include "GameCamera.hpp"
 #include "GameText.hpp"
 #include "Highlighter.hpp"
+#include "IEventListener.hpp"
 #include "SnowTermIO.hpp"
 #include "SnowlangInstance.hpp"
 
-class Terminal {
+class Terminal : public IEventListener {
 public:
-  Terminal(WindowManager::WindowID window, GameCamera *camera,
-           sf::Texture *fontTexture);
-  ~Terminal();
+  Terminal(WindowID window, GameCamera *camera, sf::Texture *fontTexture);
 
-  void handleEvent(const sf::Event &event);
+  ~Terminal() override;
 
-  [[nodiscard]] WindowManager::WindowID getTargetWindow() const;
+  void handleEvent(WindowID windowId, const sf::Event &event) override;
+
+  [[nodiscard]] WindowID getTargetWindow() const;
 
   void kill();
   void close();
@@ -39,7 +40,7 @@ private:
   void commitLine();
 
 private:
-  WindowManager::WindowID targetWindow;
+  WindowID targetWindow;
 
   std::unordered_map<std::string, std::string> aliases;
 

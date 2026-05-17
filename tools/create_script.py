@@ -49,8 +49,8 @@ cpp = f"""\
 #include "{target_include}"
 
 #include "RegistryMacros.hpp"
-#include "ScriptRegistry.hpp"
 #include "Scripter.hpp"
+#include "ScriptRegistry.hpp" // IWYU pragma: keep
 
 namespace Scripts {{
 

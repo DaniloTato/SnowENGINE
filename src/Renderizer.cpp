@@ -31,13 +31,13 @@ void Renderizer::unregisterPair(Renderizer *rend) {
                 [&](const RenderEntry &e) { return e.renderizer == rend; });
 }
 
-void Renderizer::unregisterByWindow(WindowManager::WindowID window) {
+void Renderizer::unregisterByWindow(WindowID window) {
   std::erase_if(registry, [&](const RenderEntry &e) {
     return e.renderizer->getWindow() == window;
   });
 }
 
-WindowManager::WindowID Renderizer::getWindow() const { return window; }
+WindowID Renderizer::getWindow() const { return window; }
 
 void Renderizer::assignCamera(GameCamera *cam) { assignedCamera = cam; }
 

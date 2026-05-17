@@ -7,9 +7,9 @@ public:
   UISlider(const sf::Vector2f &position, float width, float minValue,
            float maxValue, float *boundValue);
 
-  void draw(WindowManager::WindowID window);
+  void draw(WindowID window);
 
-  void handleEvent(const sf::Event &ev, WindowManager::WindowID window);
+  void handleEvent(const sf::Event &ev, WindowID window);
 
   void setValue(float v);
 

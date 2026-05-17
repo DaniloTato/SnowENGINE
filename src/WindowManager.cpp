@@ -1,5 +1,6 @@
 #include "WindowManager.hpp"
 #include "Constants.hpp"
+#include "IEventListener.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -9,9 +10,8 @@ WindowManager &WindowManager::getInstance() {
   return instance;
 }
 
-WindowManager::WindowID WindowManager::create(Set set, unsigned int w,
-                                              unsigned int h,
-                                              const std::string &name) {
+WindowID WindowManager::create(Set set, unsigned int w, unsigned int h,
+                               const std::string &name) {
 
   if (set == Set::MAIN) {
     for (const auto &[id, entry] : windows) {
@@ -21,7 +21,7 @@ WindowManager::WindowID WindowManager::create(Set set, unsigned int w,
     }
   }
 
-  WindowID id = nextId++;
+  WindowID id(nextId++);
 
   GameWindow gw(nullptr, Constants::FRAME_RATE);
   gw.setWindow(new sf::RenderWindow(sf::VideoMode(w, h), name));
@@ -29,6 +29,15 @@ WindowManager::WindowID WindowManager::create(Set set, unsigned int w,
   windows.emplace(id, WindowEntry{.set = set, .window = gw});
 
   return id;
+}
+
+void WindowManager::queueDestroy(WindowID id) { pendingDestroy.push_back(id); }
+
+void WindowManager::applyDestroyQueue() {
+  for (auto id : pendingDestroy) {
+    destroy(id);
+  }
+  pendingDestroy.clear();
 }
 
 void WindowManager::destroy(WindowID id) {
@@ -49,7 +58,7 @@ void WindowManager::destroy(WindowID id) {
   windows.erase(it);
 }
 
-const std::unordered_map<WindowManager::WindowID, WindowManager::WindowEntry> &
+const std::unordered_map<WindowID, WindowManager::WindowEntry> &
 WindowManager::getAll() const {
   return windows;
 }
@@ -57,7 +66,7 @@ WindowManager::getAll() const {
 // Right now, inefficient. It allocates a vector each frame.
 // Better approaach would be to update and cache the sets only when a window is
 // created
-std::vector<WindowManager::WindowID> WindowManager::getByDomain(Set set) {
+std::vector<WindowID> WindowManager::getByDomain(Set set) {
 
   std::vector<WindowID> result;
 
@@ -70,7 +79,7 @@ std::vector<WindowManager::WindowID> WindowManager::getByDomain(Set set) {
   return result;
 }
 
-WindowManager::WindowID WindowManager::getMain() {
+WindowID WindowManager::getMain() {
   for (const auto &[id, entry] : windows) {
     if (entry.set == Set::MAIN) {
       return id;
@@ -107,7 +116,7 @@ const GameWindow *WindowManager::fetchGameWindow(WindowID id) const {
   return &it->second.window;
 }
 
-void WindowManager::pauseWindow(WindowManager::WindowID id) {
+void WindowManager::pauseWindow(WindowID id) {
   GameWindow *ptr = fetchGameWindow(id);
   if (!ptr) {
     std::cerr << "[WindowManager] tried to pause a non-fetchable window\n";
@@ -117,7 +126,7 @@ void WindowManager::pauseWindow(WindowManager::WindowID id) {
   ptr->pause();
 }
 
-void WindowManager::resumeWindow(WindowManager::WindowID id) {
+void WindowManager::resumeWindow(WindowID id) {
   GameWindow *ptr = fetchGameWindow(id);
   if (!ptr) {
     std::cerr << "[WindowManager] tried to resume a non-fetchable window\n";
@@ -126,7 +135,7 @@ void WindowManager::resumeWindow(WindowManager::WindowID id) {
   ptr->resume();
 }
 
-bool WindowManager::isWindowPaused(WindowManager::WindowID id) {
+bool WindowManager::isWindowPaused(WindowID id) {
   GameWindow *ptr = fetchGameWindow(id);
   if (!ptr) {
     std::cerr << "[WindowManager] failed to get pause state from a "
@@ -191,13 +200,45 @@ void WindowManager::drawOnWindow(WindowID id, const sf::Vertex *vertices,
   window->draw(vertices, count, type);
 }
 
-bool WindowManager::pollEventOnWindow(WindowID id, sf::Event &event) {
-  auto *gw = fetchGameWindow(id);
-  if (!gw)
-    return false;
-  return gw->getWindow()->pollEvent(event);
-}
-
 void WindowManager::clearWindow(WindowID id, sf::Color backgroundColor) {
   fetchGameWindow(id)->getWindow()->clear(backgroundColor);
+}
+
+void WindowManager::subscribe(WindowID id, IEventListener *listener) {
+
+  if (id.isNull()) {
+    throw std::runtime_error(
+        "[WindowManager] [subscribe] Subscribed listener to null ID");
+  }
+
+  listeners[id].push_back(listener);
+}
+
+void WindowManager::unsubscribe(WindowID id, IEventListener *listener) {
+
+  if (id.isNull()) {
+    throw std::runtime_error(
+        "[WindowManager] [unsubscribe] Unsubscribed listener to null ID");
+  }
+
+  auto it = listeners.find(id);
+  if (it == listeners.end()) {
+    return;
+  }
+
+  auto &vec = it->second;
+  auto [first, last] = std::ranges::remove(vec, listener);
+  vec.erase(first, last);
+}
+
+void WindowManager::pollEvents() {
+  sf::Event event;
+  for (auto &[id, entry] : windows) {
+    auto *win = entry.window.getWindow();
+    while (win->pollEvent(event)) {
+      for (auto *listener : listeners[id]) {
+        listener->handleEvent(id, event);
+      }
+    }
+  }
 }

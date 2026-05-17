@@ -6,7 +6,7 @@
 class GameCamera;
 
 struct RenderizerParameters {
-  WindowManager::WindowID window;
+  WindowID window;
   sf::Texture *texture = nullptr;
   GameCamera *camera = nullptr;
   float layer = 0.f;

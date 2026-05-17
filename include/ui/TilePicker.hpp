@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "IEventListener.hpp"
+
 enum class PickerMode : std::uint8_t { Tiles, Enemies };
 
 struct PickerSelection {
@@ -13,20 +15,20 @@ struct PickerSelection {
   std::string enemyId;
 };
 
-class TilePicker {
+class TilePicker : public IEventListener {
 public:
   TilePicker(sf::Texture &tileset, int tileSize);
 
   void open();
   void close();
 
-  void handleEvent(WindowManager::WindowID id, const sf::Event &ev);
+  void handleEvent(WindowID id, const sf::Event &ev) override;
   void update();
   void draw();
 
   void setLayers(std::vector<LayerInfo> *l);
 
-  WindowManager::WindowID getWindow() const;
+  WindowID getWindow() const;
 
   [[nodiscard]] bool isOpen() const;
   [[nodiscard]] PickerSelection getSelection() const;
@@ -38,7 +40,7 @@ private:
   void drawEnemyPicker();
 
 private:
-  WindowManager::WindowID window;
+  WindowID window;
   bool opened = false;
 
   sf::Font font;

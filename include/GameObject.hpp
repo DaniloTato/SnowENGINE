@@ -10,15 +10,14 @@ struct GeneralContext;
 class GameObject {
 public:
   struct UpdateDomain {
-    std::vector<WindowManager::WindowID> windows;
+    std::vector<WindowID> windows;
     std::vector<WindowManager::Set> domains;
 
-    bool matches(WindowManager &wm, WindowManager::WindowID id) const;
+    bool matches(WindowManager &wm, WindowID id) const;
 
-    UpdateDomain(WindowManager::WindowID id) : windows({id}) {}
+    UpdateDomain(WindowID id) : windows({id}) {}
 
-    UpdateDomain(std::vector<WindowManager::WindowID> &&ids)
-        : windows(std::move(ids)) {}
+    UpdateDomain(std::vector<WindowID> &&ids) : windows(std::move(ids)) {}
 
     UpdateDomain(WindowManager::Set domain) : domains({domain}) {}
 

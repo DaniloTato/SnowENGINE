@@ -35,7 +35,7 @@ static size_t countVisualLines(std::string_view s) {
   return lines;
 }
 
-Terminal::Terminal(WindowManager::WindowID window, GameCamera *camera,
+Terminal::Terminal(WindowID window, GameCamera *camera,
                    sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
       text(new GameText({.window = targetWindow,
@@ -59,7 +59,12 @@ Terminal::~Terminal() { GameObject::destroy(text); }
 
 void Terminal::update() { snowlang.update(GameState::getInstance().dt()); }
 
-void Terminal::handleEvent(const sf::Event &event) {
+void Terminal::handleEvent(WindowID windowId, const sf::Event &event) {
+
+  if (event.type == sf::Event::Closed) {
+    close();
+    return;
+  }
 
   // TEXT INPUT (insert at cursor)
   if (event.type == sf::Event::TextEntered) {
@@ -233,9 +238,7 @@ void Terminal::executeSnowlang() {
   }
 }
 
-WindowManager::WindowID Terminal::getTargetWindow() const {
-  return targetWindow;
-}
+WindowID Terminal::getTargetWindow() const { return targetWindow; }
 
 bool Terminal::destroysWindowOnClose() const { return destroyWindowOnClose; }
 
@@ -245,7 +248,7 @@ void Terminal::destroyKilledTerminals() {
   auto isKilled = [](Terminal *t) {
     if (!t->isOpen()) {
       if (t->destroysWindowOnClose()) {
-        WindowManager::getInstance().destroy(t->getTargetWindow());
+        WindowManager::getInstance().queueDestroy(t->getTargetWindow());
       }
       delete t;
       return true;

@@ -53,7 +53,7 @@ float UISlider::getValue() const {
   return (valuePtr ? *valuePtr : internalValue);
 }
 
-void UISlider::draw(WindowManager::WindowID window) {
+void UISlider::draw(WindowID window) {
   // make sure knob follows current value
   setValue(getValue());
 
@@ -63,8 +63,7 @@ void UISlider::draw(WindowManager::WindowID window) {
   windowManager.drawOnWindow(window, knob);
 }
 
-void UISlider::handleEvent(const sf::Event &ev,
-                           WindowManager::WindowID window) {
+void UISlider::handleEvent(const sf::Event &ev, WindowID window) {
   sf::Vector2i mp = InputManager::getInstance().getMousePosition(window);
 
   // start dragging if press on knob (distance threshold)

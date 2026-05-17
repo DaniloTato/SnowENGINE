@@ -3,8 +3,9 @@
 #include "InputManager.hpp"
 #include "TangibleObject.hpp"
 
+#include "NamedScript.hpp" // IWYU pragma: keep
 #include "RegistryMacros.hpp"
-#include "ScriptRegistry.hpp"
+#include "ScriptRegistry.hpp" // IWYU pragma: keep
 #include "Scripter.hpp"
 
 namespace Scripts {
