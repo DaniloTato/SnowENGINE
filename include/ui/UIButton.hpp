@@ -1,5 +1,5 @@
 #pragma once
-#include "WindowManager.hpp"
+#include "WindowID.hpp"
 #include <SFML/Graphics.hpp>
 
 class UIButton {

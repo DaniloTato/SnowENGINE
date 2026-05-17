@@ -31,6 +31,11 @@ void terminalCreationScript(ScriptRunner &renderable,
       s_terminal =
           new Terminal(id, GameState::getInstance().getTerminalCamera(),
                        &TextureManager::getInstance().get("snowFont"));
+
+      std::cout << "camera: " << GameState::getInstance().getTerminalCamera()
+                << "\n";
+      std::cout << "window: " << s_terminal << "\n";
+
       WindowManager::getInstance().subscribe(id, &InputManager::getInstance());
       WindowManager::getInstance().subscribe(id, s_terminal);
     }

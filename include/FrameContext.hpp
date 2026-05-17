@@ -4,7 +4,7 @@
 struct FrameContext {
   GeneralContext &general;
 
-  WindowManager::WindowID windowId;
+  WindowID windowId;
   const sf::Event *event;
   float dt;
 };

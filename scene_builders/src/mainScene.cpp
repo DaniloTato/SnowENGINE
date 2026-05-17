@@ -56,10 +56,12 @@ void mainScene() {
 
   // may need to refactor terminalCreation into a sytem for the engine
   ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
-      {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL,
-       WindowManager::Set::DEVUI}));
+      {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}));
   sr->scripter.addScript(Scripts::terminalCreationScript);
-  sr->scripter.addScript(Scripts::tilePickerCreationScript);
+
+  ScriptRunner *sr2 = new ScriptRunner(GameObject::UpdateDomain(
+      {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}));
+  sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
   GeneralContext ctx = {.player = image};
   GameState::getInstance().updateGeneralContext(ctx);

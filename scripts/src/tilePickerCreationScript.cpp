@@ -25,6 +25,8 @@ struct tilePickerCreationScriptState {
 void tilePickerCreationScript(ScriptRunner &scriptRunner,
                               const GeneralContext &ctx) {
 
+  // std::cout << std::chrono::system_clock::now() << "\n";
+
   auto &state = scriptRunner.scripter.getState<tilePickerCreationScriptState>(
       "tilePickerCreationScript");
 

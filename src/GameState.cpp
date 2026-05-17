@@ -65,13 +65,14 @@ GameCamera *GameState::getUiCamera() const {
 }
 
 GameCamera *GameState::getTerminalCamera() const {
-  size_t consoleCameraIndex = static_cast<int>(CameraTypes::TERMINAL);
-  if (activeCameras.size() >= consoleCameraIndex) {
-    return activeCameras[consoleCameraIndex];
+  size_t i = static_cast<size_t>(CameraTypes::TERMINAL);
+
+  if (i >= activeCameras.size() || !activeCameras[i]) {
+    throw std::runtime_error("[GameState] [getTerminalCamera()] Terminal "
+                             "camera not yet initilized\n");
   }
-  throw std::runtime_error(
-      "[GameState] [getTerminalCamera()] Terminal camera not yet initilized\n");
-  return nullptr;
+
+  return activeCameras[i];
 }
 
 void GameState::createCamera(CameraTypes type,
