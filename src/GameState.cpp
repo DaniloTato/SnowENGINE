@@ -16,30 +16,6 @@ GameState &GameState::getInstance() {
   return instance;
 }
 
-const std::vector<GameCamera *> &GameState::getActiveCameras() const {
-  return activeCameras;
-}
-
-GameCamera *GameState::getMainCamera() const {
-  size_t mainCameraIndex = static_cast<int>(CameraTypes::MAIN);
-  if (activeCameras.size() >= mainCameraIndex) {
-    return activeCameras[mainCameraIndex];
-  }
-  throw std::runtime_error("[GameState] Main camera not yet initilized\n");
-  return nullptr;
-}
-
-void GameState::clearCameras() {
-  for (size_t i = 0; i < activeCameras.size(); i++) {
-    if (activeCameras[i] &&
-        static_cast<CameraTypes>(i) != CameraTypes::TERMINAL &&
-        !activeCameras[i]->isPersistentAcrossScenes()) {
-      GameObject::destroy(activeCameras[i]);
-    }
-  }
-  activeCameras.clear();
-}
-
 float GameState::dt() { return dtValue; }
 
 void GameState::updateDt() {
@@ -52,47 +28,6 @@ void GameState::updateDt() {
     elapsed = MAX_DT;
 
   dtValue = elapsed;
-}
-
-GameCamera *GameState::getUiCamera() const {
-  size_t uiCameraIndex = static_cast<int>(CameraTypes::UI);
-  if (activeCameras.size() >= uiCameraIndex) {
-    return activeCameras[uiCameraIndex];
-  }
-  throw std::runtime_error(
-      "[GameState] [getUiCamera()] UI camera not yet initilized\n");
-  return nullptr;
-}
-
-GameCamera *GameState::getTerminalCamera() const {
-  size_t i = static_cast<size_t>(CameraTypes::TERMINAL);
-
-  if (i >= activeCameras.size() || !activeCameras[i]) {
-    throw std::runtime_error("[GameState] [getTerminalCamera()] Terminal "
-                             "camera not yet initilized\n");
-  }
-
-  return activeCameras[i];
-}
-
-void GameState::createCamera(CameraTypes type,
-                             GameObject::UpdateDomain updateDomain) {
-
-  auto index = static_cast<size_t>(type);
-
-  if (activeCameras.size() < static_cast<int>(CameraTypes::COUNT)) {
-    activeCameras.resize(static_cast<int>(CameraTypes::COUNT));
-  }
-
-  if (activeCameras[index]) {
-    return;
-  }
-
-  activeCameras[index] = new GameCamera(std::move(updateDomain));
-
-  if (type == CameraTypes::TERMINAL) {
-    activeCameras[index]->makePersistentAcrossScenes();
-  }
 }
 
 int GameState::getCrystalAmount() const { return crystals; }

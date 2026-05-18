@@ -46,6 +46,9 @@ public:
   sf::Vector2f position;
   sf::Vector2f offset;
 
+  GameObject(const GameObject &) = delete;
+  GameObject &operator=(const GameObject &) = delete;
+
 protected:
   bool persistentAcrossScenes = false;
   static std::vector<GameObject *> s_gameObjects;

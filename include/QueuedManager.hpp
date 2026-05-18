@@ -4,6 +4,7 @@
 #include <vector>
 
 template <typename TObject, typename TCreateReq>
+// Queued Manger should not inherit from Scene Aware
 class QueuedManager : public SceneAware {
 protected:
   std::vector<TObject *> objects;

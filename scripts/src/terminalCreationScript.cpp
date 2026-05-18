@@ -1,6 +1,5 @@
 #include "terminalCreationScript.hpp"
 
-#include "GameState.hpp"
 #include "InputManager.hpp"
 #include "Terminal.hpp"
 #include "TextureManager.hpp"
@@ -21,23 +20,20 @@ void terminalCreationScript(ScriptRunner &renderable,
 
       std::cout << "creating terminal\n";
 
-      const WindowID id = WindowManager::getInstance().create(
+      const WindowID terminalWindow = WindowManager::getInstance().create(
           WindowManager::Set::TERMINAL, 900, 500, "Snowgun Terminal");
 
-      GameState::getInstance().createCamera(
-          CameraTypes::TERMINAL,
-          GameObject::UpdateDomain(WindowManager::Set::TERMINAL));
+      const CameraID terminalCamera = ctx.cameraManager->createCamera(
+          GameObject::UpdateDomain(WindowManager::Set::TERMINAL), true);
 
-      s_terminal =
-          new Terminal(id, GameState::getInstance().getTerminalCamera(),
-                       &TextureManager::getInstance().get("snowFont"));
+      s_terminal = new Terminal(terminalWindow,
+                                ctx.cameraManager->getCamera(terminalCamera),
+                                ctx.cameraManager->getCamera(ctx.mainCamera),
+                                &TextureManager::getInstance().get("snowFont"));
 
-      std::cout << "camera: " << GameState::getInstance().getTerminalCamera()
-                << "\n";
-      std::cout << "window: " << s_terminal << "\n";
-
-      WindowManager::getInstance().subscribe(id, &InputManager::getInstance());
-      WindowManager::getInstance().subscribe(id, s_terminal);
+      WindowManager::getInstance().subscribe(terminalWindow,
+                                             &InputManager::getInstance());
+      WindowManager::getInstance().subscribe(terminalWindow, s_terminal);
     }
   }
 

@@ -1,15 +1,7 @@
 #include "SceneManager.hpp"
-#include "BulletManager.hpp"
-#include "CollectableManager.hpp"
 #include "Constants.hpp"
-#include "DialogueManager.hpp"
-#include "EnemyManager.hpp"
 #include "GameObject.hpp"
 #include "GameState.hpp"
-#include "LevelManager.hpp"
-#include "ParticleManager.hpp"
-
-#include <iostream>
 
 SceneManager &SceneManager::getInstance() {
   static SceneManager instance;
@@ -48,15 +40,7 @@ void SceneManager::beginTransition(const std::string &nextScene) {
 
 void SceneManager::unloadCurrentScene() {
 
-  BulletManager::getInstance().onSceneUnload();
-  EnemyManager::getInstance().onSceneUnload();
-  ParticleManager::getInstance().onSceneUnload();
-  DialogueManager::getInstance().onSceneUnload();
-  LevelManager::getInstance().onSceneUnload();
-  CollectableManager::getInstance().onSceneUnload();
-
-  GameState::getInstance().clearCameras();
-
+  SceneAware::notifySceneUnload();
   GameObject::destroySceneObjects();
 }
 

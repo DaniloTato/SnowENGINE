@@ -8,7 +8,8 @@
 
 class Terminal : public IEventListener {
 public:
-  Terminal(WindowID window, GameCamera *camera, sf::Texture *fontTexture);
+  Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
+           sf::Texture *fontTexture);
 
   ~Terminal() override;
 

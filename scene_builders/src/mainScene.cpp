@@ -19,11 +19,14 @@
 namespace SceneBuilder {
 void mainScene() {
 
-  GameState::getInstance().createCamera(
-      CameraTypes::MAIN, GameObject::UpdateDomain(WindowManager::Set::MAIN));
+  // watch out to avoid memory leaks. May need SceneManager to clean it
+  auto *cameraManager = new CameraManager();
 
-  GameState::getInstance().getMainCamera()->scripter.addScript(
-      Scripts::cameraBehaviourScript);
+  CameraID mainCamera = cameraManager->createCamera(
+      GameObject::UpdateDomain(WindowManager::Set::MAIN));
+
+  cameraManager->getCamera(mainCamera)
+      ->scripter.addScript(Scripts::cameraBehaviourScript);
 
   /* Setup in case we'd like to have particles in the scene.
 
@@ -41,13 +44,14 @@ void mainScene() {
 
   LevelManager::getInstance().loadLevel(
       WindowManager::getInstance().getMain(),
-      GameState::getInstance().getMainCamera(),
+      cameraManager->getCamera(mainCamera),
       Helper::getPath("assets/levels/Level1.json"));
 
   // add a window param in Object Builder
+  // Horrible syntax for declaring camera
   auto *image = ObjectBuilder<TangibleObject>("todd")
                     .at(100, 100)
-                    .onCamera(CameraTypes::MAIN)
+                    .onCamera(*cameraManager->getCamera(mainCamera))
                     .withEmptyAnimation(16, 16)
                     .build();
 
@@ -63,7 +67,9 @@ void mainScene() {
       {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}));
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
-  GeneralContext ctx = {.player = image};
+  GeneralContext ctx = {.player = image,
+                        .cameraManager = cameraManager,
+                        .mainCamera = mainCamera};
   GameState::getInstance().updateGeneralContext(ctx);
 }
 } // namespace SceneBuilder

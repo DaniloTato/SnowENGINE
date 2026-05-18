@@ -1,6 +1,4 @@
 #include "GameObjectExposure.hpp"
-#include "GameCamera.hpp"
-#include "GameState.hpp"
 #include "SnowlangInstance.hpp"
 
 namespace GameObjectExposure {
@@ -22,20 +20,22 @@ Value::Object Descriptor::describeVector2f(sf::Vector2f &v) {
 Value::Object Descriptor::describeActiveCameraList() {
   auto desc = std::make_shared<Descriptor>();
 
-  desc->fields["main"] = makeConstFieldValue([]() -> Value {
-    return Value{.value = GameState::getInstance().getMainCamera()->describe()};
-  });
+  // desc->fields["main"] = makeConstFieldValue([]() -> Value {
+  //   return Value{.value =
+  //   GameState::getInstance().getMainCamera()->describe()};
+  // });
 
-  if (GameState::getInstance().getUiCamera()) {
-    desc->fields["ui"] = makeConstFieldValue([]() -> Value {
-      return Value{.value = GameState::getInstance().getUiCamera()->describe()};
-    });
-  }
+  // if (GameState::getInstance().getUiCamera()) {
+  //   desc->fields["ui"] = makeConstFieldValue([]() -> Value {
+  //     return Value{.value =
+  //     GameState::getInstance().getUiCamera()->describe()};
+  //   });
+  // }
 
-  desc->fields["terminal"] = makeConstFieldValue([]() -> Value {
-    return Value{.value =
-                     GameState::getInstance().getTerminalCamera()->describe()};
-  });
+  // desc->fields["terminal"] = makeConstFieldValue([]() -> Value {
+  //   return Value{.value =
+  //                    GameState::getInstance().getTerminalCamera()->describe()};
+  // });
 
   return desc;
 }

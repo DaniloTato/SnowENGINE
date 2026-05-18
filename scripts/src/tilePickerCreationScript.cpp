@@ -1,7 +1,6 @@
 #include "tilePickerCreationScript.hpp"
 #include "Constants.hpp"
 #include "EnemyManager.hpp"
-#include "GameState.hpp"
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
 #include "TilePicker.hpp"
@@ -25,8 +24,6 @@ struct tilePickerCreationScriptState {
 void tilePickerCreationScript(ScriptRunner &scriptRunner,
                               const GeneralContext &ctx) {
 
-  // std::cout << std::chrono::system_clock::now() << "\n";
-
   auto &state = scriptRunner.scripter.getState<tilePickerCreationScriptState>(
       "tilePickerCreationScript");
 
@@ -41,6 +38,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
   }
 
   const WindowID main = windowManager.getMain();
+  const CameraID mainCamera = ctx.mainCamera;
 
   if (inputManager.isJustPressed("tilePicker")) {
     if (!state.picker->isOpen()) {
@@ -50,6 +48,10 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
       windowManager.subscribe(state.picker->getWindow(), state.picker.get());
     } else {
       state.picker->close();
+      // HORRIBLE BUG WAITING TO HAPPEN LOL
+      LevelManager::getInstance().reloadAllLayers(
+          WindowManager::getInstance().getMain(),
+          ctx.cameraManager->getCamera(mainCamera));
     }
   }
 
@@ -69,19 +71,22 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     if (inputManager.isJustPressed("spawnEnemy")) {
       EnemyManager::getInstance().queueCreateEnemy(
           state.selectedEnemyId,
-          GameState::getInstance().getMainCamera()->screenToWorld(
-              {static_cast<float>(inputManager.getMousePosition(main).x),
-               static_cast<float>(inputManager.getMousePosition(main).y)},
-              1.f));
+          ctx.cameraManager->getCamera(mainCamera)
+              ->screenToWorld(
+                  {static_cast<float>(inputManager.getMousePosition(main).x),
+                   static_cast<float>(inputManager.getMousePosition(main).y)},
+                  1.f));
     }
 
     if (state.mode == PickerMode::Tiles) {
       if (inputManager.isPressed("createTile")) {
         sf::Vector2f mousePosToTilePos =
-            GameState::getInstance().getMainCamera()->screenToWorld(
-                {static_cast<float>(inputManager.getMousePosition(main).x),
-                 static_cast<float>(inputManager.getMousePosition(main).y)},
-                levelManager.getLayerInfo(levelManager.activeLayer).paralax);
+            ctx.cameraManager->getCamera(mainCamera)
+                ->screenToWorld(
+                    {static_cast<float>(inputManager.getMousePosition(main).x),
+                     static_cast<float>(inputManager.getMousePosition(main).y)},
+                    levelManager.getLayerInfo(levelManager.activeLayer)
+                        .paralax);
 
         sf::IntRect &selRect = state.selectedTileRect;
         const int tileSize = Constants::TILE_SIZE;
@@ -96,7 +101,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
                                 selRect.top + y * tileSize, tileSize, tileSize);
 
             levelManager.queueCreateTile(
-                main, GameState::getInstance().getMainCamera(),
+                main, ctx.cameraManager->getCamera(mainCamera),
                 levelManager.activeLayer, baseTileX + x, baseTileY + y,
                 subRect);
           }
@@ -105,10 +110,11 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     } else if (state.mode == PickerMode::Enemies) {
       if (inputManager.isJustPressed("createTile")) {
         sf::Vector2f mousePosToEnemyPos =
-            GameState::getInstance().getMainCamera()->screenToWorld(
-                {static_cast<float>(inputManager.getMousePosition(main).x),
-                 static_cast<float>(inputManager.getMousePosition(main).y)},
-                1.f);
+            ctx.cameraManager->getCamera(mainCamera)
+                ->screenToWorld(
+                    {static_cast<float>(inputManager.getMousePosition(main).x),
+                     static_cast<float>(inputManager.getMousePosition(main).y)},
+                    1.f);
         sf::Vector2i EnemyPosInt = {static_cast<int>(mousePosToEnemyPos.x),
                                     static_cast<int>(mousePosToEnemyPos.y)};
 
@@ -123,10 +129,11 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
 
     if (inputManager.isPressed("deleteTile")) {
       sf::Vector2f mousePosToTilePos =
-          GameState::getInstance().getMainCamera()->screenToWorld(
-              {static_cast<float>(inputManager.getMousePosition(main).x),
-               static_cast<float>(inputManager.getMousePosition(main).y)},
-              levelManager.getLayerInfo(levelManager.activeLayer).paralax);
+          ctx.cameraManager->getCamera(mainCamera)
+              ->screenToWorld(
+                  {static_cast<float>(inputManager.getMousePosition(main).x),
+                   static_cast<float>(inputManager.getMousePosition(main).y)},
+                  levelManager.getLayerInfo(levelManager.activeLayer).paralax);
 
       levelManager.queueDeleteTile(
           levelManager.activeLayer,
@@ -142,10 +149,11 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
 
     if (inputManager.isMouseJustPressed(MouseButton::Left)) {
       sf::Vector2f mousePosInWorld =
-          GameState::getInstance().getMainCamera()->screenToWorld(
-              {static_cast<float>(inputManager.getMousePosition(main).x),
-               static_cast<float>(inputManager.getMousePosition(main).y)},
-              1.f);
+          ctx.cameraManager->getCamera(mainCamera)
+              ->screenToWorld(
+                  {static_cast<float>(inputManager.getMousePosition(main).x),
+                   static_cast<float>(inputManager.getMousePosition(main).y)},
+                  1.f);
       std::cout << "(" << mousePosInWorld.x << "," << mousePosInWorld.y << ")"
                 << " "
                 << "("

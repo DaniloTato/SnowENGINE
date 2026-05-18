@@ -53,11 +53,6 @@ void TilePicker::close() {
   if (!opened)
     return;
 
-  // HORRIBLE BUG WAITING TO HAPPEN LOL
-  LevelManager::getInstance().reloadAllLayers(
-      WindowManager::getInstance().getMain(),
-      GameState::getInstance().getMainCamera());
-
   WindowManager::getInstance().queueDestroy(window);
   opened = false;
 }

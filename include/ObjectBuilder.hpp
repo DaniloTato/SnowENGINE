@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AnimationFactory.hpp"
-#include "GameState.hpp"
+#include "RenderizerParameters.hpp"
 #include "TextureManager.hpp"
 #include "WindowManager.hpp"
 #include <string>
@@ -28,9 +28,8 @@ public:
     return *this;
   }
 
-  ObjectBuilder &onCamera(CameraTypes cam) {
-    params.camera =
-        GameState::getInstance().getActiveCameras()[static_cast<int>(cam)];
+  ObjectBuilder &onCamera(GameCamera &cam) {
+    params.camera = &cam;
     return *this;
   }
 

@@ -8,20 +8,10 @@
 #include <chrono>
 #include <vector>
 
-enum class CameraTypes : std::uint8_t { MAIN, UI, TERMINAL, COUNT };
-
 class GameState {
 public:
   static GameState &getInstance();
 
-  void createCamera(CameraTypes type, GameObject::UpdateDomain updateDomain);
-
-  [[nodiscard]] const std::vector<GameCamera *> &getActiveCameras() const;
-  [[nodiscard]] GameCamera *getMainCamera() const;
-  [[nodiscard]] GameCamera *getUiCamera() const;
-  [[nodiscard]] GameCamera *getTerminalCamera() const;
-
-  void clearCameras();
   float dt();
   void updateDt();
 

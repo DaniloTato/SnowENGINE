@@ -1,8 +1,8 @@
 #include "Commands.hpp"
 #include "Constants.hpp"
-#include "GameState.hpp"
 #include "LevelManager.hpp"
 #include "RuntimeValue.hpp"
+#include "SnowlangInstance.hpp"
 
 namespace Snowlang::Commands {
 
@@ -29,15 +29,19 @@ RuntimeValue tileCommand(const CommandContext &ctx) {
                                                 static_cast<int>(y));
   } else {
     // MUST CHANGE. TIGHTLY COUPLED
-    LevelManager::getInstance().queueCreateTile(
-        WindowManager::getInstance().getMain(), GameState::getInstance().getMainCamera(),
-        static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y),
-        sf::IntRect({
-            static_cast<int>(Rx),
-            static_cast<int>(Ry),
-            Constants::TILE_SIZE,
-            Constants::TILE_SIZE,
-        }));
+    if (!ctx.snowlang.tileCamera) {
+      throwError(SnowErr::Phase::Evaluator, "no Reference to tile camera.", ctx.cmd.span);
+    }
+
+    LevelManager::getInstance().queueCreateTile(WindowManager::getInstance().getMain(),
+                                                ctx.snowlang.tileCamera, static_cast<int>(layer),
+                                                static_cast<int>(x), static_cast<int>(y),
+                                                sf::IntRect({
+                                                    static_cast<int>(Rx),
+                                                    static_cast<int>(Ry),
+                                                    Constants::TILE_SIZE,
+                                                    Constants::TILE_SIZE,
+                                                }));
   }
 
   return {true};

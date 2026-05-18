@@ -35,7 +35,7 @@ static size_t countVisualLines(std::string_view s) {
   return lines;
 }
 
-Terminal::Terminal(WindowID window, GameCamera *camera,
+Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
                    sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
       text(new GameText({.window = targetWindow,
@@ -43,6 +43,9 @@ Terminal::Terminal(WindowID window, GameCamera *camera,
                          .camera = camera,
                          .layer = Constants::UI_LAYER,
                          .parallax = 1.f})) {
+
+  // QUICK FIX FOR NOW, CHANGE LATER.
+  snowlang.tileCamera = nullptr;
 
   s_activeTerminals.push_back(this);
   text->position = {10.f, 10.f};
