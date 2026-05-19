@@ -16,6 +16,8 @@
 #include "Terminal.hpp"
 #include "WindowLifecycleListener.hpp"
 
+#include "Engine.hpp"
+
 /*Helpers*/
 #include "Helpers.hpp"
 
@@ -31,6 +33,9 @@
 using namespace Helper;
 
 int main() {
+
+  Engine engine;
+
   InputManager &inputManager = InputManager::getInstance();
   SceneManager &sceneManager = SceneManager::getInstance();
   WindowManager &windowManager = WindowManager::getInstance();
@@ -60,7 +65,7 @@ int main() {
     const std::unordered_map<WindowID, WindowManager::WindowEntry> &windows =
         windowManager.getAll();
 
-    sceneManager.update();
+    sceneManager.update(engine);
     gameState.updateDt();
 
     if (!sceneManager.isTransitioning()) {

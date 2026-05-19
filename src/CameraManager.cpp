@@ -7,9 +7,10 @@ CameraID CameraManager::createCamera(GameObject::UpdateDomain updateDomain,
   uint64_t id = nextId++;
 
   GameCamera *cam = new GameCamera(std::move(updateDomain));
-
+  if (persistent) {
+    cam->makePersistentAcrossScenes();
+  }
   cameras[id] = CameraEntry{.camera = cam, .persistent = persistent};
-
   return CameraID{id};
 }
 

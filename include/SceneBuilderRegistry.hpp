@@ -1,3 +1,5 @@
 #include "Registry.hpp"
 
-class SceneBuilderRegistry : public Registry<std::function<void()>> {};
+#include "SceneManager.hpp"
+
+class SceneBuilderRegistry : public Registry<SceneManager::SceneSetupFn> {};

@@ -17,15 +17,14 @@
 #include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
 
 namespace SceneBuilder {
-void mainScene() {
+void mainScene(Engine &engine) {
 
-  // watch out to avoid memory leaks. May need SceneManager to clean it
-  auto *cameraManager = new CameraManager();
+  CameraManager &cameraManager = engine.getCameraManager();
 
-  CameraID mainCamera = cameraManager->createCamera(
+  CameraID mainCamera = cameraManager.createCamera(
       GameObject::UpdateDomain(WindowManager::Set::MAIN));
 
-  cameraManager->getCamera(mainCamera)
+  cameraManager.getCamera(mainCamera)
       ->scripter.addScript(Scripts::cameraBehaviourScript);
 
   /* Setup in case we'd like to have particles in the scene.
@@ -44,14 +43,14 @@ void mainScene() {
 
   LevelManager::getInstance().loadLevel(
       WindowManager::getInstance().getMain(),
-      cameraManager->getCamera(mainCamera),
+      cameraManager.getCamera(mainCamera),
       Helper::getPath("assets/levels/Level1.json"));
 
   // add a window param in Object Builder
   // Horrible syntax for declaring camera
   auto *image = ObjectBuilder<TangibleObject>("todd")
                     .at(100, 100)
-                    .onCamera(*cameraManager->getCamera(mainCamera))
+                    .onCamera(*cameraManager.getCamera(mainCamera))
                     .withEmptyAnimation(16, 16)
                     .build();
 
@@ -68,7 +67,7 @@ void mainScene() {
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
   GeneralContext ctx = {.player = image,
-                        .cameraManager = cameraManager,
+                        .cameraManager = &cameraManager,
                         .mainCamera = mainCamera};
   GameState::getInstance().updateGeneralContext(ctx);
 }

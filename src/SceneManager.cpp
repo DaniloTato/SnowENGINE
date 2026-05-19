@@ -44,7 +44,7 @@ void SceneManager::unloadCurrentScene() {
   GameObject::destroySceneObjects();
 }
 
-void SceneManager::update() {
+void SceneManager::update(Engine &engine) {
   if (!transitioning)
     return;
 
@@ -61,7 +61,7 @@ void SceneManager::update() {
 
     if (t >= 1.f) {
       unloadCurrentScene();
-      scenes[queuedScene]();
+      scenes[queuedScene](engine);
       currentScene = queuedScene;
 
       fadingOut = false;

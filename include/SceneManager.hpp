@@ -4,11 +4,14 @@
 #include <string>
 #include <unordered_map>
 
+#include "Engine.hpp"
+
 #include "RenderableObject.hpp"
 
 class SceneManager {
 public:
-  using SceneSetupFn = std::function<void()>;
+  // scene setup fn should be part of a scene class
+  using SceneSetupFn = std::function<void(Engine &)>;
   using SceneNameList = std::vector<std::string>;
 
   static SceneManager &getInstance();
@@ -18,7 +21,7 @@ public:
   void reloadCurrentScene();
   bool isTransitioning();
 
-  void update();
+  void update(Engine &engine);
 
   [[nodiscard]] SceneNameList getRegisteredScenes() const;
 

@@ -21,3 +21,5 @@
 - Avoid memory leak when creating a new cameraManager dynamically in SceneBuilder. Delete the instance when changing scene.
 - Make Scenes the ones that have the responsability of handling the lifetime of GameObjects
 - Make Scenes own the Managers
+- Solve ownership issues between GameObject and GameCamera
+- Convert Managers from singletons to members of Engine Object

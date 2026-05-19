@@ -193,3 +193,9 @@ void Renderizer::toggleColorEvery(float time, const sf::Color &color1,
 }
 
 void Renderizer::hide() { show = false; }
+
+const GameCamera *Renderizer::getAssignedCamera() const {
+  return assignedCamera;
+}
+
+const sf::Sprite &Renderizer::getSprite() const { return sprite; }

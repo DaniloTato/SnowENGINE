@@ -121,3 +121,5 @@ GameObjectExposure::Value::Object GameCamera::describe() {
 
   return desc;
 }
+
+const sf::Vector2f &GameCamera::getPosition() const { return position; }
