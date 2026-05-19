@@ -4,9 +4,12 @@
 #include "WindowManager.hpp"
 
 class WindowLifecycleListener : public IEventListener {
+  WindowManager &wm;
+
 public:
+  WindowLifecycleListener(WindowManager &windowManager) : wm(windowManager) {}
+
   void handleEvent(WindowID id, const sf::Event &event) override {
-    auto &wm = WindowManager::getInstance();
 
     switch (event.type) {
 

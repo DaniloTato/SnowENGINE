@@ -9,6 +9,7 @@
 #include <vector>
 
 struct TileCreationRequest {
+  WindowManager *windowManager;
   WindowID window;
   GameCamera *camera;
   int layer;
@@ -45,16 +46,20 @@ public:
 
   static LevelManager &getInstance();
 
-  void loadLevel(WindowID window, GameCamera *camera, const std::string &path);
+  void loadLevel(WindowManager &windowManager, WindowID window,
+                 GameCamera *camera, const std::string &path);
   void saveLevel(const std::string &path);
 
-  void queueCreateTile(WindowID window, GameCamera *camera, int layer, int x,
-                       int y, const sf::IntRect &rect);
+  void queueCreateTile(WindowManager &windowManager, WindowID window,
+                       GameCamera *camera, int layer, int x, int y,
+                       const sf::IntRect &rect);
   void queueDeleteTile(int layer, int x, int y);
   void applyQueuedTileChanges();
 
-  void reloadAllLayers(WindowID window, GameCamera *camera);
-  void reloadLayer(WindowID window, GameCamera *camera, size_t layerNo);
+  void reloadAllLayers(WindowManager &windowManager, WindowID window,
+                       GameCamera *camera);
+  void reloadLayer(WindowManager &windowManager, WindowID window,
+                   GameCamera *camera, size_t layerNo);
 
   void setSecretLayerOppacity(float oppacity);
 
@@ -83,11 +88,13 @@ public:
   LevelManager &operator=(LevelManager &&) = delete;
 
 private:
-  void createTile(WindowID window, GameCamera *camera, int layerNo, int x,
-                  int y, sf::IntRect rect);
+  void createTile(WindowManager &windowManager, WindowID window,
+                  GameCamera *camera, int layerNo, int x, int y,
+                  sf::IntRect rect);
   void deleteTile(int layerNo, int x, int y);
 
-  void loadLayer(WindowID window, GameCamera *camera, size_t layerNo,
+  void loadLayer(WindowManager &windowManager, WindowID window,
+                 GameCamera *camera, size_t layerNo,
                  const nlohmann::json &layerJSON, int tileSize);
 
   void ensureLevelLoaded() const;

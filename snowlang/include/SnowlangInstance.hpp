@@ -60,6 +60,7 @@ public:
 
   // Quick fix for now. Correct Later
   GameCamera *tileCamera;
+  WindowManager *windowManagerRef;
 };
 
 } // namespace Snowlang

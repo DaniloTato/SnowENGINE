@@ -23,3 +23,4 @@
 - Make Scenes own the Managers
 - Solve ownership issues between GameObject and GameCamera
 - Convert Managers from singletons to members of Engine Object
+- Fix references to managers inside snowlang. Pass them along trough I/O or another interface

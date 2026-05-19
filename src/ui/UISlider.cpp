@@ -53,11 +53,9 @@ float UISlider::getValue() const {
   return (valuePtr ? *valuePtr : internalValue);
 }
 
-void UISlider::draw(WindowID window) {
+void UISlider::draw(WindowID window, WindowManager &windowManager) {
   // make sure knob follows current value
   setValue(getValue());
-
-  WindowManager &windowManager = WindowManager::getInstance();
 
   windowManager.drawOnWindow(window, track);
   windowManager.drawOnWindow(window, knob);

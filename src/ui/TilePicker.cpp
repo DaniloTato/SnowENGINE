@@ -11,8 +11,10 @@ static auto createFont = [] {
   return font;
 };
 
-TilePicker::TilePicker(sf::Texture &tileset, int tileSize)
-    : font(createFont()), tileset(tileset), tileSize(tileSize) {
+TilePicker::TilePicker(sf::Texture &tileset, int tileSize,
+                       WindowManager &windowManager)
+    : font(createFont()), tileset(tileset), windowManager(windowManager),
+      tileSize(tileSize) {
   selectedRect = {0, 0, tileSize, tileSize};
   selection.tileRect = selectedRect;
   parallaxSlider = std::make_unique<UISlider>(
@@ -24,13 +26,12 @@ void TilePicker::open() {
   if (opened)
     return;
 
-  WindowManager &wm = WindowManager::getInstance();
-
   const unsigned int winW = tileset.getSize().x + 260;
   const unsigned int winH = tileset.getSize().y + 170;
 
-  window = wm.create(WindowManager::Set::DEVUI, winW, winH, "TilePicker");
-  wm.setFrameRate(window, 60);
+  window =
+      windowManager.create(WindowManager::Set::DEVUI, winW, winH, "TilePicker");
+  windowManager.setFrameRate(window, 60);
 
   selectedRect = {0, 0, tileSize, tileSize};
   selection.tileRect = selectedRect;
@@ -49,11 +50,11 @@ void TilePicker::update() {
   }
 }
 
-void TilePicker::close() {
+void TilePicker::close(WindowManager &wm) {
   if (!opened)
     return;
 
-  WindowManager::getInstance().queueDestroy(window);
+  wm.queueDestroy(window);
   opened = false;
 }
 
@@ -70,7 +71,7 @@ void TilePicker::handleEvent(WindowID id, const sf::Event &ev) {
   im.handleEvent(id, ev);
 
   if (ev.type == sf::Event::Closed) {
-    close();
+    close(windowManager);
     return;
   }
 
@@ -230,16 +231,15 @@ void TilePicker::draw() {
   if (!opened)
     return;
 
-  auto &wm = WindowManager::getInstance();
-  wm.clearWindow(window, sf::Color(30, 30, 30));
+  windowManager.clearWindow(window, sf::Color(30, 30, 30));
 
   // MODE TABS (ONLY DRAW)
   {
     UIButton tilesBtn({10, 5}, {100, 26}, "Tiles", font);
     UIButton enemyBtn({120, 5}, {100, 26}, "Enemies", font);
 
-    tilesBtn.draw(window);
-    enemyBtn.draw(window);
+    tilesBtn.draw(window, windowManager);
+    enemyBtn.draw(window, windowManager);
   }
 
   if (selection.mode == PickerMode::Tiles)
@@ -255,7 +255,7 @@ void TilePicker::draw() {
   if (activeLayer >= 0 && layers && parallaxSlider)
     drawParallaxUI((*layers)[activeLayer], *parallaxSlider);
 
-  wm.checkRenderFlag(window);
+  windowManager.checkRenderFlag(window);
 }
 
 void TilePicker::drawEnemyPicker() {
@@ -266,21 +266,19 @@ void TilePicker::drawEnemyPicker() {
 
   sf::Text title("Select Enemy:", font, 16);
   title.setPosition(x, y);
-  WindowManager::getInstance().drawOnWindow(window, title);
+  windowManager.drawOnWindow(window, title);
 
   y += 30.f;
 
   for (const auto &e : enemies) {
     UIButton btn({x, y}, {200, 24}, e, font);
-    btn.draw(window); // ONLY DRAW
+    btn.draw(window, windowManager); // ONLY DRAW
 
     y += 32.f;
   }
 }
 
 void TilePicker::drawTileset(const sf::IntRect &selectedRect) {
-
-  WindowManager &windowManager = WindowManager::getInstance();
 
   sf::Sprite spr(tileset);
   spr.setPosition(0.f, 40.f);
@@ -321,13 +319,11 @@ void TilePicker::drawTileset(const sf::IntRect &selectedRect) {
 void TilePicker::drawLayerList(std::vector<LayerInfo> &layers,
                                int &activeLayer) {
 
-  auto &wm = WindowManager::getInstance();
-
   float panelX = static_cast<float>(tileset.getSize().x) + 10.f;
   float y = 10.f;
 
   UIButton addBtn({panelX, y}, {240, 24}, "+ Add Layer", font);
-  addBtn.draw(window);
+  addBtn.draw(window, windowManager);
 
   y += 40.f;
 
@@ -338,19 +334,19 @@ void TilePicker::drawLayerList(std::vector<LayerInfo> &layers,
     entry.setPosition(panelX, y);
     entry.setFillColor(selected ? sf::Color(120, 120, 120)
                                 : sf::Color(60, 60, 60));
-    wm.drawOnWindow(window, entry);
+    windowManager.drawOnWindow(window, entry);
 
     sf::Text t(layers[i].name, font, 14);
     t.setPosition(panelX + 10, y + 5);
-    wm.drawOnWindow(window, t);
+    windowManager.drawOnWindow(window, t);
 
     UIButton up({panelX + 195, y}, {20, 12}, "", font);
     UIButton down({panelX + 195, y + 14}, {20, 12}, "", font);
     UIButton del({panelX + 220, y}, {20, 24}, "X", font);
 
-    up.draw(window);
-    down.draw(window);
-    del.draw(window);
+    up.draw(window, windowManager);
+    down.draw(window, windowManager);
+    del.draw(window, windowManager);
 
     y += 36;
   }
@@ -360,13 +356,11 @@ void TilePicker::drawParallaxUI(LayerInfo &layer, UISlider &slider) {
   float panelX = 10.f;
   float y = static_cast<float>(tileset.getSize().y) + 50.f;
 
-  WindowManager &windowManager = WindowManager::getInstance();
-
   sf::Text label("Parallax:", font, 14);
   label.setPosition(panelX, y);
   windowManager.drawOnWindow(window, label);
 
-  slider.draw(window);
+  slider.draw(window, windowManager);
 
   float rounded = float(int(layer.paralax * 100)) / 100.f;
   sf::Text v(std::to_string(rounded), font, 12);

@@ -5,14 +5,8 @@
 #include <iostream>
 #include <stdexcept>
 
-WindowManager &WindowManager::getInstance() {
-  static WindowManager instance;
-  return instance;
-}
-
 WindowID WindowManager::create(Set set, unsigned int w, unsigned int h,
                                const std::string &name) {
-
   if (set == Set::MAIN) {
     for (const auto &[id, entry] : windows) {
       if (entry.set == Set::MAIN) {
@@ -175,6 +169,7 @@ void WindowManager::checkRenderFlag(WindowID id) {
 
 void WindowManager::drawOnWindow(WindowID id, const sf::Sprite &toDraw) {
   sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+
   window->draw(toDraw);
 }
 

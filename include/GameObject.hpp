@@ -34,7 +34,7 @@ public:
 
   virtual std::shared_ptr<GameObjectExposure::Descriptor> describe();
   unsigned int getId();
-  bool isUpdateDomainPaused();
+  bool isUpdateDomainPaused(WindowManager &wm);
 
   static std::vector<GameObject *> &getGameObjects();
   static void destroy(GameObject *g);

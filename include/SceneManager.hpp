@@ -17,8 +17,8 @@ public:
   static SceneManager &getInstance();
 
   void registerScene(const std::string &name, const SceneSetupFn &setup);
-  bool loadScene(const std::string &name);
-  void reloadCurrentScene();
+  bool loadScene(const std::string &name, WindowManager &windowManager);
+  void reloadCurrentScene(WindowManager &windowManager);
   bool isTransitioning();
 
   void update(Engine &engine);
@@ -28,9 +28,10 @@ public:
 private:
   SceneManager() = default;
 
-  void beginTransition(const std::string &nextScene);
+  void beginTransition(const std::string &nextScene,
+                       WindowManager &windowManager);
   void unloadCurrentScene();
-  void initFadeOverlay();
+  void initFadeOverlay(WindowManager &windowManager);
 
   std::unordered_map<std::string, SceneSetupFn> scenes;
   std::string currentScene;

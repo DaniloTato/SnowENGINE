@@ -9,9 +9,9 @@ std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
     : window(params.window), texture(*params.texture), color(sf::Color::White),
-      assignedCamera(params.camera), layer(params.layer),
-      paralax(params.parallax), show(true), showCountDown(0.f),
-      hasCulling(true) {
+      assignedCamera(params.camera), windowManager(params.windowManager),
+      layer(params.layer), paralax(params.parallax), show(true),
+      showCountDown(0.f), hasCulling(true) {
 
   sprite.setTexture(texture);
   rect = sf::IntRect(0, 0, static_cast<int>(texture.getSize().x),
@@ -64,9 +64,6 @@ bool Renderizer::isVisible() const {
 }
 
 void Renderizer::render(GameObject *obj) {
-
-  WindowManager &windowManager = WindowManager::getInstance();
-
   sf::Vector2f position = obj->position + obj->offset;
 
   sprite.setColor(color);
@@ -124,7 +121,7 @@ void Renderizer::renderRectShape(GameObject *obj) {
                       assignedCamera->getZoom());
   }
 
-  WindowManager::getInstance().drawOnWindow(window, rectShape);
+  windowManager.drawOnWindow(window, rectShape);
 }
 
 void Renderizer::setColor(sf::Color newColor) { color = newColor; }

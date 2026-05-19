@@ -14,13 +14,14 @@ static Terminal *s_terminal = nullptr;
 
 void terminalCreationScript(ScriptRunner &renderable,
                             const GeneralContext &ctx) {
+
   if (InputManager::getInstance().isJustPressed("terminal")) {
 
     if (!s_terminal) {
 
-      std::cout << "creating terminal\n";
+      WindowManager &windowManager = ctx.engine->getWindowManager();
 
-      const WindowID terminalWindow = WindowManager::getInstance().create(
+      const WindowID terminalWindow = windowManager.create(
           WindowManager::Set::TERMINAL, 900, 500, "Snowgun Terminal");
 
       const CameraID terminalCamera = ctx.cameraManager->createCamera(
@@ -29,11 +30,11 @@ void terminalCreationScript(ScriptRunner &renderable,
       s_terminal = new Terminal(terminalWindow,
                                 ctx.cameraManager->getCamera(terminalCamera),
                                 ctx.cameraManager->getCamera(ctx.mainCamera),
+                                ctx.engine->getWindowManager(),
                                 &TextureManager::getInstance().get("snowFont"));
 
-      WindowManager::getInstance().subscribe(terminalWindow,
-                                             &InputManager::getInstance());
-      WindowManager::getInstance().subscribe(terminalWindow, s_terminal);
+      windowManager.subscribe(terminalWindow, &InputManager::getInstance());
+      windowManager.subscribe(terminalWindow, s_terminal);
     }
   }
 

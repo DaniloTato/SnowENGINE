@@ -1,5 +1,6 @@
 #pragma once
 #include "WindowID.hpp"
+#include "WindowManager.hpp"
 #include <SFML/Graphics.hpp>
 
 class UISlider {
@@ -7,7 +8,7 @@ public:
   UISlider(const sf::Vector2f &position, float width, float minValue,
            float maxValue, float *boundValue);
 
-  void draw(WindowID window);
+  void draw(WindowID window, WindowManager &windowManager);
 
   void handleEvent(const sf::Event &ev, WindowID window);
 

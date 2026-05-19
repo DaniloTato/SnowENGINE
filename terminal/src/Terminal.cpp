@@ -36,16 +36,18 @@ static size_t countVisualLines(std::string_view s) {
 }
 
 Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-                   sf::Texture *fontTexture)
+                   WindowManager &windowManager, sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
-      text(new GameText({.window = targetWindow,
+      text(new GameText({.windowManager = windowManager,
+                         .window = targetWindow,
                          .texture = fontTexture,
                          .camera = camera,
                          .layer = Constants::UI_LAYER,
                          .parallax = 1.f})) {
 
   // QUICK FIX FOR NOW, CHANGE LATER.
-  snowlang.tileCamera = nullptr;
+  snowlang.tileCamera = tileCamera;
+  snowlang.windowManagerRef = &windowManager;
 
   s_activeTerminals.push_back(this);
   text->position = {10.f, 10.f};
@@ -247,11 +249,11 @@ bool Terminal::destroysWindowOnClose() const { return destroyWindowOnClose; }
 
 void Terminal::clear() { history.clear(); }
 
-void Terminal::destroyKilledTerminals() {
-  auto isKilled = [](Terminal *t) {
+void Terminal::destroyKilledTerminals(WindowManager &wm) {
+  auto isKilled = [&wm](Terminal *t) {
     if (!t->isOpen()) {
       if (t->destroysWindowOnClose()) {
-        WindowManager::getInstance().queueDestroy(t->getTargetWindow());
+        wm.queueDestroy(t->getTargetWindow());
       }
       delete t;
       return true;

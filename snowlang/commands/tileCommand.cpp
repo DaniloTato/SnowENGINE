@@ -33,15 +33,15 @@ RuntimeValue tileCommand(const CommandContext &ctx) {
       throwError(SnowErr::Phase::Evaluator, "no Reference to tile camera.", ctx.cmd.span);
     }
 
-    LevelManager::getInstance().queueCreateTile(WindowManager::getInstance().getMain(),
-                                                ctx.snowlang.tileCamera, static_cast<int>(layer),
-                                                static_cast<int>(x), static_cast<int>(y),
-                                                sf::IntRect({
-                                                    static_cast<int>(Rx),
-                                                    static_cast<int>(Ry),
-                                                    Constants::TILE_SIZE,
-                                                    Constants::TILE_SIZE,
-                                                }));
+    LevelManager::getInstance().queueCreateTile(
+        *ctx.snowlang.windowManagerRef, ctx.snowlang.windowManagerRef->getMain(),
+        ctx.snowlang.tileCamera, static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y),
+        sf::IntRect({
+            static_cast<int>(Rx),
+            static_cast<int>(Ry),
+            Constants::TILE_SIZE,
+            Constants::TILE_SIZE,
+        }));
   }
 
   return {true};

@@ -1,5 +1,6 @@
 #pragma once
 #include "WindowID.hpp"
+#include "WindowManager.hpp"
 #include <SFML/Graphics.hpp>
 
 class UIButton {
@@ -8,7 +9,7 @@ public:
            const std::string &text, sf::Font &font,
            const sf::Color &color = sf::Color(60, 60, 60));
 
-  void draw(WindowID window);
+  void draw(WindowID window, WindowManager &windowManager);
   bool isClicked(const sf::Event &event, WindowID window);
 
   void setText(const std::string &t) { label.setString(t); }

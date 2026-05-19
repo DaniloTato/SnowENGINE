@@ -17,10 +17,10 @@ struct PickerSelection {
 
 class TilePicker : public IEventListener {
 public:
-  TilePicker(sf::Texture &tileset, int tileSize);
+  TilePicker(sf::Texture &tileset, int tileSize, WindowManager &windowManager);
 
   void open();
-  void close();
+  void close(WindowManager &wm);
 
   void handleEvent(WindowID id, const sf::Event &ev) override;
   void update();
@@ -45,6 +45,7 @@ private:
 
   sf::Font font;
   sf::Texture &tileset;
+  WindowManager &windowManager;
   int tileSize;
 
   PickerSelection selection;

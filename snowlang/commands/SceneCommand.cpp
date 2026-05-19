@@ -12,7 +12,7 @@ RuntimeValue sceneCommand(const CommandContext &ctx) {
 
   // --reload
   if (ctx.hasFlag("reload")) {
-    sceneManager.reloadCurrentScene();
+    sceneManager.reloadCurrentScene(*ctx.snowlang.windowManagerRef);
     return {true};
   }
 
@@ -37,7 +37,7 @@ RuntimeValue sceneCommand(const CommandContext &ctx) {
 
   const auto &sceneName = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[0]);
 
-  bool success = sceneManager.loadScene(sceneName);
+  bool success = sceneManager.loadScene(sceneName, *ctx.snowlang.windowManagerRef);
 
   if (!success) {
     throwError(SnowErr::Phase::Evaluator,

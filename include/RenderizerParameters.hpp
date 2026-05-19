@@ -1,11 +1,13 @@
 #pragma once
 
 #include "WindowID.hpp"
+#include "WindowManager.hpp"
 #include <SFML/Graphics.hpp>
 
 class GameCamera;
 
 struct RenderizerParameters {
+  WindowManager &windowManager;
   WindowID window;
   sf::Texture *texture = nullptr;
   GameCamera *camera = nullptr;

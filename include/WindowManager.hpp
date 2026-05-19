@@ -30,7 +30,12 @@ private:
   std::vector<WindowID> pendingDestroy;
 
 public:
-  static WindowManager &getInstance();
+  WindowManager() = default;
+  ~WindowManager() = default;
+  WindowManager(const WindowManager &) = delete;
+  WindowManager &operator=(const WindowManager &) = delete;
+  WindowManager(WindowManager &&) = delete;
+  WindowManager &operator=(WindowManager &&) = delete;
 
   WindowID create(Set set, unsigned int w, unsigned int h,
                   const std::string &name);

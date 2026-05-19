@@ -38,13 +38,13 @@ int main() {
 
   InputManager &inputManager = InputManager::getInstance();
   SceneManager &sceneManager = SceneManager::getInstance();
-  WindowManager &windowManager = WindowManager::getInstance();
   GameState &gameState = GameState::getInstance();
+  WindowManager &windowManager = engine.getWindowManager();
 
   WindowID mainWindow = windowManager.create(
       WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
       Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
-  WindowLifecycleListener lifecycleListener;
+  WindowLifecycleListener lifecycleListener(windowManager);
 
   windowManager.subscribe(mainWindow, &inputManager);
   windowManager.subscribe(mainWindow, &lifecycleListener);
@@ -53,7 +53,7 @@ int main() {
       (Helper::getPath("config/control_config.json")));
 
   GameLoader loader;
-  loader.loadGameData(Helper::getPath("config"));
+  loader.loadGameData(Helper::getPath("config"), engine.getWindowManager());
 
   sf::Clock clock;
 
@@ -75,7 +75,7 @@ int main() {
       EnemyManager::getInstance().applyQueues();
       CollectableManager::getInstance().applyQueues();
       BulletManager::getInstance().update();
-      Terminal::destroyKilledTerminals();
+      Terminal::destroyKilledTerminals(windowManager);
       windowManager.applyDestroyQueue();
     }
 
@@ -92,7 +92,7 @@ int main() {
     // IDEA: Group objects by domain like windows and only call a certain domain
     // to update.
     for (GameObject *gameObject : GameObject::getGameObjects()) {
-      if (gameObject && !gameObject->isUpdateDomainPaused()) {
+      if (gameObject && !gameObject->isUpdateDomainPaused(windowManager)) {
         gameObject->update(gameState.getGeneralContext());
       }
     }

@@ -100,8 +100,7 @@ GameObjectExposure::Value::Object GameObject::describe() {
   return desc;
 }
 
-bool GameObject::isUpdateDomainPaused() {
-  auto &wm = WindowManager::getInstance();
+bool GameObject::isUpdateDomainPaused(WindowManager &wm) {
 
   auto isAnyWindowActive = [&](auto &&ids) {
     for (auto id : ids) {

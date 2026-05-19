@@ -29,11 +29,12 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
 
   InputManager &inputManager = InputManager::getInstance();
   LevelManager &levelManager = LevelManager::getInstance();
-  WindowManager &windowManager = WindowManager::getInstance();
+  WindowManager &windowManager = ctx.engine->getWindowManager();
 
   if (!state.picker) {
     state.picker = std::make_shared<TilePicker>(levelManager.getTilesheet(),
-                                                Constants::TILE_SIZE);
+                                                Constants::TILE_SIZE,
+                                                ctx.engine->getWindowManager());
     state.picker->setLayers(&levelManager.layers);
   }
 
@@ -47,10 +48,10 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
                               &InputManager::getInstance());
       windowManager.subscribe(state.picker->getWindow(), state.picker.get());
     } else {
-      state.picker->close();
+      state.picker->close(ctx.engine->getWindowManager());
       // HORRIBLE BUG WAITING TO HAPPEN LOL
       LevelManager::getInstance().reloadAllLayers(
-          WindowManager::getInstance().getMain(),
+          windowManager, windowManager.getMain(),
           ctx.cameraManager->getCamera(mainCamera));
     }
   }
@@ -101,7 +102,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
                                 selRect.top + y * tileSize, tileSize, tileSize);
 
             levelManager.queueCreateTile(
-                main, ctx.cameraManager->getCamera(mainCamera),
+                ctx.engine->getWindowManager(), main,
+                ctx.cameraManager->getCamera(mainCamera),
                 levelManager.activeLayer, baseTileX + x, baseTileY + y,
                 subRect);
           }

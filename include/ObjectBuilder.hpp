@@ -8,14 +8,14 @@
 
 template <typename T> class ObjectBuilder {
 public:
-  ObjectBuilder(const std::string &textureKey) {
-    WindowManager &wm = WindowManager::getInstance();
-    params.window = wm.getMain();
-    params.texture = &TextureManager::getInstance().get(textureKey);
-    params.camera = nullptr;
-    params.layer = 0.f;
-    params.parallax = 1.f;
-  }
+  ObjectBuilder(const std::string &textureKey, WindowManager &windowManager)
+      : position(0.f, 0.f),
+        params{.windowManager = windowManager,
+               .window = windowManager.getMain(),
+               .texture = &TextureManager::getInstance().get(textureKey),
+               .camera = nullptr,
+               .layer = 0.f,
+               .parallax = 1.f} {}
 
   ObjectBuilder &at(float x, float y) {
     position = {x, y};
@@ -44,7 +44,7 @@ public:
   }
 
 private:
-  bool hasAnimation;
+  bool hasAnimation = false;
   sf::Vector2f position;
   RenderizerParameters params;
   Animations animations;

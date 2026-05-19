@@ -54,6 +54,7 @@ protected:
   sf::IntRect rect;
   sf::Color color;
   GameCamera *assignedCamera;
+  WindowManager &windowManager;
   float layer;
   float paralax;
 

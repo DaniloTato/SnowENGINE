@@ -21,8 +21,7 @@ void UIButton::setPosition(const sf::Vector2f &p) {
   label.setPosition(p.x + 10, p.y + 5);
 }
 
-void UIButton::draw(WindowID window) {
-  WindowManager &windowManager = WindowManager::getInstance();
+void UIButton::draw(WindowID window, WindowManager &windowManager) {
   sf::Vector2i mp = InputManager::getInstance().getMousePosition(window);
   bool hover =
       static_cast<float>(mp.x) >= box.getPosition().x &&

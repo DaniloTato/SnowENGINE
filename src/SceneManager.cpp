@@ -13,7 +13,8 @@ void SceneManager::registerScene(const std::string &name,
   scenes[name] = setup;
 }
 
-bool SceneManager::loadScene(const std::string &name) {
+bool SceneManager::loadScene(const std::string &name,
+                             WindowManager &windowManager) {
   if (transitioning) {
     return true;
   }
@@ -22,20 +23,23 @@ bool SceneManager::loadScene(const std::string &name) {
     return false;
   }
 
-  beginTransition(name);
+  beginTransition(name, windowManager);
 
   return true;
 }
 
-void SceneManager::reloadCurrentScene() { loadScene(currentScene); }
+void SceneManager::reloadCurrentScene(WindowManager &windowManager) {
+  loadScene(currentScene, windowManager);
+}
 
-void SceneManager::beginTransition(const std::string &nextScene) {
+void SceneManager::beginTransition(const std::string &nextScene,
+                                   WindowManager &windowManager) {
   transitioning = true;
   fadingOut = true;
   transitionTimer = 0.f;
   queuedScene = nextScene;
 
-  initFadeOverlay();
+  initFadeOverlay(windowManager);
 }
 
 void SceneManager::unloadCurrentScene() {
@@ -80,13 +84,14 @@ void SceneManager::update(Engine &engine) {
 
 bool SceneManager::isTransitioning() { return transitioning; }
 
-void SceneManager::initFadeOverlay() {
+void SceneManager::initFadeOverlay(WindowManager &windowManager) {
   if (fadeOverlay)
     return;
 
   sf::Texture dummyTexture;
 
-  RenderizerParameters params{.window = WindowManager::getInstance().getMain(),
+  RenderizerParameters params{.windowManager = windowManager,
+                              .window = windowManager.getMain(),
                               .texture = &dummyTexture,
                               .camera = nullptr,
                               .layer = Constants::OVERLAY_LAYER,

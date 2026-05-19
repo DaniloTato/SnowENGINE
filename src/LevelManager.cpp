@@ -22,8 +22,8 @@ LevelManager &LevelManager::getInstance() {
 
 sf::Color &LevelManager::getBackgroundColor() { return backgroundColor; }
 
-void LevelManager::loadLevel(WindowID window, GameCamera *camera,
-                             const std::string &path) {
+void LevelManager::loadLevel(WindowManager &windowManager, WindowID window,
+                             GameCamera *camera, const std::string &path) {
 
   layers.clear();
 
@@ -57,7 +57,7 @@ void LevelManager::loadLevel(WindowID window, GameCamera *camera,
   for (size_t i = 0; i < jsonLayers.size(); i++) {
     layers[i].name = jsonLayers[i]["name"].get<std::string>();
     layers[i].paralax = jsonLayers[i]["parallax"].get<float>();
-    loadLayer(window, camera, i, jsonLayers[i], tileSize);
+    loadLayer(windowManager, window, camera, i, jsonLayers[i], tileSize);
 
     // put secret layer above others
     if (layers[i].name == "secret") {
@@ -81,9 +81,9 @@ void LevelManager::deleteLayerObjects(int layerNo) {
   }
 }
 
-void LevelManager::loadLayer(WindowID window, GameCamera *camera,
-                             size_t layerNo, const json &layerJSON,
-                             int tileSize) {
+void LevelManager::loadLayer(WindowManager &windowManager, WindowID window,
+                             GameCamera *camera, size_t layerNo,
+                             const json &layerJSON, int tileSize) {
 
   auto &tileList = layers[layerNo].tiles;
   tileList.clear();
@@ -101,11 +101,14 @@ void LevelManager::loadLayer(WindowID window, GameCamera *camera,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    RenderizerParameters params{.window = window,
-                                .texture = &tilesheet,
-                                .camera = camera,
-                                .layer = static_cast<float>(layerNo),
-                                .parallax = layers[layerNo].paralax};
+    RenderizerParameters params{
+        .windowManager = windowManager,
+        .window = window,
+        .texture = &tilesheet,
+        .camera = camera,
+        .layer = static_cast<float>(layerNo),
+        .parallax = layers[layerNo].paralax,
+    };
 
     info.object = new RenderableObject(params);
     info.object->position = {float(info.x * tileSize),
@@ -120,14 +123,15 @@ void LevelManager::loadLayer(WindowID window, GameCamera *camera,
   }
 }
 
-void LevelManager::reloadAllLayers(WindowID window, GameCamera *camera) {
+void LevelManager::reloadAllLayers(WindowManager &windowManager,
+                                   WindowID window, GameCamera *camera) {
   ensureLevelLoaded();
   for (size_t i = 0; i < layers.size(); ++i)
-    reloadLayer(window, camera, i);
+    reloadLayer(windowManager, window, camera, i);
 }
 
-void LevelManager::reloadLayer(WindowID window, GameCamera *camera,
-                               size_t layerNo) {
+void LevelManager::reloadLayer(WindowManager &windowManager, WindowID window,
+                               GameCamera *camera, size_t layerNo) {
 
   ensureLevelLoaded();
 
@@ -144,7 +148,8 @@ void LevelManager::reloadLayer(WindowID window, GameCamera *camera,
       t.object = nullptr;
     }
 
-    RenderizerParameters params{.window = window,
+    RenderizerParameters params{.windowManager = windowManager,
+                                .window = window,
                                 .texture = &tilesheet,
                                 .camera = camera,
                                 .layer = layerValue,
@@ -157,8 +162,9 @@ void LevelManager::reloadLayer(WindowID window, GameCamera *camera,
   }
 }
 
-void LevelManager::createTile(WindowID window, GameCamera *camera, int layerNo,
-                              int x, int y, sf::IntRect rect) {
+void LevelManager::createTile(WindowManager &windowManager, WindowID window,
+                              GameCamera *camera, int layerNo, int x, int y,
+                              sf::IntRect rect) {
   ensureLevelLoaded();
 
   size_t unsignedX = x;
@@ -207,7 +213,8 @@ void LevelManager::createTile(WindowID window, GameCamera *camera, int layerNo,
 
       t.textureRect = rect;
 
-      RenderizerParameters params{.window = window,
+      RenderizerParameters params{.windowManager = windowManager,
+                                  .window = window,
                                   .texture = &tilesheet,
                                   .camera = camera,
                                   .layer = layerValue,
@@ -231,7 +238,8 @@ void LevelManager::createTile(WindowID window, GameCamera *camera, int layerNo,
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  RenderizerParameters params{.window = window,
+  RenderizerParameters params{.windowManager = windowManager,
+                              .window = window,
                               .texture = &tilesheet,
                               .camera = camera,
                               .layer = layerValue,
@@ -331,11 +339,18 @@ const LayerInfo LevelManager::getLayerInfo(int layerNo) const {
   return layers[layerNo];
 }
 
-void LevelManager::queueCreateTile(WindowID window, GameCamera *camera,
+void LevelManager::queueCreateTile(WindowManager &windowManager,
+                                   WindowID window, GameCamera *camera,
                                    int layer, int x, int y,
                                    const sf::IntRect &rect) {
   ensureLevelLoaded();
-  createQueue.push_back({window, camera, layer, x, y, rect});
+  createQueue.push_back(TileCreationRequest{.windowManager = &windowManager,
+                                            .window = window,
+                                            .camera = camera,
+                                            .layer = layer,
+                                            .x = x,
+                                            .y = y,
+                                            .rect = rect});
 }
 
 void LevelManager::queueDeleteTile(int layer, int x, int y) {
@@ -349,9 +364,9 @@ void LevelManager::applyQueuedTileChanges() {
   }
   deleteQueue.clear();
 
-  for (const auto &createReq : createQueue) {
-    createTile(createReq.window, createReq.camera, createReq.layer, createReq.x,
-               createReq.y, createReq.rect);
+  for (const TileCreationRequest &createReq : createQueue) {
+    createTile(*createReq.windowManager, createReq.window, createReq.camera,
+               createReq.layer, createReq.x, createReq.y, createReq.rect);
   }
   createQueue.clear();
 }

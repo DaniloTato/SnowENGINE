@@ -9,7 +9,7 @@
 class Terminal : public IEventListener {
 public:
   Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-           sf::Texture *fontTexture);
+           WindowManager &windowManager, sf::Texture *fontTexture);
 
   ~Terminal() override;
 
@@ -25,7 +25,7 @@ public:
 
   [[nodiscard]] bool isOpen() const;
 
-  static void destroyKilledTerminals();
+  static void destroyKilledTerminals(WindowManager &wm);
 
   [[nodiscard]] bool destroysWindowOnClose() const;
 

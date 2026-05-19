@@ -42,13 +42,13 @@ void mainScene(Engine &engine) {
   */
 
   LevelManager::getInstance().loadLevel(
-      WindowManager::getInstance().getMain(),
+      engine.getWindowManager(), engine.getWindowManager().getMain(),
       cameraManager.getCamera(mainCamera),
       Helper::getPath("assets/levels/Level1.json"));
 
   // add a window param in Object Builder
   // Horrible syntax for declaring camera
-  auto *image = ObjectBuilder<TangibleObject>("todd")
+  auto *image = ObjectBuilder<TangibleObject>("todd", engine.getWindowManager())
                     .at(100, 100)
                     .onCamera(*cameraManager.getCamera(mainCamera))
                     .withEmptyAnimation(16, 16)
@@ -68,7 +68,8 @@ void mainScene(Engine &engine) {
 
   GeneralContext ctx = {.player = image,
                         .cameraManager = &cameraManager,
-                        .mainCamera = mainCamera};
+                        .mainCamera = mainCamera,
+                        .engine = &engine};
   GameState::getInstance().updateGeneralContext(ctx);
 }
 } // namespace SceneBuilder
