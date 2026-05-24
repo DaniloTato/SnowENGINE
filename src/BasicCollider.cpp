@@ -54,9 +54,8 @@ void BasicCollider::computeCollisionGrid(const sf::Vector2f &objectPos) {
       tileCoords.emplace_back(x, y);
 }
 
-bool BasicCollider::horizontalLevelCollision(sf::Vector2f &objectPos) {
-
-  auto &level = LevelManager::getInstance().getLevelLayout();
+bool BasicCollider::horizontalLevelCollision(
+    sf::Vector2f &objectPos, LevelManager::LevelLayout2D &level) {
   const int TILE = Constants::TILE_SIZE;
 
   computeCollisionGrid(objectPos);
@@ -98,9 +97,9 @@ bool BasicCollider::horizontalLevelCollision(sf::Vector2f &objectPos) {
   return collided;
 }
 
-bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos) {
+bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos,
+                                           LevelManager::LevelLayout2D &level) {
 
-  auto &level = LevelManager::getInstance().getLevelLayout();
   const int TILE = Constants::TILE_SIZE;
 
   computeCollisionGrid(objectPos);

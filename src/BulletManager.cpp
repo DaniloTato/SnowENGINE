@@ -18,9 +18,10 @@ void BulletManager::queueSpawn(RenderizerParameters &params, Bullet::Type type,
                                const sf::Vector2f &pos,
                                const sf::Vector2f &speed,
                                const sf::Vector2f &accel, float damageRadius,
-                               float range, bool shotByPlayer) {
-  createQueue.push_back(
-      {params, type, pos, speed, accel, damageRadius, range, shotByPlayer});
+                               float range, bool shotByPlayer,
+                               LevelManager::LevelLayout2D &layout) {
+  createQueue.push_back({params, type, pos, speed, accel, damageRadius, range,
+                         shotByPlayer, layout});
 }
 
 void BulletManager::queueDeletion(Bullet *bullet) {
@@ -28,9 +29,9 @@ void BulletManager::queueDeletion(Bullet *bullet) {
 }
 
 Bullet *BulletManager::createFromRequest(const BulletCreationRequest &req) {
-  auto *bullet =
-      new Bullet(req.params, cachedAnimations, req.type, req.pos, req.speed,
-                 req.accel, req.damageRadius, req.range, req.shotByPlayer);
+  auto *bullet = new Bullet(req.params, cachedAnimations, req.type, req.pos,
+                            req.speed, req.accel, req.damageRadius, req.range,
+                            req.shotByPlayer, req.layout);
 
   bullet->animator.play("fly");
   return bullet;

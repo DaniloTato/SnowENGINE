@@ -9,7 +9,8 @@
 class Terminal : public IEventListener {
 public:
   Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-           WindowManager &windowManager, sf::Texture *fontTexture);
+           WindowManager &windowManager, LevelManager &levelManager,
+           SceneManager &sceneManager, sf::Texture *fontTexture);
 
   ~Terminal() override;
 

@@ -13,11 +13,13 @@ struct PickerSelection {
   PickerMode mode = PickerMode::Tiles;
   sf::IntRect tileRect;
   std::string enemyId;
+  int activeLayer;
 };
 
 class TilePicker : public IEventListener {
 public:
-  TilePicker(sf::Texture &tileset, int tileSize, WindowManager &windowManager);
+  TilePicker(sf::Texture &tileset, int tileSize, WindowManager &windowManager,
+             LevelManager &levelManager);
 
   void open();
   void close(WindowManager &wm);
@@ -58,4 +60,7 @@ private:
   std::vector<LayerInfo> *layers = nullptr;
 
   std::unique_ptr<UISlider> parallaxSlider;
+
+  // Probably incorrect dependency.
+  LevelManager &levelManager;
 };

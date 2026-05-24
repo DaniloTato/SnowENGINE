@@ -27,11 +27,12 @@ void terminalCreationScript(ScriptRunner &renderable,
       const CameraID terminalCamera = ctx.cameraManager->createCamera(
           GameObject::UpdateDomain(WindowManager::Set::TERMINAL), true);
 
-      s_terminal = new Terminal(terminalWindow,
-                                ctx.cameraManager->getCamera(terminalCamera),
-                                ctx.cameraManager->getCamera(ctx.mainCamera),
-                                ctx.engine->getWindowManager(),
-                                &TextureManager::getInstance().get("snowFont"));
+      s_terminal = new Terminal(
+          terminalWindow, ctx.cameraManager->getCamera(terminalCamera),
+          ctx.cameraManager->getCamera(ctx.mainCamera),
+          ctx.engine->getWindowManager(), ctx.engine->getLevelManager(),
+          ctx.engine->getSceneManager(),
+          &TextureManager::getInstance().get("snowFont"));
 
       windowManager.subscribe(terminalWindow, &InputManager::getInstance());
       windowManager.subscribe(terminalWindow, s_terminal);

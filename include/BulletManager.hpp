@@ -13,6 +13,7 @@ struct BulletCreationRequest {
   float damageRadius;
   float range;
   bool shotByPlayer;
+  LevelManager::LevelLayout2D &layout;
 };
 
 class BulletManager : public QueuedManager<Bullet, BulletCreationRequest> {
@@ -25,7 +26,7 @@ public:
   void queueSpawn(RenderizerParameters &params, Bullet::Type type,
                   const sf::Vector2f &pos, const sf::Vector2f &speed,
                   const sf::Vector2f &accel, float damageRadius, float range,
-                  bool shotByPlayer);
+                  bool shotByPlayer, LevelManager::LevelLayout2D &layout);
 
   void queueDeletion(Bullet *bullet);
 

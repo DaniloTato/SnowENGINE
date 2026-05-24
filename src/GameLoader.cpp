@@ -60,13 +60,12 @@ void GameLoader::loadCollectables(const std::string &path) {
 }
 
 void GameLoader::loadScenes(const std::string &path,
-                            WindowManager &windowManager) {
+                            WindowManager &windowManager,
+                            SceneManager &sceneManager) {
 
   std::ifstream file(path);
   nlohmann::json data;
   file >> data;
-
-  auto &sceneManager = SceneManager::getInstance();
 
   for (auto &[name, func] : SceneBuilderRegistry::getAllItems()) {
     sceneManager.registerScene(name, func);
@@ -76,7 +75,8 @@ void GameLoader::loadScenes(const std::string &path,
 }
 
 void GameLoader::loadGameData(const std::string &configFolder,
-                              WindowManager &windowManager) {
+                              WindowManager &windowManager,
+                              SceneManager &sceneManager) {
   loadEnemies(
       Helper::getPath(configFolder + "/enemieManagerDeclarations.json"));
   loadCollectables(
@@ -85,7 +85,7 @@ void GameLoader::loadGameData(const std::string &configFolder,
   loadTextures(
       Helper::getPath(configFolder + "/textureManagerDeclarations.json"));
   loadScenes(Helper::getPath(configFolder + "/sceneManagerDeclarations.json"),
-             windowManager);
+             windowManager, sceneManager);
 }
 
 void GameLoader::loadTextures(const std::string &path) {

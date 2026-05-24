@@ -10,6 +10,8 @@
 #include "terminalCreationScript.hpp"
 #include "tilePickerCreationScript.hpp"
 
+#include "SceneContext.hpp"
+
 #include "Helpers.hpp"
 #include "ObjectBuilder.hpp"
 
@@ -17,15 +19,21 @@
 #include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
 
 namespace SceneBuilder {
-void mainScene(Engine &engine) {
+void mainScene(SceneBuilder::SceneContext ctx) {
 
-  CameraManager &cameraManager = engine.getCameraManager();
+  WindowManager &windowManager = ctx.engine->getWindowManager();
+  CameraManager &cameraManager = ctx.engine->getCameraManager();
+  LevelManager &levelManager = ctx.engine->getLevelManager();
 
   CameraID mainCamera = cameraManager.createCamera(
       GameObject::UpdateDomain(WindowManager::Set::MAIN));
 
   cameraManager.getCamera(mainCamera)
       ->scripter.addScript(Scripts::cameraBehaviourScript);
+
+  // This method should not exist. Must work towards refactoring levelManger.
+  levelManager.initializeRenderContext(windowManager, ctx.mainWindow,
+                                       cameraManager.getCamera(mainCamera));
 
   /* Setup in case we'd like to have particles in the scene.
 
@@ -41,18 +49,16 @@ void mainScene(Engine &engine) {
           Helper::getPath("assets/animations/particles.json")));
   */
 
-  LevelManager::getInstance().loadLevel(
-      engine.getWindowManager(), engine.getWindowManager().getMain(),
-      cameraManager.getCamera(mainCamera),
-      Helper::getPath("assets/levels/Level1.json"));
+  levelManager.loadLevel(Helper::getPath("assets/levels/Level1.json"));
 
   // add a window param in Object Builder
   // Horrible syntax for declaring camera
-  auto *image = ObjectBuilder<TangibleObject>("todd", engine.getWindowManager())
-                    .at(100, 100)
-                    .onCamera(*cameraManager.getCamera(mainCamera))
-                    .withEmptyAnimation(16, 16)
-                    .build();
+  auto *image =
+      ObjectBuilder<TangibleObject>("todd", ctx.engine->getWindowManager())
+          .at(100, 100)
+          .onCamera(*cameraManager.getCamera(mainCamera))
+          .withEmptyAnimation(16, 16)
+          .build();
 
   // Change addScript to recieve the function reference, not a string.
   image->scripter.addScript(Scripts::basicMovementScript);
@@ -66,11 +72,11 @@ void mainScene(Engine &engine) {
       {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}));
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
-  GeneralContext ctx = {.player = image,
-                        .cameraManager = &cameraManager,
-                        .mainCamera = mainCamera,
-                        .engine = &engine};
-  GameState::getInstance().updateGeneralContext(ctx);
+  GeneralContext generalContext = {.player = image,
+                                   .cameraManager = &cameraManager,
+                                   .mainCamera = mainCamera,
+                                   .engine = ctx.engine};
+  GameState::getInstance().updateGeneralContext(generalContext);
 }
 } // namespace SceneBuilder
 

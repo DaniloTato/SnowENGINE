@@ -37,8 +37,10 @@ int main() {
   Engine engine;
 
   InputManager &inputManager = InputManager::getInstance();
-  SceneManager &sceneManager = SceneManager::getInstance();
   GameState &gameState = GameState::getInstance();
+
+  SceneManager &sceneManager = engine.getSceneManager();
+  LevelManager &levelManager = engine.getLevelManager();
   WindowManager &windowManager = engine.getWindowManager();
 
   WindowID mainWindow = windowManager.create(
@@ -53,7 +55,8 @@ int main() {
       (Helper::getPath("config/control_config.json")));
 
   GameLoader loader;
-  loader.loadGameData(Helper::getPath("config"), engine.getWindowManager());
+  loader.loadGameData(Helper::getPath("config"), engine.getWindowManager(),
+                      engine.getSceneManager());
 
   sf::Clock clock;
 
@@ -65,11 +68,12 @@ int main() {
     const std::unordered_map<WindowID, WindowManager::WindowEntry> &windows =
         windowManager.getAll();
 
-    sceneManager.update(engine);
+    sceneManager.update(SceneBuilder::SceneContext{.engine = &engine,
+                                                   .mainWindow = mainWindow});
     gameState.updateDt();
 
     if (!sceneManager.isTransitioning()) {
-      LevelManager::getInstance().applyQueuedTileChanges();
+      levelManager.applyQueuedTileChanges();
       DialogueManager::getInstance().applyQueues();
       BulletManager::getInstance().applyQueues();
       EnemyManager::getInstance().applyQueues();
@@ -82,8 +86,7 @@ int main() {
     for (const auto &[id, entry] : windows) {
 
       if (entry.set == WindowManager::Set::MAIN) {
-        windowManager.clearWindow(
-            id, LevelManager::getInstance().getBackgroundColor());
+        windowManager.clearWindow(id, levelManager.getBackgroundColor());
       } else {
         windowManager.clearWindow(id);
       }

@@ -2,11 +2,7 @@
 #include "Constants.hpp"
 #include "GameObject.hpp"
 #include "GameState.hpp"
-
-SceneManager &SceneManager::getInstance() {
-  static SceneManager instance;
-  return instance;
-}
+#include "SceneContext.hpp"
 
 void SceneManager::registerScene(const std::string &name,
                                  const SceneSetupFn &setup) {
@@ -48,7 +44,7 @@ void SceneManager::unloadCurrentScene() {
   GameObject::destroySceneObjects();
 }
 
-void SceneManager::update(Engine &engine) {
+void SceneManager::update(SceneBuilder::SceneContext ctx) {
   if (!transitioning)
     return;
 
@@ -65,7 +61,7 @@ void SceneManager::update(Engine &engine) {
 
     if (t >= 1.f) {
       unloadCurrentScene();
-      scenes[queuedScene](engine);
+      scenes[queuedScene](ctx);
       currentScene = queuedScene;
 
       fadingOut = false;

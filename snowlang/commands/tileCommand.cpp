@@ -25,23 +25,22 @@ RuntimeValue tileCommand(const CommandContext &ctx) {
       SnowlangHelper::RuntimeValueTo<float>(span)(ctx.getFlag<float>("layer", float(0)));
 
   if (ctx.hasFlag("destroy")) {
-    LevelManager::getInstance().queueDeleteTile(static_cast<int>(layer), static_cast<int>(x),
-                                                static_cast<int>(y));
+    ctx.snowlang.levelManagerRef->queueDeleteTile(static_cast<int>(layer), static_cast<int>(x),
+                                                  static_cast<int>(y));
   } else {
     // MUST CHANGE. TIGHTLY COUPLED
     if (!ctx.snowlang.tileCamera) {
       throwError(SnowErr::Phase::Evaluator, "no Reference to tile camera.", ctx.cmd.span);
     }
 
-    LevelManager::getInstance().queueCreateTile(
-        *ctx.snowlang.windowManagerRef, ctx.snowlang.windowManagerRef->getMain(),
-        ctx.snowlang.tileCamera, static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y),
-        sf::IntRect({
-            static_cast<int>(Rx),
-            static_cast<int>(Ry),
-            Constants::TILE_SIZE,
-            Constants::TILE_SIZE,
-        }));
+    ctx.snowlang.levelManagerRef->queueCreateTile(static_cast<int>(layer), static_cast<int>(x),
+                                                  static_cast<int>(y),
+                                                  sf::IntRect({
+                                                      static_cast<int>(Rx),
+                                                      static_cast<int>(Ry),
+                                                      Constants::TILE_SIZE,
+                                                      Constants::TILE_SIZE,
+                                                  }));
   }
 
   return {true};

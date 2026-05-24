@@ -1,5 +1,6 @@
 #pragma once
 #include "GameCamera.hpp"
+#include "LevelManager.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <vector>
@@ -20,8 +21,10 @@ public:
 
   [[nodiscard]] sf::FloatRect
   getCollisionRect(const sf::Vector2f &objectPos) const;
-  bool horizontalLevelCollision(sf::Vector2f &objectPos);
-  bool verticalLevelCollision(sf::Vector2f &objectPos);
+  bool horizontalLevelCollision(sf::Vector2f &objectPos,
+                                LevelManager::LevelLayout2D &level);
+  bool verticalLevelCollision(sf::Vector2f &objectPos,
+                              LevelManager::LevelLayout2D &level);
   void computeCollisionGrid(const sf::Vector2f &objectPos);
   void debugRender(WindowID window, WindowManager &windowManager,
                    GameCamera &camera, const sf::Vector2f &objectPos);

@@ -16,6 +16,7 @@ namespace {
 struct tilePickerCreationScriptState {
   std::shared_ptr<TilePicker> picker;
   sf::IntRect selectedTileRect;
+  int selectedActiveLayer = 0;
   std::string selectedEnemyId;
   PickerMode mode;
 };
@@ -28,13 +29,13 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
       "tilePickerCreationScript");
 
   InputManager &inputManager = InputManager::getInstance();
-  LevelManager &levelManager = LevelManager::getInstance();
+  LevelManager &levelManager = ctx.engine->getLevelManager();
   WindowManager &windowManager = ctx.engine->getWindowManager();
 
   if (!state.picker) {
-    state.picker = std::make_shared<TilePicker>(levelManager.getTilesheet(),
-                                                Constants::TILE_SIZE,
-                                                ctx.engine->getWindowManager());
+    state.picker = std::make_shared<TilePicker>(
+        levelManager.getTilesheet(), Constants::TILE_SIZE,
+        ctx.engine->getWindowManager(), ctx.engine->getLevelManager());
     state.picker->setLayers(&levelManager.layers);
   }
 
@@ -50,9 +51,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     } else {
       state.picker->close(ctx.engine->getWindowManager());
       // HORRIBLE BUG WAITING TO HAPPEN LOL
-      LevelManager::getInstance().reloadAllLayers(
-          windowManager, windowManager.getMain(),
-          ctx.cameraManager->getCamera(mainCamera));
+      ctx.engine->getLevelManager().reloadAllLayers();
     }
   }
 
@@ -64,6 +63,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     PickerSelection sel = state.picker->getSelection();
     state.selectedTileRect = sel.tileRect;
     state.selectedEnemyId = sel.enemyId;
+    state.selectedActiveLayer = sel.activeLayer;
     state.mode = sel.mode;
   }
 
@@ -86,7 +86,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
                 ->screenToWorld(
                     {static_cast<float>(inputManager.getMousePosition(main).x),
                      static_cast<float>(inputManager.getMousePosition(main).y)},
-                    levelManager.getLayerInfo(levelManager.activeLayer)
+                    levelManager.getLayerInfo(state.selectedActiveLayer)
                         .paralax);
 
         sf::IntRect &selRect = state.selectedTileRect;
@@ -101,11 +101,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
             sf::IntRect subRect(selRect.left + x * tileSize,
                                 selRect.top + y * tileSize, tileSize, tileSize);
 
-            levelManager.queueCreateTile(
-                ctx.engine->getWindowManager(), main,
-                ctx.cameraManager->getCamera(mainCamera),
-                levelManager.activeLayer, baseTileX + x, baseTileY + y,
-                subRect);
+            levelManager.queueCreateTile(state.selectedActiveLayer,
+                                         baseTileX + x, baseTileY + y, subRect);
           }
         }
       }
@@ -135,10 +132,10 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
               ->screenToWorld(
                   {static_cast<float>(inputManager.getMousePosition(main).x),
                    static_cast<float>(inputManager.getMousePosition(main).y)},
-                  levelManager.getLayerInfo(levelManager.activeLayer).paralax);
+                  levelManager.getLayerInfo(state.selectedActiveLayer).paralax);
 
       levelManager.queueDeleteTile(
-          levelManager.activeLayer,
+          state.selectedActiveLayer,
           static_cast<int>(mousePosToTilePos.x) / Constants::TILE_SIZE,
           static_cast<int>(mousePosToTilePos.y) / Constants::TILE_SIZE);
     }

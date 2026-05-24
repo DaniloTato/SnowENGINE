@@ -8,7 +8,7 @@ namespace Snowlang::Commands {
 
 RuntimeValue sceneCommand(const CommandContext &ctx) {
 
-  auto &sceneManager = SceneManager::getInstance();
+  auto &sceneManager = *ctx.snowlang.sceneManagerRef;
 
   // --reload
   if (ctx.hasFlag("reload")) {

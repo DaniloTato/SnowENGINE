@@ -8,7 +8,7 @@ public:
   Bullet(RenderizerParameters params, const Animations &cachedAnimations,
          Type type, const sf::Vector2f &spawnPos, const sf::Vector2f &initSpeed,
          const sf::Vector2f &acceleration, float damageRadius, float maxRange,
-         bool shotByPlayer);
+         bool shotByPlayer, LevelManager::LevelLayout2D &layout);
 
   void update(const GeneralContext &ctx) override;
 
@@ -41,4 +41,6 @@ private:
   bool dead = false;
 
   bool shotByPlayer;
+
+  LevelManager::LevelLayout2D &layout;
 };

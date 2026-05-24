@@ -4,30 +4,32 @@
 #include <string>
 #include <unordered_map>
 
-#include "Engine.hpp"
+#include "SceneContext.hpp"
 
 #include "RenderableObject.hpp"
 
 class SceneManager {
 public:
   // scene setup fn should be part of a scene class
-  using SceneSetupFn = std::function<void(Engine &)>;
+  using SceneSetupFn = std::function<void(SceneBuilder::SceneContext)>;
   using SceneNameList = std::vector<std::string>;
-
-  static SceneManager &getInstance();
 
   void registerScene(const std::string &name, const SceneSetupFn &setup);
   bool loadScene(const std::string &name, WindowManager &windowManager);
   void reloadCurrentScene(WindowManager &windowManager);
   bool isTransitioning();
 
-  void update(Engine &engine);
+  void update(SceneBuilder::SceneContext ctx);
 
   [[nodiscard]] SceneNameList getRegisteredScenes() const;
 
-private:
   SceneManager() = default;
+  SceneManager(const WindowManager &) = delete;
+  SceneManager &operator=(const WindowManager &) = delete;
+  SceneManager(WindowManager &&) = delete;
+  SceneManager &operator=(WindowManager &&) = delete;
 
+private:
   void beginTransition(const std::string &nextScene,
                        WindowManager &windowManager);
   void unloadCurrentScene();

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Engine.hpp"
+#include "SceneContext.hpp"
 
 namespace SceneBuilder {
-void mainScene(Engine &engine);
+void mainScene(SceneContext ctx);
 }

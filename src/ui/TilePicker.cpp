@@ -12,9 +12,9 @@ static auto createFont = [] {
 };
 
 TilePicker::TilePicker(sf::Texture &tileset, int tileSize,
-                       WindowManager &windowManager)
+                       WindowManager &windowManager, LevelManager &levelManager)
     : font(createFont()), tileset(tileset), windowManager(windowManager),
-      tileSize(tileSize) {
+      tileSize(tileSize), levelManager(levelManager) {
   selectedRect = {0, 0, tileSize, tileSize};
   selection.tileRect = selectedRect;
   parallaxSlider = std::make_unique<UISlider>(
@@ -48,6 +48,8 @@ void TilePicker::update() {
   if (parallaxSlider && activeLayer >= 0 && layers) {
     parallaxSlider->bindTo(&(*layers)[activeLayer].paralax);
   }
+
+  selection.activeLayer = activeLayer;
 }
 
 void TilePicker::close(WindowManager &wm) {
@@ -211,7 +213,7 @@ void TilePicker::handleEvent(WindowID id, const sf::Event &ev) {
       }
 
       if (del.isClicked(ev, window)) {
-        LevelManager::getInstance().deleteLayerObjects(i);
+        levelManager.deleteLayerObjects(i);
         layers->erase(layers->begin() + i);
 
         if (layers->empty())

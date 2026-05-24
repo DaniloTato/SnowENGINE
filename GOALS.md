@@ -24,3 +24,11 @@
 - Solve ownership issues between GameObject and GameCamera
 - Convert Managers from singletons to members of Engine Object
 - Fix references to managers inside snowlang. Pass them along trough I/O or another interface
+- Level Manager Refactor
+- Remove all uses of GameCamera outside Camera Manager.
+- Refactor gameloader so you dont have to pass around functions from Mangers around internally.
+
+- Error pipeline for the whole engine.
+- Refactor Bullet Object. (or delete it completely)
+
+- Fix Level manager creation of tiles. `DONE`

@@ -9,21 +9,31 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
+RenderableObject *LevelManager::TileFactory::create(
+    const TileInfo &tile, const RenderizerParameters &params, int tileSize) {
+  auto *obj = new RenderableObject(params);
+  obj->position = {float(tile.x * tileSize + 1), float(tile.y * tileSize + 1)};
+
+  obj->renderizer.setRect(tile.textureRect, 1);
+
+  return obj;
+}
+
+void LevelManager::TileFactory::destroy(RenderableObject *&obj) {
+  if (obj) {
+    GameObject::destroy(obj);
+    obj = nullptr;
+  }
+}
+
 using json = nlohmann::json;
 
 LevelManager::LevelManager()
-    : activeLayer(0), isLevelLoaded(false),
-      backgroundColor(ColorPalette::Black) {}
-
-LevelManager &LevelManager::getInstance() {
-  static LevelManager instance;
-  return instance;
-}
+    : isLevelLoaded(false), backgroundColor(ColorPalette::Black) {}
 
 sf::Color &LevelManager::getBackgroundColor() { return backgroundColor; }
 
-void LevelManager::loadLevel(WindowManager &windowManager, WindowID window,
-                             GameCamera *camera, const std::string &path) {
+void LevelManager::loadLevel(const std::string &path) {
 
   layers.clear();
 
@@ -57,7 +67,7 @@ void LevelManager::loadLevel(WindowManager &windowManager, WindowID window,
   for (size_t i = 0; i < jsonLayers.size(); i++) {
     layers[i].name = jsonLayers[i]["name"].get<std::string>();
     layers[i].paralax = jsonLayers[i]["parallax"].get<float>();
-    loadLayer(windowManager, window, camera, i, jsonLayers[i], tileSize);
+    loadLayer(i, jsonLayers[i], tileSize);
 
     // put secret layer above others
     if (layers[i].name == "secret") {
@@ -74,16 +84,12 @@ void LevelManager::deleteLayerObjects(int layerNo) {
   LayerInfo layer = layers[layerNo];
 
   for (auto &tile : layer.tiles) {
-    if (tile.object) {
-      GameObject::destroy(tile.object);
-      tile.object = nullptr;
-    }
+    TileFactory::destroy(tile.object);
   }
 }
 
-void LevelManager::loadLayer(WindowManager &windowManager, WindowID window,
-                             GameCamera *camera, size_t layerNo,
-                             const json &layerJSON, int tileSize) {
+void LevelManager::loadLayer(size_t layerNo, const json &layerJSON,
+                             int tileSize) {
 
   auto &tileList = layers[layerNo].tiles;
   tileList.clear();
@@ -101,19 +107,8 @@ void LevelManager::loadLayer(WindowManager &windowManager, WindowID window,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    RenderizerParameters params{
-        .windowManager = windowManager,
-        .window = window,
-        .texture = &tilesheet,
-        .camera = camera,
-        .layer = static_cast<float>(layerNo),
-        .parallax = layers[layerNo].paralax,
-    };
-
-    info.object = new RenderableObject(params);
-    info.object->position = {float(info.x * tileSize),
-                             float(info.y * tileSize)};
-    info.object->renderizer.setRect(info.textureRect, 1);
+    info.object = TileFactory::create(info, makeRenderParams(layerNo),
+                                      Constants::TILE_SIZE);
 
     tileList.push_back(info);
 
@@ -123,48 +118,26 @@ void LevelManager::loadLayer(WindowManager &windowManager, WindowID window,
   }
 }
 
-void LevelManager::reloadAllLayers(WindowManager &windowManager,
-                                   WindowID window, GameCamera *camera) {
+void LevelManager::reloadAllLayers() {
   ensureLevelLoaded();
   for (size_t i = 0; i < layers.size(); ++i)
-    reloadLayer(windowManager, window, camera, i);
+    reloadLayer(i);
 }
 
-void LevelManager::reloadLayer(WindowManager &windowManager, WindowID window,
-                               GameCamera *camera, size_t layerNo) {
+void LevelManager::reloadLayer(size_t layerNo) {
 
   ensureLevelLoaded();
 
   auto &tiles = layers[layerNo].tiles;
 
-  auto layerValue = static_cast<float>(layerNo);
-  if (layers[layerNo].name == "secret") {
-    layerValue = -1;
-  }
-
   for (auto &t : tiles) {
-    if (t.object) {
-      GameObject::destroy(t.object);
-      t.object = nullptr;
-    }
-
-    RenderizerParameters params{.windowManager = windowManager,
-                                .window = window,
-                                .texture = &tilesheet,
-                                .camera = camera,
-                                .layer = layerValue,
-                                .parallax = layers[layerNo].paralax};
-
-    t.object = new RenderableObject(params);
-    t.object->position = {float(t.x * Constants::TILE_SIZE + 1),
-                          float(t.y * Constants::TILE_SIZE + 1)};
-    t.object->renderizer.setRect(t.textureRect, 1);
+    TileFactory::destroy(t.object);
+    t.object =
+        TileFactory::create(t, makeRenderParams(layerNo), Constants::TILE_SIZE);
   }
 }
 
-void LevelManager::createTile(WindowManager &windowManager, WindowID window,
-                              GameCamera *camera, int layerNo, int x, int y,
-                              sf::IntRect rect) {
+void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
   ensureLevelLoaded();
 
   size_t unsignedX = x;
@@ -195,17 +168,9 @@ void LevelManager::createTile(WindowManager &windowManager, WindowID window,
 
   std::vector<TileInfo> &tiles = layers[layerNo].tiles;
 
-  auto layerValue = static_cast<float>(layerNo);
-  if (layers[layerNo].name == "secret") {
-    layerValue = -1;
-  }
-
   for (auto &t : tiles) {
     if (t.x == x && t.y == y) {
-      if (t.object) {
-        GameObject::destroy(t.object);
-        t.object = nullptr;
-      }
+      TileFactory::destroy(t.object);
 
       if (layerNo == 0) {
         levelLayout[unsignedY][unsignedX] = 1;
@@ -213,17 +178,8 @@ void LevelManager::createTile(WindowManager &windowManager, WindowID window,
 
       t.textureRect = rect;
 
-      RenderizerParameters params{.windowManager = windowManager,
-                                  .window = window,
-                                  .texture = &tilesheet,
-                                  .camera = camera,
-                                  .layer = layerValue,
-                                  .parallax = layers[layerNo].paralax};
-
-      t.object = new RenderableObject(params);
-      t.object->position = {float(x * Constants::TILE_SIZE + 1),
-                            float(y * Constants::TILE_SIZE + 1)};
-      t.object->renderizer.setRect(t.textureRect, 1);
+      t.object = TileFactory::create(t, makeRenderParams(layerNo),
+                                     Constants::TILE_SIZE);
 
       return;
     }
@@ -238,18 +194,8 @@ void LevelManager::createTile(WindowManager &windowManager, WindowID window,
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  RenderizerParameters params{.windowManager = windowManager,
-                              .window = window,
-                              .texture = &tilesheet,
-                              .camera = camera,
-                              .layer = layerValue,
-                              .parallax = layers[layerNo].paralax};
-
-  info.object = new RenderableObject(params);
-  info.object->position = {float(x * Constants::TILE_SIZE + 1),
-                           float(y * Constants::TILE_SIZE + 1)};
-  info.object->renderizer.assignCamera(camera);
-  info.object->renderizer.setRect(info.textureRect, 1);
+  info.object = TileFactory::create(info, makeRenderParams(layerNo),
+                                    Constants::TILE_SIZE);
 
   tiles.push_back(info);
 }
@@ -268,10 +214,7 @@ void LevelManager::deleteTile(int layerNo, int x, int y) {
 
   std::erase_if(tiles, [&](TileInfo &t) {
     if (t.x == x && t.y == y) {
-      if (t.object) {
-        GameObject::destroy(t.object);
-        t.object = nullptr;
-      }
+      TileFactory::destroy(t.object);
       return true;
     }
     return false;
@@ -320,7 +263,7 @@ void LevelManager::saveLevel(const std::string &path) {
   file.close();
 }
 
-const std::vector<std::vector<int>> &LevelManager::getLevelLayout() const {
+LevelManager::LevelLayout2D &LevelManager::getLevelLayout() const {
   ensureLevelLoaded();
   return levelLayout;
 }
@@ -339,18 +282,11 @@ const LayerInfo LevelManager::getLayerInfo(int layerNo) const {
   return layers[layerNo];
 }
 
-void LevelManager::queueCreateTile(WindowManager &windowManager,
-                                   WindowID window, GameCamera *camera,
-                                   int layer, int x, int y,
+void LevelManager::queueCreateTile(int layer, int x, int y,
                                    const sf::IntRect &rect) {
   ensureLevelLoaded();
-  createQueue.push_back(TileCreationRequest{.windowManager = &windowManager,
-                                            .window = window,
-                                            .camera = camera,
-                                            .layer = layer,
-                                            .x = x,
-                                            .y = y,
-                                            .rect = rect});
+  createQueue.push_back(
+      TileCreationRequest{.layer = layer, .x = x, .y = y, .rect = rect});
 }
 
 void LevelManager::queueDeleteTile(int layer, int x, int y) {
@@ -365,8 +301,7 @@ void LevelManager::applyQueuedTileChanges() {
   deleteQueue.clear();
 
   for (const TileCreationRequest &createReq : createQueue) {
-    createTile(*createReq.windowManager, createReq.window, createReq.camera,
-               createReq.layer, createReq.x, createReq.y, createReq.rect);
+    createTile(createReq.layer, createReq.x, createReq.y, createReq.rect);
   }
   createQueue.clear();
 }
@@ -374,10 +309,7 @@ void LevelManager::applyQueuedTileChanges() {
 void LevelManager::onSceneUnload() {
   for (auto &layer : layers) {
     for (auto &tile : layer.tiles) {
-      if (tile.object) {
-        GameObject::destroy(tile.object);
-        tile.object = nullptr;
-      }
+      TileFactory::destroy(tile.object);
     }
 
     layer.tiles.clear();
@@ -390,7 +322,6 @@ void LevelManager::onSceneUnload() {
 
   levelLayout.clear();
 
-  activeLayer = 0;
   backgroundColor = ColorPalette::DarkCyanBlue;
 }
 
@@ -425,4 +356,27 @@ void LevelManager::ensureLevelLoaded() const {
     throw LevelManager::Error(
         "[LevelManager] Can't execute action. No level loaded");
   }
+}
+
+void LevelManager::initializeRenderContext(WindowManager &windowManager,
+                                           WindowID window,
+                                           GameCamera *camera) {
+  renderContext.windowManager = &windowManager;
+  renderContext.window = window;
+  renderContext.camera = camera;
+}
+
+RenderizerParameters LevelManager::makeRenderParams(size_t layerNo) const {
+
+  float layerValue = static_cast<float>(layerNo);
+  if (layers[layerNo].name == "secret") {
+    layerValue = -1;
+  }
+
+  return RenderizerParameters{.windowManager = *renderContext.windowManager,
+                              .window = renderContext.window,
+                              .texture = const_cast<sf::Texture *>(&tilesheet),
+                              .camera = renderContext.camera,
+                              .layer = layerValue,
+                              .parallax = layers[layerNo].paralax};
 }

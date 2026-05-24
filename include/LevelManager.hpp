@@ -9,9 +9,6 @@
 #include <vector>
 
 struct TileCreationRequest {
-  WindowManager *windowManager;
-  WindowID window;
-  GameCamera *camera;
   int layer;
   int x;
   int y;
@@ -44,22 +41,40 @@ public:
     std::string message;
   };
 
-  static LevelManager &getInstance();
+  struct LevelRenderContext {
+    WindowManager *windowManager = nullptr;
+    WindowID window;
+    GameCamera *camera = nullptr;
+  };
 
-  void loadLevel(WindowManager &windowManager, WindowID window,
-                 GameCamera *camera, const std::string &path);
+  class TileFactory {
+  public:
+    static RenderableObject *create(const TileInfo &tile,
+                                    const RenderizerParameters &params,
+                                    int tileSize);
+    static void destroy(RenderableObject *&obj);
+  };
+
+  using LevelLayout2D = const std::vector<std::vector<int>>;
+
+  LevelManager();
+  LevelManager(const WindowManager &) = delete;
+  LevelManager &operator=(const WindowManager &) = delete;
+  LevelManager(WindowManager &&) = delete;
+  LevelManager &operator=(WindowManager &&) = delete;
+
+  void initializeRenderContext(WindowManager &windowManager, WindowID window,
+                               GameCamera *camera);
+
+  void loadLevel(const std::string &path);
   void saveLevel(const std::string &path);
 
-  void queueCreateTile(WindowManager &windowManager, WindowID window,
-                       GameCamera *camera, int layer, int x, int y,
-                       const sf::IntRect &rect);
+  void queueCreateTile(int layer, int x, int y, const sf::IntRect &rect);
   void queueDeleteTile(int layer, int x, int y);
   void applyQueuedTileChanges();
 
-  void reloadAllLayers(WindowManager &windowManager, WindowID window,
-                       GameCamera *camera);
-  void reloadLayer(WindowManager &windowManager, WindowID window,
-                   GameCamera *camera, size_t layerNo);
+  void reloadAllLayers();
+  void reloadLayer(size_t layerNo);
 
   void setSecretLayerOppacity(float oppacity);
 
@@ -73,33 +88,22 @@ public:
   const LayerInfo getLayerInfo(int layerNo) const;
   void deleteLayerObjects(int layerNo);
 
-  const std::vector<std::vector<int>> &getLevelLayout() const;
+  LevelLayout2D &getLevelLayout() const;
 
   sf::Texture &getTilesheet();
 
   // MUST Refactor later to turn them into private members
   std::vector<LayerInfo> layers;
-  int activeLayer;
-
-  LevelManager(const LevelManager &) = delete;
-  LevelManager &operator=(const LevelManager &) = delete;
-
-  LevelManager(LevelManager &&) = delete;
-  LevelManager &operator=(LevelManager &&) = delete;
 
 private:
-  void createTile(WindowManager &windowManager, WindowID window,
-                  GameCamera *camera, int layerNo, int x, int y,
-                  sf::IntRect rect);
+  void createTile(int layerNo, int x, int y, sf::IntRect rect);
   void deleteTile(int layerNo, int x, int y);
 
-  void loadLayer(WindowManager &windowManager, WindowID window,
-                 GameCamera *camera, size_t layerNo,
-                 const nlohmann::json &layerJSON, int tileSize);
+  void loadLayer(size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
 
   void ensureLevelLoaded() const;
 
-  LevelManager();
+  RenderizerParameters makeRenderParams(size_t layerNo) const;
 
   bool isLevelLoaded;
 
@@ -113,5 +117,5 @@ private:
   std::string loadedLevelpath;
   std::string tilesetPath;
 
-  // SHOULD MAKE WINDOW AND CAMERA MEMBERS OF THE MANAGER SOMEHOW
+  LevelRenderContext renderContext;
 };

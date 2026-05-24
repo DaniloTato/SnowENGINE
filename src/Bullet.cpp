@@ -7,10 +7,11 @@
 Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
                Bullet::Type t, const sf::Vector2f &spawnPos,
                const sf::Vector2f &initSpeed, const sf::Vector2f &accel,
-               float dmgRadius, float range, bool shotByPlayer)
+               float dmgRadius, float range, bool shotByPlayer,
+               LevelManager::LevelLayout2D &layout)
     : TangibleObject(params, cachedAnimations), type(t), acceleration(accel),
       damageRadius(dmgRadius), maxRange(range), spawnPos(spawnPos),
-      shotByPlayer(shotByPlayer) {
+      shotByPlayer(shotByPlayer), layout(layout) {
 
   physics.setSpeed(initSpeed, PhysicsComponent::SpeedType::MOVEMENT);
   if (type != Bullet::Type::BubbleGun) {
@@ -42,8 +43,10 @@ Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
     break;
   }
 
-  collider.horizontalLevelCollision(position);
-  collider.verticalLevelCollision(position);
+  // Kinda don't remember why it ws here in the first place. It stays for now.
+  // Lol.
+  //  collider.horizontalLevelCollision(position, );
+  //  collider.verticalLevelCollision(position);
 }
 
 void Bullet::update(const GeneralContext &ctx) {
@@ -74,7 +77,7 @@ void Bullet::updateBehavior(const GeneralContext &ctx) {
                    PhysicsComponent::SpeedType::MOVEMENT);
 
   physics.updateY(position);
-  if (collider.verticalLevelCollision(position)) {
+  if (collider.verticalLevelCollision(position, layout)) {
     if (type == Bullet::Type::BubbleGun) {
       bounceCount++;
       physics.setSpdy(-physics.getSpdy(PhysicsComponent::SpeedType::MOVEMENT) *
@@ -89,7 +92,7 @@ void Bullet::updateBehavior(const GeneralContext &ctx) {
   }
 
   physics.updateX(position);
-  if (collider.horizontalLevelCollision(position)) {
+  if (collider.horizontalLevelCollision(position, layout)) {
     if (type == Bullet::Type::BubbleGun) {
       bounceCount++;
       physics.setSpdx(-physics.getSpdx(PhysicsComponent::SpeedType::MOVEMENT) *

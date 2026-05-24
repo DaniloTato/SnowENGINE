@@ -1,6 +1,7 @@
 #pragma once
 #include "Debug.hpp"
 #include "Evaluator.hpp"
+#include "LevelManager.hpp"
 #include "Memory.hpp"
 #include "Resolver.hpp"
 #include "SnowIO.hpp"
@@ -8,6 +9,7 @@
 #include "GameObjectExposure.hpp"
 
 #include "GameCamera.hpp"
+#include "SceneManager.hpp"
 
 #include "ScheduledTask.hpp"
 #include <string>
@@ -61,6 +63,8 @@ public:
   // Quick fix for now. Correct Later
   GameCamera *tileCamera;
   WindowManager *windowManagerRef;
+  LevelManager *levelManagerRef;
+  SceneManager *sceneManagerRef;
 };
 
 } // namespace Snowlang
