@@ -14,7 +14,11 @@ struct TextCreationRequest {
 
 class DialogueManager : public QueuedManager<GameText, TextCreationRequest> {
 public:
-  static DialogueManager &getInstance();
+  DialogueManager() = default;
+  DialogueManager(const DialogueManager &) = delete;
+  DialogueManager &operator=(const DialogueManager &) = delete;
+  DialogueManager(DialogueManager &&) = delete;
+  DialogueManager &operator=(DialogueManager &&) = delete;
 
   bool loadDialoguesFromFile(const std::string &filename);
 
@@ -30,12 +34,7 @@ public:
   void print(const std::string markup);
   void printByKey(const std::string &key);
 
-  DialogueManager(const DialogueManager &) = delete;
-  DialogueManager &operator=(const DialogueManager &) = delete;
-
 private:
-  DialogueManager() = default;
-
   GameText *createFromRequest(const TextCreationRequest &req) override;
   void destroyObject(GameText *text) override;
 

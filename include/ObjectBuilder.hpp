@@ -11,7 +11,7 @@ public:
   ObjectBuilder(const std::string &textureKey, WindowManager &windowManager)
       : position(0.f, 0.f),
         params{.windowManager = windowManager,
-               .window = windowManager.getMain(),
+               .window = WindowID(),
                .texture = &TextureManager::getInstance().get(textureKey),
                .camera = nullptr,
                .layer = 0.f,
@@ -30,6 +30,11 @@ public:
 
   ObjectBuilder &onCamera(GameCamera &cam) {
     params.camera = &cam;
+    return *this;
+  }
+
+  ObjectBuilder &onWindow(WindowID window) {
+    params.window = window;
     return *this;
   }
 

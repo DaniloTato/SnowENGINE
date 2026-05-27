@@ -166,61 +166,77 @@ void GameText::parseBody(const std::string &body) {
   int appearCounter = 0;
 
   for (size_t i = 0; i < body.size();) {
+    if (body[i] == '\\' && i + 1 < body.size()) {
+      char escaped = body[i + 1];
 
-    // metadata start
-    if (body[i] == '\\' && i + 1 < body.size() && body[i + 1] == '<') {
+      pushTextChar(escaped, stack.back().color, stack.back().anim,
+                   stack.back().animParam);
 
-      // metadata closing
-      size_t j = body.find("\\>", i + 2);
+      glyphs.back().appearIndex = appearCounter++;
 
-      // malformed tag
+      i += 2;
+      continue;
+    }
+
+    if (body[i] == '[') {
+
+      size_t j = body.find(']', i + 1);
+
       if (j == std::string::npos) {
-        pushTextChar('<', stack.back().color, stack.back().anim,
+        pushTextChar('[', stack.back().color, stack.back().anim,
                      stack.back().animParam);
         glyphs.back().appearIndex = appearCounter++;
-        i += 2;
+        ++i;
         continue;
       }
 
-      std::string tag = body.substr(i + 2, j - (i + 2));
+      std::string tag = body.substr(i + 1, j - i - 1);
 
-      // trim
       while (!tag.empty() && std::isspace((unsigned char)tag.front()))
         tag.erase(tag.begin());
+
       while (!tag.empty() && std::isspace((unsigned char)tag.back()))
         tag.pop_back();
 
-      // tag handling
       if (tag == "ln") {
         pushTextChar('\n', stack.back().color, stack.back().anim,
                      stack.back().animParam);
+      }
 
-      } else if (!tag.empty() && tag[0] == '/') {
-        // closing tag
+      else if (!tag.empty() && tag[0] == '/') {
+
         if (stack.size() > 1)
           stack.pop_back();
 
-      } else if (tag.starts_with("color")) {
+      }
+
+      else if (tag.starts_with("color")) {
         size_t eq = tag.find('=');
+
         if (eq != std::string::npos) {
           sf::Color ccol = parseColorSpec(tag.substr(eq + 1));
           stack.push_back({ccol, stack.back().anim, stack.back().animParam});
         }
+      }
 
-      } else if (tag.starts_with("anim")) {
+      else if (tag.starts_with("anim")) {
         size_t eq = tag.find('=');
+
         if (eq != std::string::npos) {
           std::string spec = tag.substr(eq + 1);
+
           std::string name = spec;
           float param = 0.f;
 
           size_t colon = spec.find(':');
+
           if (colon != std::string::npos) {
             name = spec.substr(0, colon);
             param = std::stof(spec.substr(colon + 1));
           }
 
           Glyph::Anim an = Glyph::Anim::None;
+
           if (name == "sin")
             an = Glyph::Anim::Sin;
           else if (name == "shake")
@@ -229,8 +245,7 @@ void GameText::parseBody(const std::string &body) {
           stack.push_back({stack.back().color, an, param});
         }
       }
-
-      i = j + 2; // skip "\>"
+      i = j + 1;
       continue;
     }
 
@@ -243,7 +258,6 @@ void GameText::parseBody(const std::string &body) {
 
     pushTextChar(body[i], stack.back().color, stack.back().anim,
                  stack.back().animParam);
-
     glyphs.back().appearIndex = appearCounter++;
     ++i;
   }
@@ -367,7 +381,7 @@ void GameText::rebuildLayout() {
   // Assign appearIndex sequentially to all non-newline, so typewriter shows
   // them in order
   int ap = 0;
-  for (auto glyph : glyphs) {
+  for (auto &glyph : glyphs) {
     if (glyph.c != '\n')
       glyph.appearIndex = ap++;
     else

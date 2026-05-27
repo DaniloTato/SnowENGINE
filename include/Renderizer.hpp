@@ -22,7 +22,6 @@ public:
   const sf::IntRect &getRect() const;
   virtual void render(GameObject *ob);
   void renderRectShape(GameObject *obj);
-  void assignCamera(GameCamera *cam);
   float getLayer() const;
   [[nodiscard]] const GameCamera *getAssignedCamera() const;
   [[nodiscard]] const sf::Sprite &getSprite() const;

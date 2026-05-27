@@ -6,11 +6,11 @@ namespace Snowlang {
 SnowTermIO::SnowTermIO(Terminal &t) : terminal(t) {}
 
 void SnowTermIO::write(const std::string &text) {
-  terminal.print("\\<color=purple\\>" + text + "\\</color\\>");
+  terminal.print("[color=purple]" + text + "[/color]");
 }
 
 void SnowTermIO::writeLn(const std::string &text) {
-  terminal.printLn("\\<color=purple\\>" + text + "\\</color\\>");
+  terminal.printLn("[color=purple]" + text + "[/color]");
 }
 
 bool SnowTermIO::hasLine() { return !inputQueue.empty(); }

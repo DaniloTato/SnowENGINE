@@ -39,8 +39,6 @@ void Renderizer::unregisterByWindow(WindowID window) {
 
 WindowID Renderizer::getWindow() const { return window; }
 
-void Renderizer::assignCamera(GameCamera *cam) { assignedCamera = cam; }
-
 bool Renderizer::isVisible() const {
 
   float zoom = assignedCamera ? assignedCamera->getZoom() : 1.f;

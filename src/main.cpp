@@ -6,6 +6,7 @@
 #include "CollectableManager.hpp"
 #include "DialogueManager.hpp"
 #include "EnemyManager.hpp"
+#include "Engine.hpp"
 #include "GameLoader.hpp"
 #include "GameObject.hpp"
 #include "GameState.hpp"
@@ -15,8 +16,6 @@
 #include "SceneManager.hpp"
 #include "Terminal.hpp"
 #include "WindowLifecycleListener.hpp"
-
-#include "Engine.hpp"
 
 /*Helpers*/
 #include "Helpers.hpp"
@@ -30,8 +29,6 @@
 #include <cstdlib>
 #include <ctime>
 
-using namespace Helper;
-
 int main() {
 
   Engine engine;
@@ -42,6 +39,7 @@ int main() {
   SceneManager &sceneManager = engine.getSceneManager();
   LevelManager &levelManager = engine.getLevelManager();
   WindowManager &windowManager = engine.getWindowManager();
+  DialogueManager &dialogueManager = engine.getDialogueManager();
 
   WindowID mainWindow = windowManager.create(
       WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
@@ -74,7 +72,7 @@ int main() {
 
     if (!sceneManager.isTransitioning()) {
       levelManager.applyQueuedTileChanges();
-      DialogueManager::getInstance().applyQueues();
+      dialogueManager.applyQueues();
       BulletManager::getInstance().applyQueues();
       EnemyManager::getInstance().applyQueues();
       CollectableManager::getInstance().applyQueues();

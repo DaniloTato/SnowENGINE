@@ -4,11 +4,6 @@
 #include <iostream>
 #include <sstream>
 
-DialogueManager &DialogueManager::getInstance() {
-  static DialogueManager instance;
-  return instance;
-}
-
 bool DialogueManager::loadDialoguesFromFile(const std::string &filename) {
   std::ifstream file(filename);
   if (!file.is_open()) {

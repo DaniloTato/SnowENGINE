@@ -13,9 +13,6 @@ void PolyRenderizer::updateRenderCommands(
 }
 
 void PolyRenderizer::render(GameObject *obj) {
-  if (!assignedCamera)
-    return;
-
   for (const RenderCommand &command : renderCommands) {
     sprite.setTextureRect(command.rect);
     sprite.setColor(command.color);
@@ -25,10 +22,16 @@ void PolyRenderizer::render(GameObject *obj) {
       finalParalax = command.overrideParalax;
     }
 
-    sf::Vector2f screenPos =
-        assignedCamera->worldToScreen(command.pos, finalParalax);
+    sf::Vector2f screenPos;
+
+    if (assignedCamera) {
+      screenPos = assignedCamera->worldToScreen(command.pos, finalParalax);
+      sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
+    } else {
+      screenPos = command.pos;
+      sprite.setScale({1.f, 1.f});
+    }
     sprite.setPosition(screenPos);
-    sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
     windowManager.drawOnWindow(window, sprite);
   }
 }

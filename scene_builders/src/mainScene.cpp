@@ -1,10 +1,12 @@
 #include "mainScene.hpp"
 
+#include "Constants.hpp"
 #include "GameState.hpp"
 #include "LevelManager.hpp"
 #include "ScriptRunner.hpp"
 #include "TangibleObject.hpp"
 
+#include "GameTextBuilder.hpp"
 #include "basicMovementScript.hpp"
 #include "cameraBehaviourScript.hpp"
 #include "terminalCreationScript.hpp"
@@ -27,6 +29,10 @@ void mainScene(SceneBuilder::SceneContext ctx) {
 
   CameraID mainCamera = cameraManager.createCamera(
       GameObject::UpdateDomain(WindowManager::Set::MAIN));
+  CameraID uiCamera =
+      cameraManager.createCamera(GameObject::UpdateDomain(ctx.mainWindow));
+  cameraManager.getCamera(uiCamera)->zoomTo(2.f);
+  cameraManager.getCamera(uiCamera)->goToDesired();
 
   cameraManager.getCamera(mainCamera)
       ->scripter.addScript(Scripts::cameraBehaviourScript);
@@ -51,17 +57,29 @@ void mainScene(SceneBuilder::SceneContext ctx) {
 
   levelManager.loadLevel(Helper::getPath("assets/levels/Level1.json"));
 
-  // add a window param in Object Builder
   // Horrible syntax for declaring camera
   auto *image =
       ObjectBuilder<TangibleObject>("todd", ctx.engine->getWindowManager())
           .at(100, 100)
+          .onWindow(ctx.mainWindow)
           .onCamera(*cameraManager.getCamera(mainCamera))
           .withEmptyAnimation(16, 16)
           .build();
 
   // Change addScript to recieve the function reference, not a string.
   image->scripter.addScript(Scripts::basicMovementScript);
+
+  GameTextBuilder("snowFont", ctx.engine->getWindowManager(), ctx.mainWindow)
+      .at({0.f, 50.f})
+      .onWindow(ctx.mainWindow)
+      .boundary(Constants::SCREEN_WIDTH /
+                cameraManager.getCamera(uiCamera)->getDesiredZoom())
+      .alignment(GameText::Align::Center)
+      .typewriter(0.1f)
+      .camera(*cameraManager.getCamera(uiCamera))
+      .markup(
+          R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])")
+      .build();
 
   // may need to refactor terminalCreation into a sytem for the engine
   ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(

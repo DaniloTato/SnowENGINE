@@ -25,7 +25,7 @@ static size_t countVisualLines(std::string_view s) {
   }
 
   // count explicit line-jump markup
-  std::string_view token = "\\<ln\\>";
+  std::string_view token = "[ln]";
   size_t pos = 0;
   while ((pos = s.find(token, pos)) != std::string_view::npos) {
     lines++;
@@ -56,9 +56,10 @@ Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
   text->position = {10.f, 10.f};
   text->makePersistentAcrossScenes();
 
-  history.emplace_back(R"(\<color=cyan\>SNOWLANG Developer Console\</color\>)");
   history.emplace_back(
-      R"(Type \<color=yellow\>print_commands\</color\> for command listing\<ln\>)");
+      R"([color=cyan][anim=sin]SNOWLANG[/anim] Developer Console[/color])");
+  history.emplace_back(
+      R"(Type [color=yellow]print_commands[/color] for command listing[ln])");
 
   rebuildText();
 }
@@ -188,11 +189,11 @@ void Terminal::close() {
 
 void Terminal::print(std::string_view message, std::string_view color) {
   if (!color.empty()) {
-    currentLine += "\\<color=";
+    currentLine += "[color=";
     currentLine += color;
-    currentLine += "\\>";
+    currentLine += "]";
     currentLine += message;
-    currentLine += "\\</color\\>";
+    currentLine += "[/color]";
   } else {
     currentLine += message;
   }
@@ -233,7 +234,7 @@ void Terminal::rebuildText() {
 
   visibleInput = highlighter.applyParenHighlight(visibleInput);
 
-  markup += "\\<color=yellow\\>> " + visibleInput + "\\</color\\>";
+  markup += "[color=yellow]> " + visibleInput + "[/color]";
 
   if (text) {
     text->loadFromMarkup(markup);
