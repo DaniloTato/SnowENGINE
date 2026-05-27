@@ -1,4 +1,5 @@
 #include "SnowErr.hpp"
+#include "SnowlangHelper.hpp"
 #include <sstream>
 
 namespace Snowlang {
@@ -10,18 +11,18 @@ const char *SnowErr::what() const noexcept { return diag.message.c_str(); }
 std::string SnowErr::format(const std::string &source) const {
   std::ostringstream out;
 
-  out << "\n\\<color=magenta\\>error[" << phaseToString(diag.phase) << "]: \\<color=yellow\\>"
-      << diag.message << "\\</color\\>\n";
+  out << "\n[color=magenta]error\\[" << phaseToString(diag.phase) << "\\]: [color=yellow]"
+      << diag.message << "[/color]\n";
 
   out << "  --> line " << diag.span.line << ", column " << diag.span.column << "\n";
 
   printSourceLine(out, source, diag.span);
 
   for (const auto &note : diag.notes) {
-    out << "\\<color=cyan\\> note: " << note << "\\</color\\>\n";
+    out << "[color=cyan] note: " << note << "[/color]\n";
   }
 
-  out << "\\</color\\>";
+  out << "[/color]";
 
   return out.str();
 }
@@ -46,9 +47,9 @@ void SnowErr::printSourceLine(std::ostream &out, const std::string &source,
 
   std::string lineText = source.substr(lineStart, lineEnd - lineStart);
 
-  out << "\\<color=white\\>   |\n";
-  out << " " << span.line << " | " << lineText << "\n";
-  out << "   | \\</color\\>";
+  out << "[color=white]   |\n";
+  out << " " << span.line << " | " << SnowlangHelper::escapeBraces(lineText) << "\n";
+  out << "   | [/color]";
 
   for (size_t i = 1; i < span.column; ++i)
     out << ' ';

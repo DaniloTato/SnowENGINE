@@ -56,13 +56,13 @@ std::string Highlighter::applyParenHighlight(const std::string &input) {
         const std::string &color =
             DEPTH_COLORS[depthAt[i] % DEPTH_COLORS.size()];
 
-        out += "\\<color=" + color + "\\>";
+        out += "[color=" + color + "]";
         out += c;
-        out += "\\</color\\>";
+        out += "[/color]";
       } else {
-        out += "\\<color=#FF4444\\>";
+        out += "[color=#FF4444]";
         out += c;
-        out += "\\</color\\>";
+        out += "[/color]";
       }
     } else {
       out += c;

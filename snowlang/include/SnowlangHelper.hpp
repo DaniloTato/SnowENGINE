@@ -131,6 +131,20 @@ inline float toNumber(const RuntimeValue &v) {
   return 0.0f;
 }
 
+inline std::string escapeBraces(const std::string &s) {
+  std::string out;
+
+  for (char c : s) {
+    if (c == '[' || c == ']') {
+      out += '\\';
+    }
+
+    out += c;
+  }
+
+  return out;
+}
+
 template <typename... Ts> class GetListHelper {
 public:
   GetListHelper(const SourceSpan &span) : span(span) {}

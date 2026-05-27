@@ -36,12 +36,6 @@ public:
   Highlighter highlighter;
 
 private:
-  void rebuildText();
-  void executeSnowlang();
-  void trimHistoryToFit();
-  void commitLine();
-
-private:
   WindowID targetWindow;
 
   std::unordered_map<std::string, std::string> aliases;
@@ -51,7 +45,14 @@ private:
 
   GameText *text;
 
-  std::deque<std::string> history;
+  enum class LineType : u_int8_t { Raw, Markup };
+
+  struct TerminalLine {
+    std::string text;
+    LineType type = LineType::Raw;
+  };
+
+  std::deque<TerminalLine> history;
   std::vector<std::string> inputHistory;
   std::string input;
   std::string currentLine;
@@ -65,4 +66,12 @@ private:
 
   int historyBrowseIndex = -1;
   std::string savedInput;
+
+private:
+  void rebuildText();
+  void executeSnowlang();
+  void trimHistoryToFit();
+  void commitLine();
+  std::string escapeInput(const std::string &s);
+  size_t countVisualLines(const TerminalLine &line);
 };

@@ -1,5 +1,6 @@
 #include "RuntimeValue.hpp"
 #include "Cell.hpp"
+#include "SnowlangHelper.hpp"
 
 namespace Snowlang {
 
@@ -52,7 +53,8 @@ std::string RuntimeValue::toStringImpl(bool showDataTypes, int indentLevel) cons
         }
 
         else if constexpr (std::is_same_v<T, std::string>) {
-          return showDataTypes ? "<String>: " + val : val;
+          std::string escapedVal = SnowlangHelper::escapeBraces(val);
+          return showDataTypes ? "<String>: " + escapedVal : escapedVal;
         }
 
         else if constexpr (std::is_same_v<T, List>) {
@@ -84,7 +86,7 @@ std::string RuntimeValue::toStringImpl(bool showDataTypes, int indentLevel) cons
           if (!val)
             return "<Object:null>";
 
-          std::string out = "\\<color=lightblue\\>{\n";
+          std::string out = "[color=lightblue]{\n";
 
           for (const auto &[name, field] : val->fields) {
             out += indent(indentLevel + 1);
@@ -93,7 +95,7 @@ std::string RuntimeValue::toStringImpl(bool showDataTypes, int indentLevel) cons
             out += "\n";
           }
 
-          out += indent(indentLevel) + "}\\</color\\>";
+          out += indent(indentLevel) + "}[/color]";
           return out;
         }
 

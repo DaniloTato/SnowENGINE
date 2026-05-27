@@ -15,21 +15,27 @@ static constexpr size_t MAX_LINES = 37;
 
 std::vector<Terminal *> Terminal::s_activeTerminals;
 
-static size_t countVisualLines(std::string_view s) {
+size_t Terminal::countVisualLines(const TerminalLine &line) {
+
   size_t lines = 1;
 
-  for (const char &i : s) {
-    if (i == '\n') {
+  for (char c : line.text) {
+    if (c == '\n') {
       lines++;
     }
   }
 
-  // count explicit line-jump markup
-  std::string_view token = "[ln]";
-  size_t pos = 0;
-  while ((pos = s.find(token, pos)) != std::string_view::npos) {
-    lines++;
-    pos += token.size();
+  // Only markup lines interpret [ln]
+  if (line.type == LineType::Markup) {
+
+    constexpr std::string_view token = "[ln]";
+
+    size_t pos = 0;
+
+    while ((pos = line.text.find(token, pos)) != std::string::npos) {
+      lines++;
+      pos += token.size();
+    }
   }
 
   return lines;
@@ -56,15 +62,34 @@ Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
   text->position = {10.f, 10.f};
   text->makePersistentAcrossScenes();
 
-  history.emplace_back(
-      R"([color=cyan][anim=sin]SNOWLANG[/anim] Developer Console[/color])");
-  history.emplace_back(
-      R"(Type [color=yellow]print_commands[/color] for command listing[ln])");
+  history.emplace_back(TerminalLine{
+      .text =
+          R"([color=cyan][anim=sin]SNOWLANG[/anim] Developer Console[/color])",
+      .type = LineType::Markup});
+
+  history.emplace_back(TerminalLine{
+      .text =
+          R"(Type [color=yellow]print_commands[/color] for command listing[ln])",
+      .type = LineType::Markup});
 
   rebuildText();
 }
 
 Terminal::~Terminal() { GameObject::destroy(text); }
+
+std::string Terminal::escapeInput(const std::string &s) {
+  std::string out;
+
+  for (char c : s) {
+    if (c == '[' || c == ']') {
+      out += '\\';
+    }
+
+    out += c;
+  }
+
+  return out;
+}
 
 void Terminal::update() { snowlang.update(GameState::getInstance().dt()); }
 
@@ -81,9 +106,11 @@ void Terminal::handleEvent(WindowID windowId, const sf::Event &event) {
         event.text.unicode != '\\') {
 
       char c = static_cast<char>(event.text.unicode);
+
       input.insert(input.begin() +
                        static_cast<std::string::difference_type>(cursorPos),
                    c);
+
       cursorPos++;
 
       rebuildText();
@@ -160,12 +187,14 @@ void Terminal::handleEvent(WindowID windowId, const sf::Event &event) {
       if (inputHistory.empty() || inputHistory.back() != input) {
         inputHistory.push_back(input);
       }
-      currentLine += input;
-      commitLine();
+
+      history.emplace_back(
+          TerminalLine{.text = "> " + input, .type = LineType::Raw});
 
       snowlangIO.pushLine(input);
       executeSnowlang();
 
+      input.clear();
       input.clear();
       cursorPos = 0;
       historyBrowseIndex = -1;
@@ -207,7 +236,8 @@ void Terminal::printLn(std::string_view message, std::string_view color) {
 }
 
 void Terminal::commitLine() {
-  history.emplace_back(currentLine);
+  history.emplace_back(
+      TerminalLine{.text = currentLine, .type = LineType::Markup});
   currentLine.clear();
   rebuildText();
 }
@@ -222,7 +252,14 @@ void Terminal::rebuildText() {
   markup += "#boundary 880\n";
 
   for (const auto &line : history) {
-    markup += line + "\n";
+
+    if (line.type == LineType::Markup) {
+      markup += line.text;
+    } else {
+      markup += escapeInput(line.text);
+    }
+
+    markup += "\n";
   }
 
   if (!currentLine.empty()) {
@@ -231,6 +268,7 @@ void Terminal::rebuildText() {
 
   std::string visibleInput = input;
   visibleInput.insert(cursorPos, "|");
+  visibleInput = escapeInput(visibleInput);
 
   visibleInput = highlighter.applyParenHighlight(visibleInput);
 

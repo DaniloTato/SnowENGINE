@@ -15,10 +15,10 @@ std::string getDescription(const std::string &file, const std::string &commandNa
   std::string line;
   bool inBlock = false;
 
-  const std::string header = "[" + commandName + "]";
+  const std::string header = "<" + commandName + ">";
 
   while (std::getline(in, line)) {
-    if (!line.empty() && line.front() == '[' && line.back() == ']') {
+    if (!line.empty() && line.front() == '<' && line.back() == '>') {
       if (inBlock) {
         break;
       }
