@@ -4,15 +4,14 @@
 
 class GameTextBuilder {
 public:
-  GameTextBuilder(std::string_view fontTextureKey, WindowManager &windowManager,
-                  WindowID window);
+  GameTextBuilder(std::string_view fontTextureKey, Engine &engine);
   GameTextBuilder &at(sf::Vector2f p);
   GameTextBuilder &onWindow(WindowID window);
   GameTextBuilder &boundary(float b);
   GameTextBuilder &typewriter(float speed);
   GameTextBuilder &alignment(GameText::Align a);
   GameTextBuilder &markup(const std::string &m);
-  GameTextBuilder &camera(GameCamera &cam);
+  GameTextBuilder &camera(CameraID cam);
   GameTextBuilder &layer(float l);
   GameTextBuilder &parallax(float p);
   GameText *build();

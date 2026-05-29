@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CameraView.hpp"
 #include "GameCamera.hpp"
 #include "GameObject.hpp"
 #include "SceneAware.hpp"
@@ -31,22 +32,21 @@ public:
   CameraManager &operator=(CameraManager &&) = delete;
 
   CameraID createCamera(GameObject::UpdateDomain updateDomain,
+                        Scripter<GameCamera>::ScriptFunc script = nullptr,
                         bool persistent = false);
-
-  [[nodiscard]] GameCamera *getCamera(const CameraID &id) const;
 
   [[nodiscard]] std::vector<GameCamera *> getAllCameras() const;
 
   void destroyCamera(const CameraID &id);
-
   void applyQueues();
-
   void clear();
-
   void onSceneUnload() override;
+
+  [[nodiscard]] CameraView buildView(CameraID id) const;
 
   [[nodiscard]] CameraID getInvalidId() const { return CameraID{0}; }
 
 private:
   void destroyInternal(GameCamera *camera);
+  [[nodiscard]] GameCamera *getCamera(const CameraID &id) const;
 };

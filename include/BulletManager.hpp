@@ -3,6 +3,7 @@
 #include "BasicCollider.hpp"
 #include "Bullet.hpp"
 #include "QueuedManager.hpp"
+#include "RenderizerParameters.hpp"
 
 struct BulletCreationRequest {
   RenderizerParameters params;

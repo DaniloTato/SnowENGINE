@@ -72,8 +72,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     if (inputManager.isJustPressed("spawnEnemy")) {
       EnemyManager::getInstance().queueCreateEnemy(
           state.selectedEnemyId,
-          ctx.cameraManager->getCamera(mainCamera)
-              ->screenToWorld(
+          ctx.cameraManager->buildView(mainCamera)
+              .screenToWorld(
                   {static_cast<float>(inputManager.getMousePosition(main).x),
                    static_cast<float>(inputManager.getMousePosition(main).y)},
                   1.f));
@@ -82,8 +82,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     if (state.mode == PickerMode::Tiles) {
       if (inputManager.isPressed("createTile")) {
         sf::Vector2f mousePosToTilePos =
-            ctx.cameraManager->getCamera(mainCamera)
-                ->screenToWorld(
+            ctx.cameraManager->buildView(mainCamera)
+                .screenToWorld(
                     {static_cast<float>(inputManager.getMousePosition(main).x),
                      static_cast<float>(inputManager.getMousePosition(main).y)},
                     levelManager.getLayerInfo(state.selectedActiveLayer)
@@ -109,8 +109,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
     } else if (state.mode == PickerMode::Enemies) {
       if (inputManager.isJustPressed("createTile")) {
         sf::Vector2f mousePosToEnemyPos =
-            ctx.cameraManager->getCamera(mainCamera)
-                ->screenToWorld(
+            ctx.cameraManager->buildView(mainCamera)
+                .screenToWorld(
                     {static_cast<float>(inputManager.getMousePosition(main).x),
                      static_cast<float>(inputManager.getMousePosition(main).y)},
                     1.f);
@@ -128,8 +128,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
 
     if (inputManager.isPressed("deleteTile")) {
       sf::Vector2f mousePosToTilePos =
-          ctx.cameraManager->getCamera(mainCamera)
-              ->screenToWorld(
+          ctx.cameraManager->buildView(mainCamera)
+              .screenToWorld(
                   {static_cast<float>(inputManager.getMousePosition(main).x),
                    static_cast<float>(inputManager.getMousePosition(main).y)},
                   levelManager.getLayerInfo(state.selectedActiveLayer).paralax);
@@ -148,8 +148,8 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
 
     if (inputManager.isMouseJustPressed(MouseButton::Left)) {
       sf::Vector2f mousePosInWorld =
-          ctx.cameraManager->getCamera(mainCamera)
-              ->screenToWorld(
+          ctx.cameraManager->buildView(mainCamera)
+              .screenToWorld(
                   {static_cast<float>(inputManager.getMousePosition(main).x),
                    static_cast<float>(inputManager.getMousePosition(main).y)},
                   1.f);

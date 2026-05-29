@@ -1,7 +1,6 @@
 #include "Terminal.hpp"
 
 #include "Constants.hpp"
-#include "GameCamera.hpp"
 #include "GameState.hpp"
 #include "GameText.hpp"
 
@@ -41,11 +40,10 @@ size_t Terminal::countVisualLines(const TerminalLine &line) {
   return lines;
 }
 
-Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-                   WindowManager &windowManager, LevelManager &levelManager,
-                   SceneManager &sceneManager, sf::Texture *fontTexture)
+Terminal::Terminal(WindowID window, CameraID camera, CameraID tileCamera,
+                   Engine &engine, sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
-      text(new GameText({.windowManager = windowManager,
+      text(new GameText({.engine = engine,
                          .window = targetWindow,
                          .texture = fontTexture,
                          .camera = camera,
@@ -53,10 +51,7 @@ Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
                          .parallax = 1.f})) {
 
   // QUICK FIX FOR NOW, CHANGE LATER.
-  snowlang.tileCamera = tileCamera;
-  snowlang.windowManagerRef = &windowManager;
-  snowlang.levelManagerRef = &levelManager;
-  snowlang.sceneManagerRef = &sceneManager;
+  snowlang.tileCamera = nullptr;
 
   s_activeTerminals.push_back(this);
   text->position = {10.f, 10.f};

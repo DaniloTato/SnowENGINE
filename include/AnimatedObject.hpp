@@ -2,6 +2,7 @@
 
 #include "Animator.hpp"
 #include "Renderizer.hpp"
+#include "Scripter.hpp"
 
 class AnimatedObject : public GameObject {
 public:

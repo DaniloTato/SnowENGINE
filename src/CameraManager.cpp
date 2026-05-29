@@ -3,6 +3,7 @@
 CameraManager::~CameraManager() { clear(); }
 
 CameraID CameraManager::createCamera(GameObject::UpdateDomain updateDomain,
+                                     Scripter<GameCamera>::ScriptFunc script,
                                      bool persistent) {
   uint64_t id = nextId++;
 
@@ -10,6 +11,11 @@ CameraID CameraManager::createCamera(GameObject::UpdateDomain updateDomain,
   if (persistent) {
     cam->makePersistentAcrossScenes();
   }
+
+  if (script) {
+    cam->scripter.addScript(script);
+  }
+
   cameras[id] = CameraEntry{.camera = cam, .persistent = persistent};
   return CameraID{id};
 }
@@ -79,4 +85,16 @@ void CameraManager::onSceneUnload() {
   }
 
   destroyQueue.clear();
+}
+
+CameraView CameraManager::buildView(CameraID id) const {
+  if (id.isNull()) {
+    return {{0, 0}, 1};
+  }
+
+  const GameCamera *cam = getCamera(id);
+
+  CameraView view(cam->getPosition(), cam->getZoom());
+
+  return view;
 }

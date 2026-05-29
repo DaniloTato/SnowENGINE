@@ -1,5 +1,5 @@
 #pragma once
-#include "GameCamera.hpp"
+#include "CameraID.hpp"
 #include "GameText.hpp"
 #include "Highlighter.hpp"
 #include "IEventListener.hpp"
@@ -8,9 +8,8 @@
 
 class Terminal : public IEventListener {
 public:
-  Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-           WindowManager &windowManager, LevelManager &levelManager,
-           SceneManager &sceneManager, sf::Texture *fontTexture);
+  Terminal(WindowID window, CameraID camera, CameraID tileCamera,
+           Engine &engine, sf::Texture *fontTexture);
 
   ~Terminal() override;
 

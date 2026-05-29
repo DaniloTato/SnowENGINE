@@ -168,6 +168,10 @@ void WindowManager::checkRenderFlag(WindowID id) {
 }
 
 void WindowManager::drawOnWindow(WindowID id, const sf::Sprite &toDraw) {
+  if (id.isNull()) {
+    return;
+  }
+
   sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
 
   window->draw(toDraw);

@@ -1,5 +1,5 @@
 #pragma once
-#include "GameCamera.hpp"
+#include "CameraID.hpp"
 #include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
@@ -7,6 +7,8 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
+
+class Engine;
 
 struct TileCreationRequest {
   int layer;
@@ -42,9 +44,9 @@ public:
   };
 
   struct LevelRenderContext {
-    WindowManager *windowManager = nullptr;
+    Engine *engine;
     WindowID window;
-    GameCamera *camera = nullptr;
+    CameraID camera;
   };
 
   class TileFactory {
@@ -63,8 +65,8 @@ public:
   LevelManager(WindowManager &&) = delete;
   LevelManager &operator=(WindowManager &&) = delete;
 
-  void initializeRenderContext(WindowManager &windowManager, WindowID window,
-                               GameCamera *camera);
+  void initializeRenderContext(Engine &engine, WindowID window,
+                               CameraID camera);
 
   void loadLevel(const std::string &path);
   void saveLevel(const std::string &path);

@@ -8,11 +8,11 @@ namespace Snowlang::Commands {
 
 RuntimeValue sceneCommand(const CommandContext &ctx) {
 
-  auto &sceneManager = *ctx.snowlang.sceneManagerRef;
+  auto &sceneManager = ctx.snowlang.engineRef->getSceneManager();
 
   // --reload
   if (ctx.hasFlag("reload")) {
-    sceneManager.reloadCurrentScene(*ctx.snowlang.windowManagerRef);
+    sceneManager.reloadCurrentScene(*ctx.snowlang.engineRef);
     return {true};
   }
 
@@ -37,7 +37,7 @@ RuntimeValue sceneCommand(const CommandContext &ctx) {
 
   const auto &sceneName = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[0]);
 
-  bool success = sceneManager.loadScene(sceneName, *ctx.snowlang.windowManagerRef);
+  bool success = sceneManager.loadScene(sceneName, *ctx.snowlang.engineRef);
 
   if (!success) {
     throwError(SnowErr::Phase::Evaluator,

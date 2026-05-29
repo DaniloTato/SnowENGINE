@@ -8,14 +8,16 @@
 std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
-    : window(params.window), texture(*params.texture), color(sf::Color::White),
-      assignedCamera(params.camera), windowManager(params.windowManager),
-      layer(params.layer), paralax(params.parallax), show(true),
-      showCountDown(0.f), hasCulling(true) {
+    : window(params.window), texture(params.texture), color(sf::Color::White),
+      assignedCamera(params.camera), engine(params.engine), layer(params.layer),
+      paralax(params.parallax), show(true), showCountDown(0.f),
+      hasCulling(true) {
 
-  sprite.setTexture(texture);
-  rect = sf::IntRect(0, 0, static_cast<int>(texture.getSize().x),
-                     static_cast<int>(texture.getSize().y));
+  if (texture) {
+    sprite.setTexture(*texture);
+    rect = sf::IntRect(0, 0, static_cast<int>(texture->getSize().x),
+                       static_cast<int>(texture->getSize().y));
+  }
   sprite.setTextureRect(rect);
 }
 
@@ -41,7 +43,9 @@ WindowID Renderizer::getWindow() const { return window; }
 
 bool Renderizer::isVisible() const {
 
-  float zoom = assignedCamera ? assignedCamera->getZoom() : 1.f;
+  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
+
+  float zoom = assignedCamera ? view.getZoom() : 1.f;
 
   float x = sprite.getPosition().x;
   float y = sprite.getPosition().y;
@@ -66,6 +70,8 @@ void Renderizer::render(GameObject *obj) {
 
   sprite.setColor(color);
 
+  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
+
   sf::Vector2f screenPos;
 
   if (!assignedCamera) {
@@ -74,14 +80,14 @@ void Renderizer::render(GameObject *obj) {
       return;
     sprite.setScale(1.f, 1.f);
   } else {
-    screenPos = assignedCamera->worldToScreen(position, paralax);
+    screenPos = view.worldToScreen(position, paralax);
     sprite.setPosition(screenPos);
     if (hasCulling && !isVisible())
       return;
-    sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
+    sprite.setScale(view.getZoom(), view.getZoom());
   }
 
-  windowManager.drawOnWindow(window, sprite);
+  engine.getWindowManager().drawOnWindow(window, sprite);
 
   if (GameState::getInstance().getPrintingObjectIds()) {
     static sf::Font idTextFont;
@@ -98,7 +104,7 @@ void Renderizer::render(GameObject *obj) {
     idText.setFillColor(sf::Color::White);
     idText.setOutlineColor(sf::Color::Black);
     idText.setOutlineThickness(1.5f);
-    windowManager.drawOnWindow(window, idText);
+    engine.getWindowManager().drawOnWindow(window, idText);
   }
 }
 
@@ -109,17 +115,19 @@ void Renderizer::renderRectShape(GameObject *obj) {
   sf::RectangleShape rectShape;
   rectShape.setFillColor(color);
 
+  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
+
   if (!assignedCamera) {
     rectShape.setPosition(position);
     rectShape.setSize(static_cast<sf::Vector2f>(rect.getSize()));
   } else {
-    sf::Vector2f screenPos = assignedCamera->worldToScreen(position, paralax);
+    sf::Vector2f screenPos = view.worldToScreen(position, paralax);
     rectShape.setPosition(screenPos);
     rectShape.setSize(static_cast<sf::Vector2f>(rect.getSize()) *
-                      assignedCamera->getZoom());
+                      view.getZoom());
   }
 
-  windowManager.drawOnWindow(window, rectShape);
+  engine.getWindowManager().drawOnWindow(window, rectShape);
 }
 
 void Renderizer::setColor(sf::Color newColor) { color = newColor; }
@@ -150,7 +158,8 @@ void Renderizer::renderAll() {
     if (!rend->shouldIRender())
       continue;
 
-    if (entry.isRectShape) {
+    if (entry.isRectShape ||
+        entry.renderizer->getSprite().getTexture() == nullptr) {
       rend->renderRectShape(obj);
     } else {
       rend->render(obj);
@@ -188,9 +197,5 @@ void Renderizer::toggleColorEvery(float time, const sf::Color &color1,
 }
 
 void Renderizer::hide() { show = false; }
-
-const GameCamera *Renderizer::getAssignedCamera() const {
-  return assignedCamera;
-}
 
 const sf::Sprite &Renderizer::getSprite() const { return sprite; }

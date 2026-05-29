@@ -1,4 +1,5 @@
 #include "PolyRenderizer.hpp"
+#include "Engine.hpp"
 #include "GameObject.hpp"
 #include "Renderizer.hpp"
 #include <limits>
@@ -25,13 +26,18 @@ void PolyRenderizer::render(GameObject *obj) {
     sf::Vector2f screenPos;
 
     if (assignedCamera) {
-      screenPos = assignedCamera->worldToScreen(command.pos, finalParalax);
-      sprite.setScale(assignedCamera->getZoom(), assignedCamera->getZoom());
+      // screenPos = assignedCamera->worldToScreen(command.pos, finalParalax);
+      screenPos = engine.getCameraManager()
+                      .buildView(assignedCamera)
+                      .worldToScreen(command.pos, finalParalax);
+      sprite.setScale(
+          engine.getCameraManager().buildView(assignedCamera).getZoom(),
+          engine.getCameraManager().buildView(assignedCamera).getZoom());
     } else {
       screenPos = command.pos;
       sprite.setScale({1.f, 1.f});
     }
     sprite.setPosition(screenPos);
-    windowManager.drawOnWindow(window, sprite);
+    engine.getWindowManager().drawOnWindow(window, sprite);
   }
 }

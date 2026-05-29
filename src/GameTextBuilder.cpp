@@ -2,12 +2,12 @@
 #include "TextureManager.hpp"
 
 GameTextBuilder::GameTextBuilder(std::string_view fontTextureKey,
-                                 WindowManager &windowManager, WindowID window)
-    : params{.windowManager = windowManager,
-             .window = window,
+                                 Engine &engine)
+    : params{.engine = engine,
+             .window = WindowID(),
              .texture = &TextureManager::getInstance().get(
                  std::string(fontTextureKey)),
-             .camera = nullptr,
+             .camera = CameraID(),
              .layer = 0.f,
              .parallax = 1.f,
              .registerAsRectShape = false} {}
@@ -43,8 +43,8 @@ GameTextBuilder &GameTextBuilder::markup(const std::string &m) {
   return *this;
 }
 
-GameTextBuilder &GameTextBuilder::camera(GameCamera &cam) {
-  params.camera = &cam;
+GameTextBuilder &GameTextBuilder::camera(CameraID cam) {
+  params.camera = cam;
   return *this;
 }
 

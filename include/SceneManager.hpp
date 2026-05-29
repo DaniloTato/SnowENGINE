@@ -15,8 +15,8 @@ public:
   using SceneNameList = std::vector<std::string>;
 
   void registerScene(const std::string &name, const SceneSetupFn &setup);
-  bool loadScene(const std::string &name, WindowManager &windowManager);
-  void reloadCurrentScene(WindowManager &windowManager);
+  bool loadScene(const std::string &name, Engine &engine);
+  void reloadCurrentScene(Engine &engine);
   bool isTransitioning();
 
   void update(SceneBuilder::SceneContext ctx);
@@ -30,10 +30,9 @@ public:
   SceneManager &operator=(WindowManager &&) = delete;
 
 private:
-  void beginTransition(const std::string &nextScene,
-                       WindowManager &windowManager);
+  void beginTransition(const std::string &nextScene, Engine &engine);
   void unloadCurrentScene();
-  void initFadeOverlay(WindowManager &windowManager);
+  void initFadeOverlay(Engine &engine);
 
   std::unordered_map<std::string, SceneSetupFn> scenes;
   std::string currentScene;

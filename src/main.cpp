@@ -53,8 +53,7 @@ int main() {
       (Helper::getPath("config/control_config.json")));
 
   GameLoader loader;
-  loader.loadGameData(Helper::getPath("config"), engine.getWindowManager(),
-                      engine.getSceneManager());
+  loader.loadGameData(Helper::getPath("config"), engine);
 
   sf::Clock clock;
 

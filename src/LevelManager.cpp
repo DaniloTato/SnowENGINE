@@ -358,10 +358,9 @@ void LevelManager::ensureLevelLoaded() const {
   }
 }
 
-void LevelManager::initializeRenderContext(WindowManager &windowManager,
-                                           WindowID window,
-                                           GameCamera *camera) {
-  renderContext.windowManager = &windowManager;
+void LevelManager::initializeRenderContext(Engine &engine, WindowID window,
+                                           CameraID camera) {
+  renderContext.engine = &engine;
   renderContext.window = window;
   renderContext.camera = camera;
 }
@@ -373,7 +372,7 @@ RenderizerParameters LevelManager::makeRenderParams(size_t layerNo) const {
     layerValue = -1;
   }
 
-  return RenderizerParameters{.windowManager = *renderContext.windowManager,
+  return RenderizerParameters{.engine = *renderContext.engine,
                               .window = renderContext.window,
                               .texture = const_cast<sf::Texture *>(&tilesheet),
                               .camera = renderContext.camera,

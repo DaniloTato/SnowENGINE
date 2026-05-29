@@ -1,6 +1,7 @@
 #include "BasicCollider.hpp"
 #include "Constants.hpp"
 #include "LevelManager.hpp"
+#include "ObjectBuilder.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "TangibleObject.hpp"
 #include <cmath>
@@ -141,20 +142,13 @@ bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos,
   return collided;
 }
 
-void BasicCollider::debugRender(WindowID window, WindowManager &windowManager,
-                                GameCamera &camera,
-                                const sf::Vector2f &objectPos) {
+void BasicCollider::debugRender(GameObject &obj, Renderizer &renderizer,
+                                Engine &engine) {
+  // unnecesary texture key
+  auto rectangle = ObjectBuilder<RenderableObject>(engine)
+                       .rectangle((int)size.x, (int)size.y)
+                       .at(obj.position.x + offset.x, obj.position.y + offset.y)
+                       .build();
 
-  sf::Vector2f posWithCamera = camera.worldToScreen(objectPos + offset);
-  sf::FloatRect box =
-      sf::FloatRect(posWithCamera.x, posWithCamera.y, size.x, size.y);
-
-  sf::RectangleShape rect;
-  rect.setPosition(box.left, box.top);
-  rect.setSize({box.width * camera.getZoom(), box.height * camera.getZoom()});
-  rect.setFillColor(sf::Color(255, 0, 0, 80));
-  rect.setOutlineColor(sf::Color(255, 0, 0, 150));
-  rect.setOutlineThickness(1.f);
-
-  windowManager.drawOnWindow(window, rect);
+  renderizer.renderRectShape(rectangle);
 }

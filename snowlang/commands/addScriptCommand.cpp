@@ -1,4 +1,5 @@
 #include "Commands.hpp"
+#include "GameCamera.hpp"
 #include "GameObject.hpp"
 #include "RuntimeValue.hpp"
 #include "Scripter.hpp"

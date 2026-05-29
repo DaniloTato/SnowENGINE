@@ -10,6 +10,7 @@
 - Level Manager Refactor `DONE`
 - Fix Level manager creation of tiles. `DONE`
 - Avoid memory leak when creating a new cameraManager dynamically in SceneBuilder. Delete the instance when changing scene.`DONE`
+- Remove all uses of GameCamera outside Camera Manager. `DONE`
 
 - Think about having a FrameContext that will contain dt.
 - Modifiy Tile Picker to update tile parallax in real time.
@@ -23,7 +24,6 @@
 - Solve ownership issues between GameObject and GameCamera
 - Fix references to managers inside snowlang. Pass them along trough I/O or another interface
 - Remove ptrs use in Tile object inside Level Manger
-- Remove all uses of GameCamera outside Camera Manager. _IN PROGRESS_
 - Refactor gameloader so you dont have to pass around functions from Mangers around internally.
 
 - Error pipeline for the whole engine.
@@ -32,6 +32,9 @@
 - Refactor Dialogue Manager. Redistribute responsabilities across Dialogue Manager and GameText
 
 - RenderizerParams should only accept CameraIDs, not GameCamera Objects.
+
+- Inheritance from base id class to WindowID and CameraID
+- Texture Key should not be in the constructor of Object Builder
 
 _PIORITY_
 

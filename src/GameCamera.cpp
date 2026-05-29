@@ -42,43 +42,6 @@ float GameCamera::getZoom() const { return zoom; }
 
 float GameCamera::getDesiredZoom() const { return desiredZoom; }
 
-const sf::Vector2f GameCamera::worldToScreen(const sf::Vector2f &worldPos,
-                                             float parallax) const {
-  if (parallax <= 0.f)
-    parallax = 1.f;
-
-  sf::Vector2f base = worldPos - (position / parallax);
-
-  sf::Vector2f zoomOffset = (zoom - 1.f) * base;
-
-  float parallaxOffsetX =
-      ((-2 + Constants::SCREEN_WIDTH * (-1 + parallax)) / (2 * parallax) + 1);
-  float parallaxOffsetY =
-      ((-2 + Constants::SCREEN_HEIGHT * (-1 + parallax)) / (2 * parallax) + 1);
-
-  sf::Vector2f parallaxOffset(parallaxOffsetX, parallaxOffsetY);
-
-  return Vec2iTo2f(Vec2fTo2i(base + zoomOffset + parallaxOffset));
-}
-
-const sf::Vector2f GameCamera::screenToWorld(const sf::Vector2f &screenPos,
-                                             float parallax) const {
-  if (parallax <= 0.f)
-    parallax = 1.f;
-
-  float parallaxOffsetX =
-      ((-2 + Constants::SCREEN_WIDTH * (-1 + parallax)) / (2 * parallax) + 1);
-  float parallaxOffsetY =
-      ((-2 + Constants::SCREEN_HEIGHT * (-1 + parallax)) / (2 * parallax) + 1);
-  sf::Vector2f parallaxOffset(parallaxOffsetX, parallaxOffsetY);
-
-  sf::Vector2f base = (screenPos - parallaxOffset) / zoom;
-
-  sf::Vector2f world = base + (position / parallax);
-
-  return world;
-}
-
 sf::FloatRect GameCamera::getWorldViewRect() const {
   sf::Vector2f size = {Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT};
   sf::Vector2f topLeft = {position.x - (size.x * 0.5f),

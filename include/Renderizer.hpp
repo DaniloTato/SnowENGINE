@@ -1,9 +1,12 @@
 #pragma once
-#include "GameCamera.hpp"
+#include "CameraID.hpp"
+#include "GameObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Sprite.hpp"
 #include "SFML/Graphics/Texture.hpp"
 #include <SFML/Graphics.hpp>
+
+class Engine;
 
 struct RenderizerParameters;
 
@@ -19,11 +22,10 @@ public:
   virtual ~Renderizer();
 
   void setRect(const sf::IntRect &newRect, int direction);
-  const sf::IntRect &getRect() const;
+  [[nodiscard]] const sf::IntRect &getRect() const;
   virtual void render(GameObject *ob);
   void renderRectShape(GameObject *obj);
   float getLayer() const;
-  [[nodiscard]] const GameCamera *getAssignedCamera() const;
   [[nodiscard]] const sf::Sprite &getSprite() const;
   void setLayer(float newLayer);
   void setColor(sf::Color newColor);
@@ -33,11 +35,11 @@ public:
   bool shouldIRender();
   void turnOffCulling();
 
-  WindowID getWindow() const;
+  [[nodiscard]] WindowID getWindow() const;
 
   void hide();
 
-  bool isVisible() const;
+  [[nodiscard]] bool isVisible() const;
 
   static void registerPair(GameObject *obj, Renderizer *rend, bool isRectShape);
   static void unregisterPair(Renderizer *rend);
@@ -49,11 +51,11 @@ public:
 protected:
   WindowID window;
   sf::Sprite sprite;
-  sf::Texture &texture;
+  sf::Texture *texture;
   sf::IntRect rect;
   sf::Color color;
-  GameCamera *assignedCamera;
-  WindowManager &windowManager;
+  CameraID assignedCamera;
+  Engine &engine;
   float layer;
   float paralax;
 

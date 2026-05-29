@@ -9,8 +9,7 @@ void SceneManager::registerScene(const std::string &name,
   scenes[name] = setup;
 }
 
-bool SceneManager::loadScene(const std::string &name,
-                             WindowManager &windowManager) {
+bool SceneManager::loadScene(const std::string &name, Engine &engine) {
   if (transitioning) {
     return true;
   }
@@ -19,23 +18,23 @@ bool SceneManager::loadScene(const std::string &name,
     return false;
   }
 
-  beginTransition(name, windowManager);
+  beginTransition(name, engine);
 
   return true;
 }
 
-void SceneManager::reloadCurrentScene(WindowManager &windowManager) {
-  loadScene(currentScene, windowManager);
+void SceneManager::reloadCurrentScene(Engine &engine) {
+  loadScene(currentScene, engine);
 }
 
 void SceneManager::beginTransition(const std::string &nextScene,
-                                   WindowManager &windowManager) {
+                                   Engine &engine) {
   transitioning = true;
   fadingOut = true;
   transitionTimer = 0.f;
   queuedScene = nextScene;
 
-  initFadeOverlay(windowManager);
+  initFadeOverlay(engine);
 }
 
 void SceneManager::unloadCurrentScene() {
@@ -80,16 +79,16 @@ void SceneManager::update(SceneBuilder::SceneContext ctx) {
 
 bool SceneManager::isTransitioning() { return transitioning; }
 
-void SceneManager::initFadeOverlay(WindowManager &windowManager) {
+void SceneManager::initFadeOverlay(Engine &engine) {
   if (fadeOverlay)
     return;
 
   sf::Texture dummyTexture;
 
-  RenderizerParameters params{.windowManager = windowManager,
-                              .window = windowManager.getMain(),
+  RenderizerParameters params{.engine = engine,
+                              .window = engine.getWindowManager().getMain(),
                               .texture = &dummyTexture,
-                              .camera = nullptr,
+                              .camera = CameraID(),
                               .layer = Constants::OVERLAY_LAYER,
                               .parallax = 1.f,
                               .registerAsRectShape = true};
