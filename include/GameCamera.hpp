@@ -1,4 +1,6 @@
 #pragma once
+#include "CameraID.hpp"
+#include "CameraView.hpp"
 #include "GameObject.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "Scripter.hpp"
@@ -24,11 +26,14 @@ public:
   void zoomToDesired();
   void goToDesired();
 
+  [[nodiscard]] CameraView buildView();
+
   GameObjectExposure::Value::Object describe() override;
 
   [[nodiscard]] sf::FloatRect getWorldViewRect() const;
 
   Scripter<GameCamera> scripter;
+  CameraID myCamId;
 
 private:
   sf::Vector2f desiredPosition;

@@ -1,16 +1,36 @@
 #include "Scene.hpp"
+
 #include "GameObject.hpp"
 
 void Scene::update(const GeneralContext &ctx) {
+
   for (auto &obj : objects) {
-    obj->update(ctx);
+    if (!obj->isPendingDestroy()) {
+      obj->update(ctx);
+    }
   }
+
+  applyDestroyQueue();
 }
 
-template <typename T, typename... Args> T *Scene::createObject(Args &&...args) {
-  static_assert(std::is_base_of_v<GameObject, T>);
-  auto obj = std::make_unique<T>(std::forward<Args>(args)...);
-  T *ptr = obj.get();
-  objects.push_back(std::move(obj));
-  return ptr;
+const std::vector<std::unique_ptr<GameObject>> &Scene::getObjects() const {
+  return objects;
+}
+
+void Scene::applyDestroyQueue() {
+  std::erase_if(objects, [](const auto &obj) {
+    if (!obj->isPendingDestroy())
+      return false;
+
+    return true;
+  });
+}
+
+GameObject *Scene::findObjectById(unsigned int id) const {
+  for (const auto &obj : objects) {
+    if (obj && obj->getId() == id) {
+      return obj.get();
+    }
+  }
+  return nullptr;
 }

@@ -7,94 +7,77 @@
 #include "TangibleObject.hpp"
 
 #include "GameTextBuilder.hpp"
+
 #include "basicMovementScript.hpp"
 #include "cameraBehaviourScript.hpp"
 #include "terminalCreationScript.hpp"
 #include "tilePickerCreationScript.hpp"
 
-#include "SceneContext.hpp"
-
+#include "CameraBuilder.hpp"
 #include "Helpers.hpp"
 #include "ObjectBuilder.hpp"
 
-#include "RegistryMacros.hpp"
-#include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
+void MainScene::setup(Scene::Context ctx) {
 
-namespace SceneBuilder {
-void mainScene(SceneBuilder::SceneContext ctx) {
+  std::cout << "mainScene setup run\n";
 
-  CameraManager &cameraManager = ctx.engine->getCameraManager();
-  LevelManager &levelManager = ctx.engine->getLevelManager();
+  Engine &engine = *ctx.engine;
+  WindowManager &windowManager = engine.getWindowManager();
+  WindowID mainWindow = windowManager.getMain();
+  LevelManager &levelManager = engine.getLevelManager();
 
-  CameraID mainCamera = cameraManager.createCamera(
-      GameObject::UpdateDomain(WindowManager::Set::MAIN),
-      Scripts::cameraBehaviourScript);
-  CameraID uiCamera =
-      cameraManager.createCamera(GameObject::UpdateDomain(ctx.mainWindow));
+  GameCamera *mainCamera =
+      this->create(CameraBuilder()
+                       .updateDomain(WindowManager::Set::MAIN)
+                       .script(Scripts::cameraBehaviourScript));
 
-  // This method should not exist. Must work towards refactoring levelManger.
-  levelManager.initializeRenderContext(*ctx.engine, ctx.mainWindow, mainCamera);
+  GameCamera *uiCamera =
+      this->create(CameraBuilder().updateDomain(WindowManager::Set::MAIN));
 
-  /* Setup in case we'd like to have particles in the scene.
-
-  RenderizerParameters polyRenderizerParams{
-      .window = GameState::getInstance().getMainWindow(),
-      .texture = &TextureManager::getInstance().get("particles"),
-      .camera = GameState::getInstance().getMainCamera()};
-
-  auto *pr = new PolyRenderizer(polyRenderizerParams);
-  ParticleManager::getInstance().attachPolyRederizer(pr);
-  ParticleManager::getInstance().loadAnimations(
-      Animator::getAsepriteJSONAnimations(
-          Helper::getPath("assets/animations/particles.json")));
-  */
+  levelManager.initializeRenderContext(engine, mainWindow, mainCamera);
 
   levelManager.loadLevel(Helper::getPath("assets/levels/Level1.json"));
 
-  auto *image = ObjectBuilder<TangibleObject>(*ctx.engine)
-                    .withTexture("todd")
-                    .at(100, 100)
-                    .onWindow(ctx.mainWindow)
-                    .onCamera(mainCamera)
-                    .withEmptyAnimation(16, 16)
-                    .build();
+  auto *image = create(ObjectBuilder<TangibleObject>(engine)
+                           .withTexture("todd")
+                           .at(100, 100)
+                           .onWindow(mainWindow)
+                           .onCamera(mainCamera)
+                           .withEmptyAnimation(16, 16));
 
-  // Change addScript to recieve the function reference, not a string.
   image->scripter.addScript(Scripts::basicMovementScript);
 
-  ObjectBuilder<RenderableObject>(*ctx.engine)
-      .rectangle(20, 20)
-      .at(200, 200)
-      .onWindow(ctx.mainWindow)
-      .onCamera(mainCamera)
-      .build();
+  this->create(ObjectBuilder<RenderableObject>(engine)
+                   .rectangle(20, 20)
+                   .at(200, 200)
+                   .onWindow(mainWindow)
+                   .onCamera(mainCamera));
 
-  GameTextBuilder("snowFont", *ctx.engine)
-      .at({0.f, 50.f})
-      .onWindow(ctx.mainWindow)
-      .boundary(Constants::SCREEN_WIDTH)
-      .alignment(GameText::Align::Center)
-      .typewriter(0.1f)
-      .camera(uiCamera)
-      .markup(
-          R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])")
-      .build();
+  this->create(
+      GameTextBuilder("snowFont", engine)
+          .at({0.f, 50.f})
+          .onWindow(mainWindow)
+          .boundary(Constants::SCREEN_WIDTH)
+          .alignment(GameText::Align::Center)
+          .typewriter(0.1f)
+          .camera(uiCamera)
+          .markup(
+              R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])"));
 
-  // may need to refactor terminalCreation into a sytem for the engine
-  ScriptRunner *sr = new ScriptRunner(GameObject::UpdateDomain(
-      {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}));
+  auto *sr = this->create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
+      GameObject::UpdateDomain{
+          {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}}));
+
   sr->scripter.addScript(Scripts::terminalCreationScript);
 
-  ScriptRunner *sr2 = new ScriptRunner(GameObject::UpdateDomain(
-      {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}));
+  auto *sr2 = this->create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
+      GameObject::UpdateDomain{
+          {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}}));
+
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
-  GeneralContext generalContext = {.player = image,
-                                   .cameraManager = &cameraManager,
-                                   .mainCamera = mainCamera,
-                                   .engine = ctx.engine};
+  GeneralContext generalContext{
+      .player = image, .mainCamera = mainCamera, .engine = &engine};
+
   GameState::getInstance().updateGeneralContext(generalContext);
 }
-} // namespace SceneBuilder
-
-REGISTER_SCENE_BUILDER("mainScene", SceneBuilder::mainScene);

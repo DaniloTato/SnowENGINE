@@ -27,12 +27,9 @@ void PolyRenderizer::render(GameObject *obj) {
 
     if (assignedCamera) {
       // screenPos = assignedCamera->worldToScreen(command.pos, finalParalax);
-      screenPos = engine.getCameraManager()
-                      .buildView(assignedCamera)
-                      .worldToScreen(command.pos, finalParalax);
-      sprite.setScale(
-          engine.getCameraManager().buildView(assignedCamera).getZoom(),
-          engine.getCameraManager().buildView(assignedCamera).getZoom());
+      const CameraView &view = assignedCamera->buildView();
+      screenPos = view.worldToScreen(command.pos, finalParalax);
+      sprite.setScale(view.getZoom(), view.getZoom());
     } else {
       screenPos = command.pos;
       sprite.setScale({1.f, 1.f});

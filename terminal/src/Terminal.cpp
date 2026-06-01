@@ -40,7 +40,7 @@ size_t Terminal::countVisualLines(const TerminalLine &line) {
   return lines;
 }
 
-Terminal::Terminal(WindowID window, CameraID camera, CameraID tileCamera,
+Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
                    Engine &engine, sf::Texture *fontTexture)
     : targetWindow(window), snowlangIO(*this), snowlang(snowlangIO),
       text(new GameText({.engine = engine,
@@ -70,7 +70,7 @@ Terminal::Terminal(WindowID window, CameraID camera, CameraID tileCamera,
   rebuildText();
 }
 
-Terminal::~Terminal() { GameObject::destroy(text); }
+Terminal::~Terminal() { text->destroyLater(); }
 
 std::string Terminal::escapeInput(const std::string &s) {
   std::string out;

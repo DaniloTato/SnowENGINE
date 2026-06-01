@@ -66,6 +66,7 @@ void GameLoader::loadScenes(const std::string &path, Engine &engine) {
   file >> data;
 
   for (auto &[name, func] : SceneBuilderRegistry::getAllItems()) {
+    std::cout << "Resgistered scene " + name << "\n";
     engine.getSceneManager().registerScene(name, func);
   }
 

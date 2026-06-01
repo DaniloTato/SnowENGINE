@@ -1,9 +1,16 @@
 #pragma once
 
 #include "GameText.hpp"
+#include "RenderizerParameters.hpp"
+
+#include <memory>
+#include <string>
+
+class Engine;
 
 class GameTextBuilder {
 public:
+  using ObjectType = GameText;
   GameTextBuilder(std::string_view fontTextureKey, Engine &engine);
   GameTextBuilder &at(sf::Vector2f p);
   GameTextBuilder &onWindow(WindowID window);
@@ -11,17 +18,17 @@ public:
   GameTextBuilder &typewriter(float speed);
   GameTextBuilder &alignment(GameText::Align a);
   GameTextBuilder &markup(const std::string &m);
-  GameTextBuilder &camera(CameraID cam);
+  GameTextBuilder &camera(GameCamera *camera);
   GameTextBuilder &layer(float l);
   GameTextBuilder &parallax(float p);
-  GameText *build();
+  [[nodiscard]] std::unique_ptr<GameText> create() const;
 
 private:
   RenderizerParameters params;
-  std::string markupText;
-  sf::Vector2f textPosition = {0.f, 0.f};
-  float textBoundary = 100000.f;
+  sf::Vector2f textPosition;
+  float textBoundary = 0.f;
   bool useTypewriter = false;
-  float typewriterSpeed = 0.04f;
+  float typewriterSpeed = 0.f;
   GameText::Align textAlignment = GameText::Align::Left;
+  std::string markupText;
 };

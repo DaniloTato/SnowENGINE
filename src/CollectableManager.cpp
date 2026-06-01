@@ -1,5 +1,4 @@
 #include "CollectableManager.hpp"
-#include "GameObject.hpp"
 
 CollectableManager &CollectableManager::getInstance() {
   static CollectableManager instance;
@@ -16,7 +15,7 @@ void CollectableManager::queueDeleteCollectable(TangibleObject *obj) {
 }
 
 void CollectableManager::destroyObject(TangibleObject *obj) {
-  GameObject::destroy(obj);
+  obj->destroyLater();
 }
 
 std::vector<std::string> CollectableManager::getCollectableList() const {

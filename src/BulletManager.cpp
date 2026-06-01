@@ -37,9 +37,7 @@ Bullet *BulletManager::createFromRequest(const BulletCreationRequest &req) {
   return bullet;
 }
 
-void BulletManager::destroyObject(Bullet *bullet) {
-  GameObject::destroy(bullet);
-}
+void BulletManager::destroyObject(Bullet *bullet) { bullet->destroyLater(); }
 
 void BulletManager::update() {
   for (Bullet *bullet : objects) {

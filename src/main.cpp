@@ -8,7 +8,6 @@
 #include "EnemyManager.hpp"
 #include "Engine.hpp"
 #include "GameLoader.hpp"
-#include "GameObject.hpp"
 #include "GameState.hpp"
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
@@ -65,9 +64,11 @@ int main() {
     const std::unordered_map<WindowID, WindowManager::WindowEntry> &windows =
         windowManager.getAll();
 
-    sceneManager.update(SceneBuilder::SceneContext{.engine = &engine,
-                                                   .mainWindow = mainWindow});
     gameState.updateDt();
+
+    sceneManager.update(
+        gameState.getGeneralContext(),
+        Scene::Context{.engine = &engine, .mainWindow = mainWindow});
 
     if (!sceneManager.isTransitioning()) {
       levelManager.applyQueuedTileChanges();
@@ -86,14 +87,6 @@ int main() {
         windowManager.clearWindow(id, levelManager.getBackgroundColor());
       } else {
         windowManager.clearWindow(id);
-      }
-    }
-
-    // IDEA: Group objects by domain like windows and only call a certain domain
-    // to update.
-    for (GameObject *gameObject : GameObject::getGameObjects()) {
-      if (gameObject && !gameObject->isUpdateDomainPaused(windowManager)) {
-        gameObject->update(gameState.getGeneralContext());
       }
     }
 

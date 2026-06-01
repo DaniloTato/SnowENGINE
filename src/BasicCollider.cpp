@@ -1,7 +1,6 @@
 #include "BasicCollider.hpp"
 #include "Constants.hpp"
 #include "LevelManager.hpp"
-#include "ObjectBuilder.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "TangibleObject.hpp"
 #include <cmath>
@@ -140,15 +139,4 @@ bool BasicCollider::verticalLevelCollision(sf::Vector2f &objectPos,
 
   lastFramePos.y = objectPos.y;
   return collided;
-}
-
-void BasicCollider::debugRender(GameObject &obj, Renderizer &renderizer,
-                                Engine &engine) {
-  // unnecesary texture key
-  auto rectangle = ObjectBuilder<RenderableObject>(engine)
-                       .rectangle((int)size.x, (int)size.y)
-                       .at(obj.position.x + offset.x, obj.position.y + offset.y)
-                       .build();
-
-  renderizer.renderRectShape(rectangle);
 }

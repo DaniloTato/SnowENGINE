@@ -1,7 +1,13 @@
 #pragma once
 
-#include "SceneContext.hpp"
+#include "RegistryMacros.hpp"
+#include "Scene.hpp"
+#include "SceneBuilderRegistry.hpp"
 
-namespace SceneBuilder {
-void mainScene(SceneContext ctx);
-}
+class MainScene : public Scene {
+public:
+  void setup(Scene::Context ctx) override;
+};
+
+REGISTER_SCENE_BUILDER("mainScene",
+                       []() { return std::make_unique<MainScene>(); });

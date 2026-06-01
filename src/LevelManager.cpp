@@ -2,6 +2,7 @@
 #include "ColorPalette.hpp"
 #include "Constants.hpp"
 #include "Helpers.hpp"
+#include "ObjectBuilder.hpp"
 #include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include <algorithm>
@@ -9,9 +10,17 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-RenderableObject *LevelManager::TileFactory::create(
-    const TileInfo &tile, const RenderizerParameters &params, int tileSize) {
-  auto *obj = new RenderableObject(params);
+RenderableObject *
+LevelManager::TileFactory::create(Scene &scene, const TileInfo &tile,
+                                  const RenderizerParameters &params,
+                                  int tileSize) {
+  auto *obj = scene.create(ObjectBuilder<RenderableObject>(params.engine)
+                               .rectangle(tileSize, tileSize)
+                               .onWindow(params.window)
+                               .onCamera(params.camera)
+                               .layer(params.layer)
+                               .parallax(params.parallax));
+
   obj->position = {float(tile.x * tileSize + 1), float(tile.y * tileSize + 1)};
 
   obj->renderizer.setRect(tile.textureRect, 1);
@@ -21,7 +30,7 @@ RenderableObject *LevelManager::TileFactory::create(
 
 void LevelManager::TileFactory::destroy(RenderableObject *&obj) {
   if (obj) {
-    GameObject::destroy(obj);
+    obj->destroyLater();
     obj = nullptr;
   }
 }
@@ -107,8 +116,9 @@ void LevelManager::loadLayer(size_t layerNo, const json &layerJSON,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    info.object = TileFactory::create(info, makeRenderParams(layerNo),
-                                      Constants::TILE_SIZE);
+    info.object = TileFactory::create(
+        *renderContext.engine->getSceneManager().getCurrentScene(), info,
+        makeRenderParams(layerNo), Constants::TILE_SIZE);
 
     tileList.push_back(info);
 
@@ -132,8 +142,9 @@ void LevelManager::reloadLayer(size_t layerNo) {
 
   for (auto &t : tiles) {
     TileFactory::destroy(t.object);
-    t.object =
-        TileFactory::create(t, makeRenderParams(layerNo), Constants::TILE_SIZE);
+    t.object = TileFactory::create(
+        *renderContext.engine->getSceneManager().getCurrentScene(), t,
+        makeRenderParams(layerNo), Constants::TILE_SIZE);
   }
 }
 
@@ -178,8 +189,9 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
 
       t.textureRect = rect;
 
-      t.object = TileFactory::create(t, makeRenderParams(layerNo),
-                                     Constants::TILE_SIZE);
+      t.object = TileFactory::create(
+          *renderContext.engine->getSceneManager().getCurrentScene(), t,
+          makeRenderParams(layerNo), Constants::TILE_SIZE);
 
       return;
     }
@@ -194,8 +206,9 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  info.object = TileFactory::create(info, makeRenderParams(layerNo),
-                                    Constants::TILE_SIZE);
+  info.object = TileFactory::create(
+      *renderContext.engine->getSceneManager().getCurrentScene(), info,
+      makeRenderParams(layerNo), Constants::TILE_SIZE);
 
   tiles.push_back(info);
 }
@@ -359,7 +372,7 @@ void LevelManager::ensureLevelLoaded() const {
 }
 
 void LevelManager::initializeRenderContext(Engine &engine, WindowID window,
-                                           CameraID camera) {
+                                           GameCamera *camera) {
   renderContext.engine = &engine;
   renderContext.window = window;
   renderContext.camera = camera;

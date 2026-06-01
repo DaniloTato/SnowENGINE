@@ -10,7 +10,7 @@ public:
   Animator() = default;
 
   void addAnimation(const std::string &name, const Animation &anim);
-  void setAnimations(Animations &newAnimations);
+  void setAnimations(const Animations &newAnimations);
   void update();
 
   void play(const std::string &name);

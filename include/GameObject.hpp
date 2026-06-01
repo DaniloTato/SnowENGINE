@@ -26,7 +26,7 @@ public:
   };
 
   GameObject(UpdateDomain updateDomain, sf::Vector2f pos = {0.f, 0.f});
-  virtual ~GameObject();
+  virtual ~GameObject() = default;
   virtual void update(const GeneralContext &ctx) = 0;
 
   void makePersistentAcrossScenes();
@@ -36,12 +36,10 @@ public:
   unsigned int getId();
   bool isUpdateDomainPaused(WindowManager &wm);
 
-  static std::vector<GameObject *> &getGameObjects();
-  static void destroy(GameObject *g);
+  void setUpdateDomain(const UpdateDomain &newDomain);
 
-  static void destroySceneObjects();
-
-  static GameObject *findGameObjectById(float id);
+  void destroyLater();
+  [[nodiscard]] bool isPendingDestroy() const;
 
   sf::Vector2f position;
   sf::Vector2f offset;
@@ -51,7 +49,7 @@ public:
 
 protected:
   bool persistentAcrossScenes = false;
-  static std::vector<GameObject *> s_gameObjects;
+  bool pendingDestroy = false;
 
 private:
   unsigned int id;

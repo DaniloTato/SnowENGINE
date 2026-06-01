@@ -1,8 +1,9 @@
 #pragma once
-#include "CameraID.hpp"
+#include "GameCamera.hpp"
 #include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
+#include "Scene.hpp"
 #include "SceneAware.hpp"
 #include <nlohmann/json.hpp>
 #include <string>
@@ -46,12 +47,12 @@ public:
   struct LevelRenderContext {
     Engine *engine;
     WindowID window;
-    CameraID camera;
+    GameCamera *camera;
   };
 
   class TileFactory {
   public:
-    static RenderableObject *create(const TileInfo &tile,
+    static RenderableObject *create(Scene &scene, const TileInfo &tile,
                                     const RenderizerParameters &params,
                                     int tileSize);
     static void destroy(RenderableObject *&obj);
@@ -66,7 +67,7 @@ public:
   LevelManager &operator=(WindowManager &&) = delete;
 
   void initializeRenderContext(Engine &engine, WindowID window,
-                               CameraID camera);
+                               GameCamera *camera);
 
   void loadLevel(const std::string &path);
   void saveLevel(const std::string &path);

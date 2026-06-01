@@ -7,10 +7,11 @@ namespace Snowlang::Commands {
 
 namespace {
 
-static GameObject *findGameObjectById(float id) {
-  for (auto *obj : GameObject::getGameObjects()) {
-    if (obj->getId() == static_cast<unsigned int>(id))
-      return obj;
+static GameObject *findGameObjectById(float id, Engine &engine) {
+  for (const auto &obj : engine.getSceneManager().getCurrentScene()->getObjects()) {
+    if (obj->getId() == static_cast<unsigned int>(id)) {
+      return obj.get();
+    }
   }
   return nullptr;
 }
@@ -25,7 +26,7 @@ RuntimeValue gameGetCommand(const CommandContext &ctx) {
 
   float id = SnowlangHelper::RuntimeValueTo<float>(ctx.cmd.span)(ctx.args[0]);
 
-  GameObject *obj = findGameObjectById(id);
+  GameObject *obj = findGameObjectById(id, *ctx.snowlang.engineRef);
   if (!obj) {
     throwError(SnowErr::Phase::Evaluator,
                "game_get: no GameObject found with id = " + std::to_string(id), ctx.cmd.span);

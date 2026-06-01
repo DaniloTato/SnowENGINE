@@ -6,9 +6,9 @@
     return true;                                                               \
   }()
 
-#define REGISTER_SCENE_BUILDER(name, func)                                     \
+#define REGISTER_SCENE_BUILDER(name, factory)                                  \
   static bool _scene_builder_reg_##__COUNTER__ = []() {                        \
-    SceneBuilderRegistry::registerItem(name, func);                            \
+    SceneBuilderRegistry::registerItem(name, factory);                         \
     return true;                                                               \
   }()
 

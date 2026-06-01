@@ -91,7 +91,7 @@ void Animator::addAnimation(const std::string &name, const Animation &anim) {
   animations[name] = anim;
 }
 
-void Animator::setAnimations(Animations &newAnimations) {
+void Animator::setAnimations(const Animations &newAnimations) {
   animations = newAnimations;
 }
 

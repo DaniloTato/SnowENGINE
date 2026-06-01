@@ -26,7 +26,6 @@ public:
   bool verticalLevelCollision(sf::Vector2f &objectPos,
                               LevelManager::LevelLayout2D &level);
   void computeCollisionGrid(const sf::Vector2f &objectPos);
-  void debugRender(GameObject &obj, Renderizer &renderizer, Engine &engine);
 
   static bool objectsColliding(TangibleObject *object1,
                                TangibleObject *object2);

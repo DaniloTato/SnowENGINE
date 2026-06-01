@@ -1,5 +1,6 @@
 #include "terminalCreationScript.hpp"
 
+#include "CameraBuilder.hpp"
 #include "InputManager.hpp"
 #include "Terminal.hpp"
 #include "TextureManager.hpp"
@@ -24,9 +25,9 @@ void terminalCreationScript(ScriptRunner &renderable,
       const WindowID terminalWindow = windowManager.create(
           WindowManager::Set::TERMINAL, 900, 500, "Snowgun Terminal");
 
-      const CameraID terminalCamera = ctx.cameraManager->createCamera(
-          GameObject::UpdateDomain(WindowManager::Set::TERMINAL), nullptr,
-          true);
+      GameCamera *terminalCamera =
+          ctx.engine->getSceneManager().getCurrentScene()->create(
+              CameraBuilder().persistent().updateDomain(terminalWindow));
 
       s_terminal = new Terminal(terminalWindow, terminalCamera, ctx.mainCamera,
                                 *ctx.engine,

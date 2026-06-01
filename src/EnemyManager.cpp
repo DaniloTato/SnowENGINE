@@ -1,5 +1,4 @@
 #include "EnemyManager.hpp"
-#include "GameObject.hpp"
 #include "GameState.hpp"
 #include "Helpers.hpp"
 #include <fstream>
@@ -20,9 +19,7 @@ void EnemyManager::queueDeleteEnemy(TangibleObject *enemy) {
   deleteQueue.push_back(enemy);
 }
 
-void EnemyManager::destroyObject(TangibleObject *obj) {
-  GameObject::destroy(obj);
-}
+void EnemyManager::destroyObject(TangibleObject *obj) { obj->destroyLater(); }
 
 std::vector<std::string> EnemyManager::getEnemyList() const {
   std::vector<std::string> result;

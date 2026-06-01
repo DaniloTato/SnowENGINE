@@ -1,4 +1,5 @@
 #include "GameTextBuilder.hpp"
+
 #include "TextureManager.hpp"
 
 GameTextBuilder::GameTextBuilder(std::string_view fontTextureKey,
@@ -7,7 +8,7 @@ GameTextBuilder::GameTextBuilder(std::string_view fontTextureKey,
              .window = WindowID(),
              .texture = &TextureManager::getInstance().get(
                  std::string(fontTextureKey)),
-             .camera = CameraID(),
+             .camera = nullptr,
              .layer = 0.f,
              .parallax = 1.f,
              .registerAsRectShape = false} {}
@@ -43,8 +44,8 @@ GameTextBuilder &GameTextBuilder::markup(const std::string &m) {
   return *this;
 }
 
-GameTextBuilder &GameTextBuilder::camera(CameraID cam) {
-  params.camera = cam;
+GameTextBuilder &GameTextBuilder::camera(GameCamera *camera) {
+  params.camera = camera;
   return *this;
 }
 
@@ -58,14 +59,10 @@ GameTextBuilder &GameTextBuilder::parallax(float p) {
   return *this;
 }
 
-GameText *GameTextBuilder::build() {
-
-  auto text = new GameText(params);
-
+std::unique_ptr<GameText> GameTextBuilder::create() const {
+  auto text = std::make_unique<GameText>(params);
   text->setPosition(textPosition);
-
   text->setBoundary(textBoundary);
-
   text->setAlignment(textAlignment);
 
   if (useTypewriter) {

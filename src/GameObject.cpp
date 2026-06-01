@@ -1,11 +1,10 @@
 #include "GameObject.hpp"
 #include "GameObjectExposure.hpp"
-#include "SFML/System/Vector2.hpp"
-#include <vector>
 
 unsigned int GameObject::nextId = 0;
 
 bool GameObject::UpdateDomain::matches(WindowManager &wm, WindowID id) const {
+
   if (std::ranges::find(windows, id) != windows.end()) {
     return true;
   }
@@ -20,54 +19,7 @@ bool GameObject::UpdateDomain::matches(WindowManager &wm, WindowID id) const {
 }
 
 GameObject::GameObject(UpdateDomain updateDomain, sf::Vector2f pos)
-    : position(pos), updateDomain(std::move(updateDomain)) {
-  s_gameObjects.push_back(this);
-  id = nextId++;
-}
-
-GameObject::~GameObject() {
-  auto it = std::ranges::find(s_gameObjects, this);
-  if (it != s_gameObjects.end()) {
-    s_gameObjects.erase(it);
-  }
-}
-
-void GameObject::destroy(GameObject *g) {
-  std::vector<GameObject *> &list = GameObject::s_gameObjects;
-
-  // Interesting use of if statement with an initizalizer. C++17
-
-  /*auto it = std::ranges::find(list, g); — This runs first. It creates the
-  variable it.
-
-  Second ExprStmt is the boolean that determines if the body of the if is
-  executed. */
-
-  if (auto it = std::ranges::find(list, g); it != list.end()) {
-    *it = list.back();
-    list.pop_back();
-  }
-
-  delete g;
-}
-
-std::vector<GameObject *> GameObject::s_gameObjects;
-
-std::vector<GameObject *> &GameObject::getGameObjects() {
-  return s_gameObjects;
-}
-
-void GameObject::destroySceneObjects() {
-  auto &objects = getGameObjects();
-
-  for (int i = static_cast<int>(objects.size()) - 1; i >= 0; --i) {
-    GameObject *obj = objects[i];
-
-    if (!obj->isPersistentAcrossScenes()) {
-      destroy(obj);
-    }
-  }
-}
+    : position(pos), id(nextId++), updateDomain(std::move(updateDomain)) {}
 
 void GameObject::makePersistentAcrossScenes() { persistentAcrossScenes = true; }
 
@@ -76,8 +28,6 @@ bool GameObject::isPersistentAcrossScenes() const {
 }
 
 unsigned int GameObject::getId() { return id; }
-
-void getTerminalObject() {}
 
 GameObjectExposure::Value::Object GameObject::describe() {
 
@@ -107,6 +57,7 @@ bool GameObject::isUpdateDomainPaused(WindowManager &wm) {
       if (!wm.isWindowPaused(id))
         return true;
     }
+
     return false;
   };
 
@@ -123,10 +74,10 @@ bool GameObject::isUpdateDomainPaused(WindowManager &wm) {
   return true;
 }
 
-GameObject *GameObject::findGameObjectById(float id) {
-  for (auto *obj : GameObject::getGameObjects()) {
-    if (obj->getId() == static_cast<unsigned int>(id))
-      return obj;
-  }
-  return nullptr;
+void GameObject::destroyLater() { pendingDestroy = true; }
+
+bool GameObject::isPendingDestroy() const { return pendingDestroy; }
+
+void GameObject::setUpdateDomain(const UpdateDomain &newDomain) {
+  updateDomain = newDomain;
 }

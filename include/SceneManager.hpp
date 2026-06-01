@@ -1,41 +1,39 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
 
-#include "SceneContext.hpp"
+struct GeneralContext;
 
-#include "RenderableObject.hpp"
+#include "Scene.hpp"
+
+class Engine;
 
 class SceneManager {
 public:
-  // scene setup fn should be part of a scene class
-  using SceneSetupFn = std::function<void(SceneBuilder::SceneContext)>;
+  using SceneFactory = std::function<std::unique_ptr<Scene>()>;
   using SceneNameList = std::vector<std::string>;
-
-  void registerScene(const std::string &name, const SceneSetupFn &setup);
+  void registerScene(const std::string &name, SceneFactory factory);
   bool loadScene(const std::string &name, Engine &engine);
   void reloadCurrentScene(Engine &engine);
+  void update(const GeneralContext &ctx, const Scene::Context &sceneContext);
+  Scene *getCurrentScene();
   bool isTransitioning();
-
-  void update(SceneBuilder::SceneContext ctx);
 
   [[nodiscard]] SceneNameList getRegisteredScenes() const;
 
-  SceneManager() = default;
-  SceneManager(const WindowManager &) = delete;
-  SceneManager &operator=(const WindowManager &) = delete;
-  SceneManager(WindowManager &&) = delete;
-  SceneManager &operator=(WindowManager &&) = delete;
-
 private:
   void beginTransition(const std::string &nextScene, Engine &engine);
-  void unloadCurrentScene();
-  void initFadeOverlay(Engine &engine);
 
-  std::unordered_map<std::string, SceneSetupFn> scenes;
-  std::string currentScene;
+  void unloadCurrentScene();
+
+  std::unordered_map<std::string, SceneFactory> scenes;
+
+  std::unique_ptr<Scene> currentScene;
+
+  std::string currentSceneName;
   std::string queuedScene;
 
   bool transitioning = false;
@@ -43,6 +41,4 @@ private:
 
   float transitionTimer = 0.f;
   float transitionDuration = 0.5f;
-
-  RenderableObject *fadeOverlay = nullptr;
 };

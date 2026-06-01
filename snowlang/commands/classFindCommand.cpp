@@ -36,8 +36,9 @@ RuntimeValue findClassCommand(const CommandContext &ctx) {
     return ids;
   }
 
-  for (auto *obj : GameObject::getGameObjects()) {
-    if (it->second(obj)) {
+  for (const auto &obj :
+       ctx.snowlang.engineRef->getSceneManager().getCurrentScene()->getObjects()) {
+    if (it->second(obj.get())) {
       ids.emplace_back(static_cast<float>(obj->getId()));
       if (ids.size() >= max) {
         break;

@@ -3,6 +3,7 @@
 #include "GameObject.hpp"
 #include "RuntimeValue.hpp"
 #include "Scripter.hpp"
+#include "SnowlangInstance.hpp"
 #include "TangibleObject.hpp"
 
 namespace Snowlang::Commands {
@@ -29,7 +30,8 @@ RuntimeValue addScriptCommand(const CommandContext &ctx) {
   }
 
   auto id = SnowlangHelper::RuntimeValueTo<float>(ctx.cmd.span)(ctx.args[0]);
-  GameObject *object = GameObject::findGameObjectById(id);
+  GameObject *object =
+      ctx.snowlang.engineRef->getSceneManager().getCurrentScene()->findObjectById((size_t)id);
 
   const auto &objectType = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[1]);
   const auto &scriptName = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[2]);

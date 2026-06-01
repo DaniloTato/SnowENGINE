@@ -9,9 +9,9 @@ std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
     : window(params.window), texture(params.texture), color(sf::Color::White),
-      assignedCamera(params.camera), engine(params.engine), layer(params.layer),
-      paralax(params.parallax), show(true), showCountDown(0.f),
-      hasCulling(true) {
+      engine(params.engine), layer(params.layer), paralax(params.parallax),
+      show(true), showCountDown(0.f), hasCulling(true),
+      assignedCamera(params.camera) {
 
   if (texture) {
     sprite.setTexture(*texture);
@@ -43,9 +43,7 @@ WindowID Renderizer::getWindow() const { return window; }
 
 bool Renderizer::isVisible() const {
 
-  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
-
-  float zoom = assignedCamera ? view.getZoom() : 1.f;
+  float zoom = assignedCamera->getZoom();
 
   float x = sprite.getPosition().x;
   float y = sprite.getPosition().y;
@@ -68,9 +66,9 @@ bool Renderizer::isVisible() const {
 void Renderizer::render(GameObject *obj) {
   sf::Vector2f position = obj->position + obj->offset;
 
-  sprite.setColor(color);
+  const CameraView &view = assignedCamera->buildView();
 
-  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
+  sprite.setColor(color);
 
   sf::Vector2f screenPos;
 
@@ -115,7 +113,7 @@ void Renderizer::renderRectShape(GameObject *obj) {
   sf::RectangleShape rectShape;
   rectShape.setFillColor(color);
 
-  const CameraView &view = engine.getCameraManager().buildView(assignedCamera);
+  const CameraView &view = assignedCamera->buildView();
 
   if (!assignedCamera) {
     rectShape.setPosition(position);

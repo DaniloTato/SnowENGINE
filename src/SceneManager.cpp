@@ -1,20 +1,22 @@
 #include "SceneManager.hpp"
-#include "Constants.hpp"
-#include "GameObject.hpp"
+
+#include "Engine.hpp"
 #include "GameState.hpp"
-#include "SceneContext.hpp"
+#include "Scene.hpp"
 
 void SceneManager::registerScene(const std::string &name,
-                                 const SceneSetupFn &setup) {
-  scenes[name] = setup;
+                                 SceneFactory factory) {
+
+  scenes[name] = std::move(factory);
 }
 
 bool SceneManager::loadScene(const std::string &name, Engine &engine) {
+
   if (transitioning) {
     return true;
   }
 
-  if (scenes.find(name) == scenes.end()) {
+  if (!scenes.contains(name)) {
     return false;
   }
 
@@ -24,89 +26,68 @@ bool SceneManager::loadScene(const std::string &name, Engine &engine) {
 }
 
 void SceneManager::reloadCurrentScene(Engine &engine) {
-  loadScene(currentScene, engine);
+
+  loadScene(currentSceneName, engine);
 }
 
 void SceneManager::beginTransition(const std::string &nextScene,
                                    Engine &engine) {
+
   transitioning = true;
   fadingOut = true;
+
   transitionTimer = 0.f;
+
   queuedScene = nextScene;
-
-  initFadeOverlay(engine);
 }
 
-void SceneManager::unloadCurrentScene() {
+void SceneManager::unloadCurrentScene() { currentScene.reset(); }
 
-  SceneAware::notifySceneUnload();
-  GameObject::destroySceneObjects();
-}
+void SceneManager::update(const GeneralContext &ctx,
+                          const Scene::Context &sceneContext) {
 
-void SceneManager::update(SceneBuilder::SceneContext ctx) {
-  if (!transitioning)
+  if (currentScene) {
+    currentScene->update(ctx);
+  }
+
+  if (!transitioning) {
     return;
+  }
 
   float dt = GameState::getInstance().dt();
+
   transitionTimer += dt;
 
   float t = transitionTimer / transitionDuration;
-  if (t > 1.f)
-    t = 1.f;
+
+  t = std::min(t, 1.f);
 
   if (fadingOut) {
-    auto alpha = static_cast<sf::Uint8>(255.f * t);
-    fadeOverlay->renderizer.setColor(sf::Color(0, 0, 0, alpha));
 
     if (t >= 1.f) {
       unloadCurrentScene();
-      scenes[queuedScene](ctx);
-      currentScene = queuedScene;
-
+      currentScene = scenes[queuedScene]();
+      currentScene->setup(sceneContext);
+      currentSceneName = queuedScene;
       fadingOut = false;
       transitionTimer = 0.f;
     }
   } else {
-    auto alpha = static_cast<sf::Uint8>(255.f * (1.f - t));
-    fadeOverlay->renderizer.setColor(sf::Color(0, 0, 0, alpha));
-
     if (t >= 1.f) {
-      fadeOverlay->renderizer.setColor(sf::Color(0, 0, 0, 0));
       transitioning = false;
     }
   }
 }
 
+Scene *SceneManager::getCurrentScene() { return currentScene.get(); }
+
 bool SceneManager::isTransitioning() { return transitioning; }
-
-void SceneManager::initFadeOverlay(Engine &engine) {
-  if (fadeOverlay)
-    return;
-
-  sf::Texture dummyTexture;
-
-  RenderizerParameters params{.engine = engine,
-                              .window = engine.getWindowManager().getMain(),
-                              .texture = &dummyTexture,
-                              .camera = CameraID(),
-                              .layer = Constants::OVERLAY_LAYER,
-                              .parallax = 1.f,
-                              .registerAsRectShape = true};
-
-  fadeOverlay = new RenderableObject(params);
-  fadeOverlay->renderizer.setRect(
-      {0, 0, Constants::SCREEN_WIDTH, Constants::SCREEN_HEIGHT}, 1);
-  fadeOverlay->makePersistentAcrossScenes();
-  fadeOverlay->renderizer.setColor(sf::Color(0, 0, 0, 0));
-}
 
 SceneManager::SceneNameList SceneManager::getRegisteredScenes() const {
   SceneNameList result;
   result.reserve(scenes.size());
-
   for (const auto &[name, _] : scenes) {
     result.push_back(name);
   }
-
   return result;
 }

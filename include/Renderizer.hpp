@@ -1,5 +1,4 @@
 #pragma once
-#include "CameraID.hpp"
 #include "GameObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Sprite.hpp"
@@ -54,7 +53,6 @@ protected:
   sf::Texture *texture;
   sf::IntRect rect;
   sf::Color color;
-  CameraID assignedCamera;
   Engine &engine;
   float layer;
   float paralax;
@@ -66,4 +64,5 @@ protected:
   bool hasCulling;
 
   static std::vector<RenderEntry> registry;
+  GameCamera *assignedCamera;
 };

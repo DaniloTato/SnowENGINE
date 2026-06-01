@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CameraID.hpp"
 #include "WindowID.hpp"
 #include <SFML/Graphics.hpp>
 
@@ -11,7 +10,7 @@ struct RenderizerParameters {
   Engine &engine;
   WindowID window;
   sf::Texture *texture = nullptr;
-  CameraID camera;
+  GameCamera *camera;
   float layer = 0.f;
   float parallax = 1.f;
   bool registerAsRectShape = false;
