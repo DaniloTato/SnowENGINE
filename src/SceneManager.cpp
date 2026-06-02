@@ -1,93 +1,109 @@
 #include "SceneManager.hpp"
 
-#include "Engine.hpp"
 #include "GameState.hpp"
-#include "Scene.hpp"
+#include "SceneBuilderRegistry.hpp"
 
-void SceneManager::registerScene(const std::string &name,
-                                 SceneFactory factory) {
-
-  scenes[name] = std::move(factory);
-}
-
-bool SceneManager::loadScene(const std::string &name, Engine &engine) {
-
-  if (transitioning) {
-    return true;
-  }
-
-  if (!scenes.contains(name)) {
+bool SceneManager::openScene(const std::string &slot,
+                             const std::string &sceneName,
+                             const Scene::Context &ctx) {
+  if (activeScenes.contains(slot)) {
     return false;
   }
+  auto factory = SceneBuilderRegistry::get(sceneName);
+  auto scene = factory();
+  scene->setup(ctx);
 
-  beginTransition(name, engine);
+  lifecycle.queueCreate(slot, SceneInstance(sceneName, std::move(scene)));
 
   return true;
 }
 
-void SceneManager::reloadCurrentScene(Engine &engine) {
+bool SceneManager::transitionScene(const std::string &slot,
+                                   const std::string &sceneName) {
+  auto it = activeScenes.find(slot);
 
-  loadScene(currentSceneName, engine);
-}
-
-void SceneManager::beginTransition(const std::string &nextScene,
-                                   Engine &engine) {
-
-  transitioning = true;
-  fadingOut = true;
-
-  transitionTimer = 0.f;
-
-  queuedScene = nextScene;
-}
-
-void SceneManager::unloadCurrentScene() { currentScene.reset(); }
-
-void SceneManager::update(const GeneralContext &ctx,
-                          const Scene::Context &sceneContext) {
-
-  if (currentScene) {
-    currentScene->update(ctx);
+  if (it == activeScenes.end()) {
+    return false;
   }
 
-  if (!transitioning) {
-    return;
+  it->second.transitioning = true;
+  it->second.fadingOut = true;
+  it->second.timer = 0.f;
+  it->second.queuedScene = sceneName;
+
+  return true;
+}
+
+void SceneManager::closeScene(const std::string &slot) {
+  lifecycle.queueDestroy(slot);
+}
+
+Scene *SceneManager::getScene(const std::string &slot) {
+  auto it = activeScenes.find(slot);
+
+  if (it == activeScenes.end()) {
+    return nullptr;
+  }
+
+  return it->second.scene.get();
+}
+
+void SceneManager::update(const GeneralContext &ctx,
+                          const Scene::Context &sceneCtx) {
+  for (auto &[_, instance] : activeScenes) {
+
+    if (instance.scene) {
+      instance.scene->update(ctx);
+    }
   }
 
   float dt = GameState::getInstance().dt();
 
-  transitionTimer += dt;
+  for (auto &[_, instance] : activeScenes) {
 
-  float t = transitionTimer / transitionDuration;
-
-  t = std::min(t, 1.f);
-
-  if (fadingOut) {
-
-    if (t >= 1.f) {
-      unloadCurrentScene();
-      currentScene = scenes[queuedScene]();
-      currentScene->setup(sceneContext);
-      currentSceneName = queuedScene;
-      fadingOut = false;
-      transitionTimer = 0.f;
+    if (!instance.transitioning) {
+      continue;
     }
-  } else {
-    if (t >= 1.f) {
-      transitioning = false;
+
+    instance.timer += dt;
+
+    float t = instance.timer / instance.duration;
+    t = std::min(t, 1.f);
+
+    if (instance.fadingOut) {
+
+      if (t >= 1.f) {
+
+        auto factory = SceneBuilderRegistry::get(instance.queuedScene);
+
+        auto replacement = factory();
+
+        replacement->setup(sceneCtx);
+
+        instance.scene = std::move(replacement);
+        instance.name = instance.queuedScene;
+
+        instance.fadingOut = false;
+        instance.timer = 0.f;
+      }
+
+    } else {
+
+      if (t >= 1.f) {
+        instance.transitioning = false;
+      }
     }
   }
+
+  lifecycle.apply(activeScenes);
 }
 
-Scene *SceneManager::getCurrentScene() { return currentScene.get(); }
+bool SceneManager::reloadScene(const std::string &slot) {
+  auto it = activeScenes.find(slot);
 
-bool SceneManager::isTransitioning() { return transitioning; }
-
-SceneManager::SceneNameList SceneManager::getRegisteredScenes() const {
-  SceneNameList result;
-  result.reserve(scenes.size());
-  for (const auto &[name, _] : scenes) {
-    result.push_back(name);
+  if (it == activeScenes.end()) {
+    return false;
   }
-  return result;
+
+  return transitionScene(slot, it->second.name);
 }

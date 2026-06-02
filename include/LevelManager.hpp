@@ -46,6 +46,7 @@ public:
 
   struct LevelRenderContext {
     Engine *engine;
+    Scene *scene;
     WindowID window;
     GameCamera *camera;
   };
@@ -66,7 +67,7 @@ public:
   LevelManager(WindowManager &&) = delete;
   LevelManager &operator=(WindowManager &&) = delete;
 
-  void initializeRenderContext(Engine &engine, WindowID window,
+  void initializeRenderContext(Engine &engine, Scene &scene, WindowID window,
                                GameCamera *camera);
 
   void loadLevel(const std::string &path);

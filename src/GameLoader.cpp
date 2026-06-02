@@ -6,7 +6,6 @@
 #include "CollectableManager.hpp"
 #include "EnemyRegistry.hpp"
 #include "Helpers.hpp"
-#include "SceneBuilderRegistry.hpp"
 #include "SceneManager.hpp"
 #include "SoundManager.hpp"
 #include "TextureManager.hpp"
@@ -59,21 +58,23 @@ void GameLoader::loadCollectables(const std::string &path) {
   }
 }
 
-void GameLoader::loadScenes(const std::string &path, Engine &engine) {
-
+void GameLoader::loadScenes(const std::string &path, Engine &engine,
+                            WindowID defaultSceneWindow) {
   std::ifstream file(path);
+
   nlohmann::json data;
+
   file >> data;
 
-  for (auto &[name, func] : SceneBuilderRegistry::getAllItems()) {
-    std::cout << "Resgistered scene " + name << "\n";
-    engine.getSceneManager().registerScene(name, func);
-  }
+  engine.getSceneManager().openScene(
+      "main", data["default"],
+      Scene::Context{.engine = &engine, .mainWindow = defaultSceneWindow}
 
-  engine.getSceneManager().loadScene(data["default"], engine);
+  );
 }
 
-void GameLoader::loadGameData(const std::string &configFolder, Engine &engine) {
+void GameLoader::loadGameData(const std::string &configFolder, Engine &engine,
+                              WindowID defaultSceneWindow) {
   loadEnemies(
       Helper::getPath(configFolder + "/enemieManagerDeclarations.json"));
   loadCollectables(
@@ -82,7 +83,7 @@ void GameLoader::loadGameData(const std::string &configFolder, Engine &engine) {
   loadTextures(
       Helper::getPath(configFolder + "/textureManagerDeclarations.json"));
   loadScenes(Helper::getPath(configFolder + "/sceneManagerDeclarations.json"),
-             engine);
+             engine, defaultSceneWindow);
 }
 
 void GameLoader::loadTextures(const std::string &path) {

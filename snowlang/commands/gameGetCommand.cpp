@@ -8,11 +8,11 @@ namespace Snowlang::Commands {
 namespace {
 
 static GameObject *findGameObjectById(float id, Engine &engine) {
-  for (const auto &obj : engine.getSceneManager().getCurrentScene()->getObjects()) {
-    if (obj->getId() == static_cast<unsigned int>(id)) {
-      return obj.get();
-    }
-  }
+  // for (const auto &obj : engine.getSceneManager().getCurrentScene()->getObjects()) {
+  //   if (obj->getId() == static_cast<unsigned int>(id)) {
+  //     return obj.get();
+  //   }
+  // }
   return nullptr;
 }
 

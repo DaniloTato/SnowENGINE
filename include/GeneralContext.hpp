@@ -6,12 +6,19 @@
 
 struct GeneralContext {
   TangibleObject *player;
+  WindowID mainWindow;
   GameCamera *mainCamera;
   Engine *engine;
+  Scene *gameScene;
 };
 
 struct EmptyContext : public GeneralContext {
   EmptyContext()
       : GeneralContext{
-            .player = nullptr, .mainCamera = nullptr, .engine = nullptr} {}
+            .player = nullptr,
+            .mainWindow = WindowID(),
+            .mainCamera = nullptr,
+            .engine = nullptr,
+            .gameScene = nullptr,
+        } {}
 };

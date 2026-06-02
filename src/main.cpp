@@ -13,7 +13,6 @@
 #include "LevelManager.hpp"
 #include "Renderizer.hpp"
 #include "SceneManager.hpp"
-#include "Terminal.hpp"
 #include "WindowLifecycleListener.hpp"
 
 /*Helpers*/
@@ -52,7 +51,7 @@ int main() {
       (Helper::getPath("config/control_config.json")));
 
   GameLoader loader;
-  loader.loadGameData(Helper::getPath("config"), engine);
+  loader.loadGameData(Helper::getPath("config"), engine, mainWindow);
 
   sf::Clock clock;
 
@@ -70,16 +69,14 @@ int main() {
         gameState.getGeneralContext(),
         Scene::Context{.engine = &engine, .mainWindow = mainWindow});
 
-    if (!sceneManager.isTransitioning()) {
-      levelManager.applyQueuedTileChanges();
-      dialogueManager.applyQueues();
-      BulletManager::getInstance().applyQueues();
-      EnemyManager::getInstance().applyQueues();
-      CollectableManager::getInstance().applyQueues();
-      BulletManager::getInstance().update();
-      Terminal::destroyKilledTerminals(windowManager);
-      windowManager.applyDestroyQueue();
-    }
+    // now we dont block instances of managers when transitioning scenes.
+    levelManager.applyQueuedTileChanges();
+    dialogueManager.applyQueues();
+    BulletManager::getInstance().applyQueues();
+    EnemyManager::getInstance().applyQueues();
+    CollectableManager::getInstance().applyQueues();
+    BulletManager::getInstance().update();
+    windowManager.applyDestroyQueue();
 
     for (const auto &[id, entry] : windows) {
 

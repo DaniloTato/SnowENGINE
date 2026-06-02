@@ -116,9 +116,9 @@ void LevelManager::loadLayer(size_t layerNo, const json &layerJSON,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    info.object = TileFactory::create(
-        *renderContext.engine->getSceneManager().getCurrentScene(), info,
-        makeRenderParams(layerNo), Constants::TILE_SIZE);
+    info.object =
+        TileFactory::create(*renderContext.scene, info,
+                            makeRenderParams(layerNo), Constants::TILE_SIZE);
 
     tileList.push_back(info);
 
@@ -142,9 +142,9 @@ void LevelManager::reloadLayer(size_t layerNo) {
 
   for (auto &t : tiles) {
     TileFactory::destroy(t.object);
-    t.object = TileFactory::create(
-        *renderContext.engine->getSceneManager().getCurrentScene(), t,
-        makeRenderParams(layerNo), Constants::TILE_SIZE);
+    t.object =
+        TileFactory::create(*renderContext.scene, t, makeRenderParams(layerNo),
+                            Constants::TILE_SIZE);
   }
 }
 
@@ -189,9 +189,10 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
 
       t.textureRect = rect;
 
-      t.object = TileFactory::create(
-          *renderContext.engine->getSceneManager().getCurrentScene(), t,
-          makeRenderParams(layerNo), Constants::TILE_SIZE);
+      // HARDCODED MAIN SCENE. MAGIC STRING
+      t.object =
+          TileFactory::create(*renderContext.scene, t,
+                              makeRenderParams(layerNo), Constants::TILE_SIZE);
 
       return;
     }
@@ -206,9 +207,9 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  info.object = TileFactory::create(
-      *renderContext.engine->getSceneManager().getCurrentScene(), info,
-      makeRenderParams(layerNo), Constants::TILE_SIZE);
+  info.object =
+      TileFactory::create(*renderContext.scene, info, makeRenderParams(layerNo),
+                          Constants::TILE_SIZE);
 
   tiles.push_back(info);
 }
@@ -371,9 +372,11 @@ void LevelManager::ensureLevelLoaded() const {
   }
 }
 
-void LevelManager::initializeRenderContext(Engine &engine, WindowID window,
+void LevelManager::initializeRenderContext(Engine &engine, Scene &scene,
+                                           WindowID window,
                                            GameCamera *camera) {
   renderContext.engine = &engine;
+  renderContext.scene = &scene;
   renderContext.window = window;
   renderContext.camera = camera;
 }

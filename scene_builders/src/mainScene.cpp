@@ -34,7 +34,7 @@ void MainScene::setup(Scene::Context ctx) {
   GameCamera *uiCamera =
       this->create(CameraBuilder().updateDomain(WindowManager::Set::MAIN));
 
-  levelManager.initializeRenderContext(engine, mainWindow, mainCamera);
+  levelManager.initializeRenderContext(engine, *this, mainWindow, mainCamera);
 
   levelManager.loadLevel(Helper::getPath("assets/levels/Level1.json"));
 
@@ -76,8 +76,11 @@ void MainScene::setup(Scene::Context ctx) {
 
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
-  GeneralContext generalContext{
-      .player = image, .mainCamera = mainCamera, .engine = &engine};
+  GeneralContext generalContext{.player = image,
+                                .mainWindow = ctx.mainWindow,
+                                .mainCamera = mainCamera,
+                                .engine = &engine,
+                                .gameScene = this};
 
   GameState::getInstance().updateGeneralContext(generalContext);
 }

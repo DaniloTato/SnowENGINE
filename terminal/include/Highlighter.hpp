@@ -3,5 +3,5 @@
 
 class Highlighter {
 public:
-  std::string applyParenHighlight(const std::string &input);
+  [[nodiscard]] std::string applyParenHighlight(const std::string &input) const;
 };

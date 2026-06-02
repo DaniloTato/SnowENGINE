@@ -1,61 +1,59 @@
 #pragma once
-#include "GameText.hpp"
+
 #include "Highlighter.hpp"
 #include "IEventListener.hpp"
 #include "SnowTermIO.hpp"
 #include "SnowlangInstance.hpp"
 
+#include <deque>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 class Terminal : public IEventListener {
 public:
-  Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
-           Engine &engine, sf::Texture *fontTexture);
-
-  ~Terminal() override;
+  Terminal();
+  ~Terminal() override = default;
 
   void handleEvent(WindowID windowId, const sf::Event &event) override;
 
-  [[nodiscard]] WindowID getTargetWindow() const;
+  void update();
 
   void kill();
   void close();
   void clear();
 
-  void update();
-
-  [[nodiscard]] bool isOpen() const;
-
-  static void destroyKilledTerminals(WindowManager &wm);
-
-  [[nodiscard]] bool destroysWindowOnClose() const;
+  [[nodiscard]]
+  bool isOpen() const;
 
   void print(std::string_view message, std::string_view color = {});
+
   void printLn(std::string_view message, std::string_view color = {});
+
+  [[nodiscard]]
+  std::string buildMarkup() const;
 
   Highlighter highlighter;
 
 private:
-  WindowID targetWindow;
-
-  std::unordered_map<std::string, std::string> aliases;
-
-  Snowlang::SnowTermIO snowlangIO;
-  Snowlang::SnowlangInstance snowlang;
-
-  GameText *text;
-
-  enum class LineType : u_int8_t { Raw, Markup };
+  enum class LineType : uint8_t { Raw, Markup };
 
   struct TerminalLine {
     std::string text;
     LineType type = LineType::Raw;
   };
 
+private:
+  Snowlang::SnowTermIO snowlangIO;
+  Snowlang::SnowlangInstance snowlang;
+
+  std::unordered_map<std::string, std::string> aliases;
+
   std::deque<TerminalLine> history;
   std::vector<std::string> inputHistory;
+
   std::string input;
   std::string currentLine;
-
-  static std::vector<Terminal *> s_activeTerminals;
 
   bool opened = true;
   bool destroyWindowOnClose = false;
@@ -66,10 +64,11 @@ private:
   std::string savedInput;
 
 private:
-  void rebuildText();
   void executeSnowlang();
   void trimHistoryToFit();
   void commitLine();
-  std::string escapeInput(const std::string &s);
-  size_t countVisualLines(const TerminalLine &line);
+
+  [[nodiscard]] std::string escapeInput(const std::string &s) const;
+
+  [[nodiscard]] size_t countVisualLines(const TerminalLine &line) const;
 };

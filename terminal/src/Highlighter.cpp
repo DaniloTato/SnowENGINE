@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-std::string Highlighter::applyParenHighlight(const std::string &input) {
+std::string Highlighter::applyParenHighlight(const std::string &input) const {
   static const std::vector<std::string> DEPTH_COLORS = {
       "#FFD700", "#00FFFF", "#7FFF00", "#FF69B4", "#FFA500", "#9370DB"};
 

@@ -1,5 +1,6 @@
 #include "Commands.hpp"
 #include "RuntimeValue.hpp"
+#include "SceneBuilderRegistry.hpp"
 #include "SceneManager.hpp"
 #include "SnowlangHelper.hpp"
 #include "SnowlangInstance.hpp"
@@ -8,20 +9,22 @@ namespace Snowlang::Commands {
 
 RuntimeValue sceneCommand(const CommandContext &ctx) {
 
-  auto &sceneManager = ctx.snowlang.engineRef->getSceneManager();
+  // auto &sceneManager = ctx.snowlang.engineRef->getSceneManager();
 
   // --reload
   if (ctx.hasFlag("reload")) {
-    sceneManager.reloadCurrentScene(*ctx.snowlang.engineRef);
+    // sceneManager.reloadCurrentScene(*ctx.snowlang.engineRef);
     return {true};
   }
 
   if (ctx.hasFlag("print")) {
     auto filter = ctx.getFlag<std::string>("print", "");
 
-    const auto scenes = sceneManager.getRegisteredScenes();
+    // tight coupling
+    const std::unordered_map<std::string, SceneManager::SceneFactory> &scenes =
+        SceneBuilderRegistry::getAllItems();
 
-    for (const auto &name : scenes) {
+    for (const auto &[name, func] : scenes) {
       if (filter.empty() || name.find(filter) != std::string::npos) {
         ctx.snowlang.io.writeLn("\"" + name + "\"");
       }
@@ -37,7 +40,8 @@ RuntimeValue sceneCommand(const CommandContext &ctx) {
 
   const auto &sceneName = SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[0]);
 
-  bool success = sceneManager.loadScene(sceneName, *ctx.snowlang.engineRef);
+  bool success = true;
+  // bool success = sceneManager.loadScene(sceneName, *ctx.snowlang.engineRef);
 
   if (!success) {
     throwError(SnowErr::Phase::Evaluator,

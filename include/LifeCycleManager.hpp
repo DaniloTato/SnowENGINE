@@ -1,7 +1,7 @@
 #include <memory>
 #include <vector>
 
-template <typename T> class LifecycleManager {
+template <typename T> class VectorLifecycle {
 public:
   using ObjectPtr = std::unique_ptr<T>;
 

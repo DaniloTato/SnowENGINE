@@ -43,3 +43,5 @@ _PIORITY_
 
 - Move on from QueuedManager inherited classes
 - Replace all instances of QueuedManager with LifeCycleManager. Composition over inheritance.
+
+- Make LevelManager part of Scene.

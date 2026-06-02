@@ -28,7 +28,7 @@ const std::unordered_map<std::string_view, ClassCheck> s_ClassChecks = {
 RuntimeValue findClassCommand(const CommandContext &ctx) {
   RuntimeValue::List ids;
 
-  size_t max = static_cast<size_t>(ctx.getFlag<float>("max", 10000.f));
+  // size_t max = static_cast<size_t>(ctx.getFlag<float>("max", 10000.f));
 
   auto it =
       s_ClassChecks.find(SnowlangHelper::RuntimeValueTo<std::string>(ctx.cmd.span)(ctx.args[0]));
@@ -36,15 +36,15 @@ RuntimeValue findClassCommand(const CommandContext &ctx) {
     return ids;
   }
 
-  for (const auto &obj :
-       ctx.snowlang.engineRef->getSceneManager().getCurrentScene()->getObjects()) {
-    if (it->second(obj.get())) {
-      ids.emplace_back(static_cast<float>(obj->getId()));
-      if (ids.size() >= max) {
-        break;
-      }
-    }
-  }
+  // for (const auto &obj :
+  //      ctx.snowlang.engineRef->getSceneManager().getCurrentScene()->getObjects()) {
+  //   if (it->second(obj.get())) {
+  //     ids.emplace_back(static_cast<float>(obj->getId()));
+  //     if (ids.size() >= max) {
+  //       break;
+  //     }
+  //   }
+  // }
 
   if (ctx.hasFlag("print")) {
     ctx.snowlang.io.writeLn("Found " + std::to_string(ids.size()) + " objects:\n");

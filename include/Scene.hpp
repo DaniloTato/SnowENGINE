@@ -36,7 +36,7 @@ public:
 
 protected:
   std::vector<std::unique_ptr<GameObject>> objects;
-  LifecycleManager<GameObject> lifecycle;
+  VectorLifecycle<GameObject> lifecycle;
 };
 
 template <typename Builder>
