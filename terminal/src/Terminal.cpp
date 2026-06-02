@@ -55,7 +55,6 @@ Terminal::Terminal(WindowID window, GameCamera *camera, GameCamera *tileCamera,
 
   s_activeTerminals.push_back(this);
   text->position = {10.f, 10.f};
-  text->makePersistentAcrossScenes();
 
   history.emplace_back(TerminalLine{
       .text =

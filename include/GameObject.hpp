@@ -29,9 +29,6 @@ public:
   virtual ~GameObject() = default;
   virtual void update(const GeneralContext &ctx) = 0;
 
-  void makePersistentAcrossScenes();
-  [[nodiscard]] bool isPersistentAcrossScenes() const;
-
   virtual std::shared_ptr<GameObjectExposure::Descriptor> describe();
   unsigned int getId();
   bool isUpdateDomainPaused(WindowManager &wm);
@@ -48,7 +45,6 @@ public:
   GameObject &operator=(const GameObject &) = delete;
 
 protected:
-  bool persistentAcrossScenes = false;
   bool pendingDestroy = false;
 
 private:

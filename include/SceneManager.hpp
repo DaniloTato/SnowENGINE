@@ -26,13 +26,9 @@ public:
 
 private:
   void beginTransition(const std::string &nextScene, Engine &engine);
-
   void unloadCurrentScene();
-
   std::unordered_map<std::string, SceneFactory> scenes;
-
   std::unique_ptr<Scene> currentScene;
-
   std::string currentSceneName;
   std::string queuedScene;
 

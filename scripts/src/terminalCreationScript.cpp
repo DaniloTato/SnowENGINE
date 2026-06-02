@@ -27,7 +27,7 @@ void terminalCreationScript(ScriptRunner &renderable,
 
       GameCamera *terminalCamera =
           ctx.engine->getSceneManager().getCurrentScene()->create(
-              CameraBuilder().persistent().updateDomain(terminalWindow));
+              CameraBuilder().updateDomain(terminalWindow));
 
       s_terminal = new Terminal(terminalWindow, terminalCamera, ctx.mainCamera,
                                 *ctx.engine,

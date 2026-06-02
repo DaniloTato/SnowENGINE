@@ -21,12 +21,6 @@ bool GameObject::UpdateDomain::matches(WindowManager &wm, WindowID id) const {
 GameObject::GameObject(UpdateDomain updateDomain, sf::Vector2f pos)
     : position(pos), id(nextId++), updateDomain(std::move(updateDomain)) {}
 
-void GameObject::makePersistentAcrossScenes() { persistentAcrossScenes = true; }
-
-bool GameObject::isPersistentAcrossScenes() const {
-  return persistentAcrossScenes;
-}
-
 unsigned int GameObject::getId() { return id; }
 
 GameObjectExposure::Value::Object GameObject::describe() {

@@ -2,11 +2,6 @@
 #include "GameCamera.hpp"
 #include <memory>
 
-CameraBuilder &CameraBuilder::persistent(bool v) {
-  isPersistent = v;
-  return *this;
-}
-
 CameraBuilder &CameraBuilder::updateDomain(GameObject::UpdateDomain d) {
   domain = std::move(d);
   return *this;
@@ -35,10 +30,6 @@ std::unique_ptr<GameCamera> CameraBuilder::create() const {
   cam->zoomTo(zoomLevel);
   cam->goToDesired();
   cam->zoomToDesired();
-
-  if (isPersistent) {
-    cam->makePersistentAcrossScenes();
-  }
 
   if (scriptFunc) {
     cam->scripter.addScript(scriptFunc);

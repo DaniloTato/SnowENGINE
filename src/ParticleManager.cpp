@@ -11,9 +11,7 @@
 #include <memory>
 
 ParticleManager::ParticleManager()
-    : GameObject(UpdateDomain{WindowManager::Set::MAIN}) {
-  persistentAcrossScenes = true;
-}
+    : GameObject(UpdateDomain{WindowManager::Set::MAIN}) {}
 
 /* HARDCODED PARTICLE ANIMATIONS PATH */
 
