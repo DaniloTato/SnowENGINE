@@ -38,5 +38,8 @@
 
 _PIORITY_
 
-- Remove static gameObjectRegistry from GameObject class.
-- Make Scenes the ones that have the responsability of handling the lifetime of GameObjects.
+- Remove static gameObjectRegistry from GameObject class. `DONE`
+- Make Scenes the ones that have the responsability of handling the lifetime of GameObjects. `DONE`
+
+- Move on from QueuedManager inherited classes
+- Replace all instances of QueuedManager with LifeCycleManager. Composition over inheritance.
