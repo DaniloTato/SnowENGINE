@@ -2,7 +2,7 @@
 #include "ColorPalette.hpp"
 #include "Constants.hpp"
 #include "GameState.hpp"
-#include "RenderCommand.hpp"
+#include "OldRenderCommand.hpp"
 #include "Renderizer.hpp"
 #include <algorithm>
 #include <cctype>
@@ -475,7 +475,7 @@ void GameText::updateRenderCommandBuffer() {
       pos.y += jitterY;
     }
 
-    RenderCommand render = {.rect = g.texRect, .pos = pos, .color = g.color};
+    OldRenderCommand render = {.rect = g.texRect, .pos = pos, .color = g.color};
     renderCommandBuffer.push_back(render);
   }
 }

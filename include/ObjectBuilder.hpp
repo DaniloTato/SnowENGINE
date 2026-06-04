@@ -2,9 +2,10 @@
 
 #include "AnimatedObject.hpp"
 #include "AnimationFactory.hpp"
-#include "RenderableObject.hpp"
+#include "CameraComponent.hpp"
 #include "RenderizerParameters.hpp"
 #include "ScriptRunner.hpp"
+#include "SpriteComponent.hpp"
 #include "TangibleObject.hpp"
 #include "TextureManager.hpp"
 
@@ -31,12 +32,16 @@ public:
   }
 
   ObjectBuilder &rectangle(int width, int height) {
+    hasSprite = true;
+
     params.registerAsRectShape = true;
     rectProportions = {0, 0, width, height};
     return *this;
   }
 
   ObjectBuilder &withTexture(std::string_view textureKey) {
+    hasSprite = true;
+
     params.texture = &TextureManager::getInstance().get(textureKey);
     return *this;
   }
@@ -49,26 +54,47 @@ public:
 
   ObjectBuilder &onCamera(GameCamera *camera) {
     params.camera = camera;
+    if (camera && camera->cameraComponent) {
+      myCamera = camera;
+    }
     return *this;
   }
 
   ObjectBuilder &onWindow(WindowID window) {
+    hasSprite = true;
+
     params.window = window;
     return *this;
   }
 
   ObjectBuilder &layer(float l) {
+    hasSprite = true;
+
     params.layer = l;
     return *this;
   }
 
   ObjectBuilder &parallax(float p) {
+    hasSprite = true;
+
     params.parallax = p;
     return *this;
   }
 
   ObjectBuilder &inUpdateDomain(GameObject::UpdateDomain domain) {
     objectUpdateDomain = std::move(domain);
+    return *this;
+  }
+
+  ObjectBuilder &withCameraComponent(Scene *scene, float zoom) {
+    hasCamera = true;
+    myScene = scene;
+    cameraZoom = zoom;
+    return *this;
+  }
+
+  ObjectBuilder &script(Scripter<T>::ScriptFunc script) {
+    scripts.push_back(script);
     return *this;
   }
 
@@ -79,7 +105,8 @@ public:
     if constexpr (std::is_same_v<T, TangibleObject>) {
       obj = std::make_unique<T>(params, animations);
 
-    } else if constexpr (std::is_same_v<T, ScriptRunner>) {
+    } else if constexpr (std::is_same_v<T, ScriptRunner> ||
+                         std::is_same_v<T, GameCamera>) {
       obj = std::make_unique<T>(objectUpdateDomain);
     } else {
       obj = std::make_unique<T>(params);
@@ -93,6 +120,29 @@ public:
 private:
   void configure(T &obj) const {
 
+    if (myCamera) {
+      myCamera->cameraComponent->subscribe(obj.getId());
+    }
+
+    if (hasCamera) {
+      auto camera = std::make_unique<CameraComponent>(myScene);
+
+      camera->goTo(position);
+      camera->zoomTo(cameraZoom);
+
+      obj.cameraComponent = camera.release();
+    }
+
+    if (hasSprite) {
+      auto sprite = std::make_unique<SpriteComponent>(params);
+
+      if (params.registerAsRectShape) {
+        sprite->setRect(rectProportions, 1);
+      }
+
+      obj.spriteComponent = sprite.release();
+    }
+
     if constexpr (std::is_same_v<T, AnimatedObject> ||
                   std::is_same_v<T, TangibleObject>) {
 
@@ -102,12 +152,14 @@ private:
       }
     }
 
-    if constexpr (std::is_same_v<T, RenderableObject> ||
-                  std::is_same_v<T, TangibleObject> ||
-                  std::is_same_v<T, AnimatedObject>) {
+    if constexpr (std::is_same_v<T, AnimatedObject> ||
+                  std::is_same_v<T, ScriptRunner> ||
+                  std::is_same_v<T, RenderableObject> ||
+                  std::is_same_v<T, GameCamera> ||
+                  std::is_same_v<T, TangibleObject>) {
 
-      if (params.registerAsRectShape) {
-        obj.renderizer.setRect(rectProportions, 1);
+      for (auto &script : scripts) {
+        obj.scripter.addScript(script);
       }
     }
 
@@ -118,6 +170,12 @@ private:
 
 private:
   bool hasAnimation = false;
+  bool hasCamera = false;
+  float cameraZoom = 1.f;
+  bool hasSprite = false;
+  GameCamera *myCamera = nullptr;
+  Scene *myScene = nullptr;
+  std::vector<typename Scripter<T>::ScriptFunc> scripts;
   GameObject::UpdateDomain objectUpdateDomain;
   sf::IntRect rectProportions;
   sf::Vector2f position;

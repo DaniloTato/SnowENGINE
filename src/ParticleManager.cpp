@@ -3,8 +3,8 @@
 #include "ColorPalette.hpp"
 #include "GameState.hpp"
 #include "Helpers.hpp"
+#include "OldRenderCommand.hpp"
 #include "PolyRenderizer.hpp"
-#include "RenderCommand.hpp"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -294,7 +294,7 @@ void ParticleManager::updateRenderCommandBuffer() {
 
   for (auto &p : particles) {
 
-    RenderCommand cmd;
+    OldRenderCommand cmd;
     cmd.rect = p.texRect;
     cmd.pos = p.pos;
     cmd.color = p.color;

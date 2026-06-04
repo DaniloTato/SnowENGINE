@@ -1,46 +1,51 @@
 #include "CameraView.hpp"
 #include "Constants.hpp"
 
-CameraView::CameraView(sf::Vector2f position, float zoom)
-    : position(position), zoom(zoom) {}
+CameraView::CameraView(sf::Vector2f position, float zoom,
+                       std::vector<RenderCommand> &&commands)
+    : position(position), zoom(zoom), commands(std::move(commands)) {}
 
 float CameraView::getZoom() const { return zoom; }
 
 sf::Vector2f CameraView::worldToScreen(const sf::Vector2f &worldPos,
-                                       float parallax) const {
-  if (parallax <= 0.f)
-    parallax = 1.f;
+                                       float paralax) const {
+  if (paralax <= 0.f)
+    paralax = 1.f;
 
-  sf::Vector2f base = worldPos - (position / parallax);
+  sf::Vector2f base = worldPos - (position / paralax);
   sf::Vector2f zoomOffset = (zoom - 1.f) * base;
 
-  float parallaxOffsetX =
-      ((-2 + Constants::SCREEN_WIDTH * (-1 + parallax)) / (2 * parallax) + 1);
+  float paralaxOffsetX =
+      ((-2 + Constants::SCREEN_WIDTH * (-1 + paralax)) / (2 * paralax) + 1);
 
-  float parallaxOffsetY =
-      ((-2 + Constants::SCREEN_HEIGHT * (-1 + parallax)) / (2 * parallax) + 1);
+  float paralaxOffsetY =
+      ((-2 + Constants::SCREEN_HEIGHT * (-1 + paralax)) / (2 * paralax) + 1);
 
-  sf::Vector2f parallaxOffset(parallaxOffsetX, parallaxOffsetY);
+  sf::Vector2f paralaxOffset(paralaxOffsetX, paralaxOffsetY);
 
-  return base + zoomOffset + parallaxOffset;
+  return base + zoomOffset + paralaxOffset;
 }
 
 sf::Vector2f CameraView::screenToWorld(const sf::Vector2f &screenPos,
-                                       float parallax) const {
-  if (parallax <= 0.f)
-    parallax = 1.f;
+                                       float paralax) const {
+  if (paralax <= 0.f)
+    paralax = 1.f;
 
-  float parallaxOffsetX =
-      ((-2 + Constants::SCREEN_WIDTH * (-1 + parallax)) / (2 * parallax) + 1);
+  float paralaxOffsetX =
+      ((-2 + Constants::SCREEN_WIDTH * (-1 + paralax)) / (2 * paralax) + 1);
 
-  float parallaxOffsetY =
-      ((-2 + Constants::SCREEN_HEIGHT * (-1 + parallax)) / (2 * parallax) + 1);
+  float paralaxOffsetY =
+      ((-2 + Constants::SCREEN_HEIGHT * (-1 + paralax)) / (2 * paralax) + 1);
 
-  sf::Vector2f parallaxOffset(parallaxOffsetX, parallaxOffsetY);
+  sf::Vector2f paralaxOffset(paralaxOffsetX, paralaxOffsetY);
 
-  sf::Vector2f base = (screenPos - parallaxOffset) / zoom;
+  sf::Vector2f base = (screenPos - paralaxOffset) / zoom;
 
-  sf::Vector2f world = base + (position / parallax);
+  sf::Vector2f world = base + (position / paralax);
 
   return world;
+}
+
+const std::vector<RenderCommand> &CameraView::getCommands() const {
+  return commands;
 }

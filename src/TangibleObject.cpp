@@ -1,20 +1,23 @@
 #include "TangibleObject.hpp"
 #include "GeneralContext.hpp"
 #include "SoundManager.hpp"
+#include "SpriteComponent.hpp"
 #include <SFML/Audio.hpp>
 
 TangibleObject::TangibleObject(RenderizerParameters params,
-                               Animations cachedAnimations)
-    : GameObject(UpdateDomain(params.window)), renderizer(params) {
+                               const Animations &cachedAnimations)
+    : GameObject(UpdateDomain(params.window)) {
   animator.setAnimations(cachedAnimations);
-  Renderizer::registerPair(this, &renderizer, params.registerAsRectShape);
 }
 
 void TangibleObject::update(const GeneralContext &ctx) {
   collider.computeCollisionGrid(position);
   scripter.runScripts(*this, ctx);
   animator.update();
-  renderizer.setRect(animator.getCurrentFrame(), direction);
+
+  if (spriteComponent) {
+    spriteComponent->setRect(animator.getCurrentFrame(), direction);
+  }
 }
 
 void TangibleObject::playSound(const std::string &id, float volume) {

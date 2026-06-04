@@ -8,13 +8,13 @@ PolyRenderizer::PolyRenderizer(const RenderizerParameters &params)
     : Renderizer(params) {}
 
 void PolyRenderizer::updateRenderCommands(
-    std::vector<RenderCommand> &newRenderCommands) {
+    std::vector<OldRenderCommand> &newRenderCommands) {
   renderCommands = newRenderCommands;
   // copy is created, but i dont want to get into dynamic memory for this one
 }
 
 void PolyRenderizer::render(GameObject *obj) {
-  for (const RenderCommand &command : renderCommands) {
+  for (const OldRenderCommand &command : renderCommands) {
     sprite.setTextureRect(command.rect);
     sprite.setColor(command.color);
 

@@ -41,7 +41,9 @@ public:
 
   bool reloadScene(const std::string &slot);
 
+  void render(RenderSystem &renderer);
+
 private:
   std::unordered_map<std::string, SceneInstance> activeScenes;
-  MapLifecycle<SceneInstance> lifecycle;
+  MapLifecycle<std::string, SceneInstance> lifecycle;
 };

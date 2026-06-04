@@ -21,7 +21,7 @@ bool GameObject::UpdateDomain::matches(WindowManager &wm, WindowID id) const {
 GameObject::GameObject(UpdateDomain updateDomain, sf::Vector2f pos)
     : position(pos), id(nextId++), updateDomain(std::move(updateDomain)) {}
 
-unsigned int GameObject::getId() { return id; }
+GameObject::ID GameObject::getId() { return id; }
 
 GameObjectExposure::Value::Object GameObject::describe() {
 
@@ -33,7 +33,7 @@ GameObjectExposure::Value::Object GameObject::describe() {
             return GameObjectExposure::Descriptor::describeVector2f(position);
           });
 
-  desc->fields["id"] = GameObjectExposure::makePublicField<unsigned int>(id);
+  desc->fields["id"] = GameObjectExposure::makePublicField<u_int32_t>(id.val);
 
   desc->fields["offset"] =
       GameObjectExposure::makeUnmutableField<GameObjectExposure::Value::Object>(

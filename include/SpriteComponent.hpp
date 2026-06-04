@@ -12,6 +12,8 @@ public:
   [[nodiscard]] const sf::IntRect &getRect() const;
   [[nodiscard]] sf::Sprite &getSprite();
   [[nodiscard]] const sf::Sprite &getSprite() const;
+  [[nodiscard]] sf::Texture *getTexture() const;
+  [[nodiscard]] const sf::Color getColor() const;
 
   [[nodiscard]] float getLayer() const;
   [[nodiscard]] float getParalax() const;

@@ -1,6 +1,8 @@
 #pragma once
 
-#include "LifeCycleManager.hpp"
+#include "GameObject.hpp"
+#include "RenderSystem.hpp"
+#include "VectorLifecycle.hpp"
 #include "WindowID.hpp"
 #include <memory>
 #include <vector>
@@ -22,6 +24,7 @@ public:
   virtual void setup(Context ctx) {}
 
   virtual void update(const GeneralContext &ctx);
+  void render(RenderSystem &renderer);
 
   // Bad declaration of Template for create. Use polymorphism with a base
   // Builder class.
@@ -31,11 +34,12 @@ public:
   [[nodiscard]] const std::vector<std::unique_ptr<GameObject>> &
   getObjects() const;
 
-  // Dangerous. Refactor Later
-  [[nodiscard]] GameObject *findObjectById(unsigned int id) const;
+  [[nodiscard]] bool containsObject(GameObject::ID id) const;
+  [[nodiscard]] GameObject *findObjectById(GameObject::ID id) const;
 
 protected:
   std::vector<std::unique_ptr<GameObject>> objects;
+  std::unordered_map<GameObject::ID, GameObject *> objectIndex;
   VectorLifecycle<GameObject> lifecycle;
 };
 
@@ -45,6 +49,7 @@ typename Builder::ObjectType *Scene::create(const Builder &builder) {
   auto *ptr = obj.get();
 
   lifecycle.queueCreate(std::move(obj));
+  objectIndex.emplace(ptr->getId(), ptr);
 
   return ptr;
 }

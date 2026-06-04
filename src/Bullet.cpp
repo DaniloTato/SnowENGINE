@@ -2,6 +2,7 @@
 #include "ColorPalette.hpp"
 #include "Constants.hpp"
 #include "PhysicsComponent.hpp"
+#include "SpriteComponent.hpp"
 #include <cmath>
 
 Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
@@ -20,7 +21,9 @@ Bullet::Bullet(RenderizerParameters params, const Animations &cachedAnimations,
     physics.setFriction({0.99f, 6.f});
   }
 
-  renderizer.setColor(ColorPalette::LimeGreen);
+  if (spriteComponent) {
+    spriteComponent->setColor(ColorPalette::LimeGreen);
+  }
 
   switch (type) {
   case Bullet::Type::Normal:
@@ -53,9 +56,9 @@ void Bullet::update(const GeneralContext &ctx) {
   if (dead)
     return;
 
-  if (!shotByPlayer) {
-    renderizer.toggleColorEvery(0.1f, ColorPalette::White,
-                                ColorPalette::MexicanPink);
+  if (!shotByPlayer && spriteComponent) {
+    spriteComponent->toggleColorEvery(0.1f, ColorPalette::White,
+                                      ColorPalette::MexicanPink);
   }
 
   if (!dying) {

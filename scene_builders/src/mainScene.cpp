@@ -27,8 +27,9 @@ void MainScene::setup(Scene::Context ctx) {
   LevelManager &levelManager = engine.getLevelManager();
 
   GameCamera *mainCamera =
-      this->create(CameraBuilder()
-                       .updateDomain(WindowManager::Set::MAIN)
+      this->create(ObjectBuilder<GameCamera>(engine)
+                       .withCameraComponent(this, 1.f)
+                       .inUpdateDomain(WindowManager::Set::MAIN)
                        .script(Scripts::cameraBehaviourScript));
 
   GameCamera *uiCamera =

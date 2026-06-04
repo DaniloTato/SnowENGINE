@@ -51,7 +51,6 @@ Scene *SceneManager::getScene(const std::string &slot) {
 void SceneManager::update(const GeneralContext &ctx,
                           const Scene::Context &sceneCtx) {
   for (auto &[_, instance] : activeScenes) {
-
     if (instance.scene) {
       instance.scene->update(ctx);
     }
@@ -106,4 +105,10 @@ bool SceneManager::reloadScene(const std::string &slot) {
   }
 
   return transitionScene(slot, it->second.name);
+}
+
+void SceneManager::render(RenderSystem &renderer) {
+  for (auto &[name, scene] : activeScenes) {
+    scene.scene->render(renderer);
+  }
 }

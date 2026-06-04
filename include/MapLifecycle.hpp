@@ -1,40 +1,36 @@
 #pragma once
 
 #include <algorithm>
-#include <string>
-#include <string_view>
+#include <cassert>
 #include <unordered_map>
 #include <vector>
 
-template <typename T> class MapLifecycle {
+template <typename Key, typename Object> class MapLifecycle {
 public:
   struct CreateEntry {
-    std::string key;
-    T object;
+    Key key;
+    Object object;
   };
 
-  void queueCreate(std::string_view key, T object) {
-    createQueue.push_back(
-        CreateEntry{.key = std::string(key), .object = std::move(object)});
+  void queueCreate(Key key, Object object) {
+    createQueue.emplace_back(CreateEntry{std::move(key), std::move(object)});
   }
 
-  void queueDestroy(std::string key) { destroyQueue.push_back(std::move(key)); }
+  void queueDestroy(Key key) { destroyQueue.push_back(std::move(key)); }
 
-  void apply(std::unordered_map<std::string, T> &objects) {
-
+  void apply(std::unordered_map<Key, Object> &objects) {
     for (const auto &key : destroyQueue) {
       objects.erase(key);
     }
-
     for (auto &entry : createQueue) {
-      objects.insert_or_assign(std::move(entry.key), std::move(entry.object));
+      assert(!objects.contains(entry.key));
+      objects.emplace(std::move(entry.key), std::move(entry.object));
     }
-
     createQueue.clear();
     destroyQueue.clear();
   }
 
 private:
   std::vector<CreateEntry> createQueue;
-  std::vector<std::string> destroyQueue;
+  std::vector<Key> destroyQueue;
 };

@@ -23,7 +23,9 @@ LevelManager::TileFactory::create(Scene &scene, const TileInfo &tile,
 
   obj->position = {float(tile.x * tileSize + 1), float(tile.y * tileSize + 1)};
 
-  obj->renderizer.setRect(tile.textureRect, 1);
+  if (obj->spriteComponent) {
+    obj->spriteComponent->setRect(tile.textureRect, 1);
+  }
 
   return obj;
 }
@@ -81,7 +83,9 @@ void LevelManager::loadLevel(const std::string &path) {
     // put secret layer above others
     if (layers[i].name == "secret") {
       for (auto &tile : layers[i].tiles) {
-        tile.object->renderizer.setLayer(-1);
+        if (tile.object->spriteComponent) {
+          tile.object->spriteComponent->setLayer(-1);
+        }
       }
     }
   }
@@ -357,8 +361,8 @@ void LevelManager::setSecretLayerOppacity(float oppacity) {
     LayerInfo &secretLayer = *it;
     for (auto &tile : secretLayer.tiles) {
       RenderableObject *obj = tile.object;
-      if (obj) {
-        obj->renderizer.setColor(
+      if (obj && obj->spriteComponent) {
+        obj->spriteComponent->setColor(
             sf::Color(255, 255, 255, static_cast<sf::Uint8>(oppacity)));
       }
     }

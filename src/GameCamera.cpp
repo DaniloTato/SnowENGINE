@@ -87,4 +87,4 @@ GameObjectExposure::Value::Object GameCamera::describe() {
 
 const sf::Vector2f &GameCamera::getPosition() const { return position; }
 
-CameraView GameCamera::buildView() { return {getPosition(), getZoom()}; }
+CameraView GameCamera::buildView() { return {getPosition(), getZoom(), {}}; }

@@ -5,6 +5,6 @@
 
 namespace Scripts {
 
-void cameraBehaviourScript(GameCamera &camera, const GeneralContext &ctx);
+void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx);
 
 }

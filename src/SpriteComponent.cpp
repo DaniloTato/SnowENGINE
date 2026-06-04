@@ -35,6 +35,10 @@ sf::Sprite &SpriteComponent::getSprite() { return sprite; }
 
 const sf::Sprite &SpriteComponent::getSprite() const { return sprite; }
 
+sf::Texture *SpriteComponent::getTexture() const { return texture; }
+
+const sf::Color SpriteComponent::getColor() const { return color; }
+
 float SpriteComponent::getLayer() const { return layer; }
 
 float SpriteComponent::getParalax() const { return paralax; }

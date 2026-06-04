@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderCommand.hpp"
+#include "OldRenderCommand.hpp"
 #include "Renderizer.hpp"
 #include <vector>
 
@@ -7,9 +7,9 @@ class PolyRenderizer : public Renderizer {
 public:
   PolyRenderizer(const RenderizerParameters &params);
 
-  void updateRenderCommands(std::vector<RenderCommand> &renderCommands);
+  void updateRenderCommands(std::vector<OldRenderCommand> &renderCommands);
   void render(GameObject *obj) override;
 
 private:
-  std::vector<RenderCommand> renderCommands;
+  std::vector<OldRenderCommand> renderCommands;
 };

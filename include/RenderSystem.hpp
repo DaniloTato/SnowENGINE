@@ -1,21 +1,17 @@
 #pragma once
 
-#include "GameCamera.hpp"
-#include "SpriteComponent.hpp"
+#include "CameraView.hpp"
 #include "WindowManager.hpp"
-
-class GameObject;
 
 class RenderSystem {
 public:
-  RenderSystem(WindowManager &windowManager, GameCamera *camera);
+  explicit RenderSystem(WindowManager &windowManager);
 
-  void render(GameObject &obj, SpriteComponent &spriteComp);
+  void render(const CameraView &view);
 
 private:
   [[nodiscard]] bool isVisible(const sf::Sprite &sprite) const;
 
 private:
   WindowManager &windowManager;
-  GameCamera *camera;
 };

@@ -1,5 +1,6 @@
 #include "cameraBehaviourScript.hpp"
 
+#include "CameraComponent.hpp"
 #include "Constants.hpp"
 #include "GameCamera.hpp"
 
@@ -9,7 +10,15 @@
 
 namespace Scripts {
 
-void cameraBehaviourScript(GameCamera &camera, const GeneralContext &ctx) {
+void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx) {
+
+  std::cout << "[script] checking if cameraComponent exists" << "\n";
+  if (!obj.cameraComponent)
+    return;
+
+  std::cout << "doing behaviour" << "\n";
+
+  CameraComponent &camera = *obj.cameraComponent;
 
   sf::Vector2f playerPosition = ctx.player->position;
 

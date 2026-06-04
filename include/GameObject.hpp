@@ -7,6 +7,7 @@
 
 struct GeneralContext;
 class SpriteComponent;
+class CameraComponent;
 
 class GameObject {
 public:
@@ -26,12 +27,18 @@ public:
         : domains(std::move(doms)) {}
   };
 
+  struct ID {
+    ID(u_int32_t val) : val(val) {}
+    u_int32_t val;
+    auto operator<=>(const ID &) const = default;
+  };
+
   GameObject(UpdateDomain updateDomain, sf::Vector2f pos = {0.f, 0.f});
   virtual ~GameObject() = default;
-  virtual void update(const GeneralContext &ctx) = 0;
+  virtual void update(const GeneralContext &ctx) {}
 
   virtual std::shared_ptr<GameObjectExposure::Descriptor> describe();
-  unsigned int getId();
+  GameObject::ID getId();
   bool isUpdateDomainPaused(WindowManager &wm);
 
   void setUpdateDomain(const UpdateDomain &newDomain);
@@ -44,6 +51,7 @@ public:
 
   // Hybrid approach. Transitioning towards ECS
   SpriteComponent *spriteComponent = nullptr;
+  CameraComponent *cameraComponent = nullptr;
 
   GameObject(const GameObject &) = delete;
   GameObject &operator=(const GameObject &) = delete;
@@ -52,7 +60,21 @@ protected:
   bool pendingDestroy = false;
 
 private:
-  unsigned int id;
+  ID id;
   static unsigned int nextId;
   UpdateDomain updateDomain;
 };
+
+namespace std {
+
+template <>
+
+struct hash<GameObject::ID> {
+
+  size_t operator()(const GameObject::ID &id) const noexcept {
+
+    return hash<uint32_t>{}(id.val);
+  }
+};
+
+} // namespace std

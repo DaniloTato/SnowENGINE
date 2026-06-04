@@ -17,16 +17,16 @@ struct AttackHitbox {
 
 class TangibleObject : public GameObject {
 public:
-  TangibleObject(RenderizerParameters params, Animations cachedAnimations);
+  TangibleObject(RenderizerParameters params,
+                 const Animations &cachedAnimations);
   void update(const GeneralContext &ctx) override;
-  Renderizer renderizer;
   BasicCollider collider;
   Scripter<TangibleObject> scripter;
   Animator animator;
   PhysicsComponent physics;
 
   void playSound(const std::string &id, float volume = 100.f);
-  bool isPlayingAnySound() const;
+  [[nodiscard]] bool isPlayingAnySound() const;
 
   GameObjectExposure::Value::Object describe() override;
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.hpp"
+#include "OldRenderCommand.hpp"
 #include "PolyRenderizer.hpp"
-#include "RenderCommand.hpp"
 #include "RenderizerParameters.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <SFML/Audio.hpp>
@@ -118,7 +118,7 @@ private:
 
   size_t revealableCount = 0;
 
-  std::vector<RenderCommand> renderCommandBuffer;
+  std::vector<OldRenderCommand> renderCommandBuffer;
 
   std::map<std::string, sf::Color> colorNameMap;
 };

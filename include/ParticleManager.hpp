@@ -6,8 +6,8 @@
 #include "Animation.hpp"
 #include "Animator.hpp"
 #include "GameObject.hpp"
+#include "OldRenderCommand.hpp"
 #include "PolyRenderizer.hpp"
-#include "RenderCommand.hpp"
 #include "SceneAware.hpp"
 
 #ifndef M_PI
@@ -86,5 +86,5 @@ private:
 
   std::unordered_map<std::string, Animation> cachedAnimations;
 
-  std::vector<RenderCommand> renderCommandBuffer;
+  std::vector<OldRenderCommand> renderCommandBuffer;
 };

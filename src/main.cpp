@@ -87,7 +87,7 @@ int main() {
       }
     }
 
-    Renderizer::renderAll();
+    sceneManager.render(engine.getRenderSystem());
 
     for (const auto &[id, entry] : windows) {
       windowManager.checkRenderFlag(id);

@@ -96,7 +96,7 @@ void Renderizer::render(GameObject *obj) {
     }
     sf::Text idText;
     idText.setFont(idTextFont);
-    idText.setString(std::to_string(obj->getId()));
+    idText.setString(std::to_string(obj->getId().val));
     idText.setPosition(screenPos);
     idText.setCharacterSize(11);
     idText.setFillColor(sf::Color::White);

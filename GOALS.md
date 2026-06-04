@@ -36,6 +36,14 @@
 - Inheritance from base id class to WindowID and CameraID
 - Texture Key should not be in the constructor of Object Builder
 
+- Change MapLifecycle to convert the Type automatically into unique_ptr<Type>
+
+- Move all instances of oldRenderCommand into RenderCommand
+
+- Remove all uses of Vector2f. Mudate towards custom-built Vector2f
+
+- Create Base ID<Type> Object tpo use as ID<WindowInstance> ID<GameObject>
+
 _PIORITY_
 
 - Remove static gameObjectRegistry from GameObject class. `DONE`
@@ -45,3 +53,13 @@ _PIORITY_
 - Replace all instances of QueuedManager with LifeCycleManager. Composition over inheritance.
 
 - Make LevelManager part of Scene.
+
+- Start moving towards a ECS model. _IN PROGRESS_
+  - Sprite Component
+  - CameraComponent
+  - AnimationComponent
+  - PhysicsComponent
+  - ScriptComponent?
+  - etc.
+
+- Make WindowID part of the CameraComponent, not part of SpriteComponent

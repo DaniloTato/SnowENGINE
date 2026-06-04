@@ -10,10 +10,12 @@ public:
   LevelManager &getLevelManager() { return levelManager; }
   SceneManager &getSceneManager() { return sceneManager; }
   DialogueManager &getDialogueManager() { return dialogueManager; }
+  RenderSystem &getRenderSystem() { return renderSystem; }
 
 private:
   DialogueManager dialogueManager;
   WindowManager windowManager;
   LevelManager levelManager;
   SceneManager sceneManager;
+  RenderSystem renderSystem{windowManager};
 };

@@ -4,6 +4,7 @@
 #include "Constants.hpp"
 #include "GameTextBuilder.hpp"
 #include "GeneralContext.hpp"
+#include "ObjectBuilder.hpp"
 
 void TerminalScene::setup(Scene::Context ctx) {
   Engine &engine = *ctx.engine;
@@ -13,7 +14,9 @@ void TerminalScene::setup(Scene::Context ctx) {
                                         "Snowgun Terminal");
   windowManager.subscribe(terminalWindow, this);
 
-  camera = create(CameraBuilder().updateDomain(terminalWindow));
+  camera = create(ObjectBuilder<GameCamera>(engine)
+                      .withCameraComponent(this, 1.f)
+                      .inUpdateDomain(terminalWindow));
 
   text = create(GameTextBuilder("snowFont", engine)
                     .at({10.f, 10.f})

@@ -2,6 +2,7 @@
 #include "Constants.hpp"
 #include "LevelManager.hpp"
 #include "SFML/System/Vector2.hpp"
+#include "SpriteComponent.hpp"
 #include "TangibleObject.hpp"
 #include <cmath>
 
@@ -16,10 +17,11 @@ bool BasicCollider::tangibleAndRenderableCollision(
     TangibleObject *tangibleObject, RenderableObject *renderableObject) {
   return isCollidingRect(
       tangibleObject->collider.getCollisionRect(tangibleObject->position),
-      sf::FloatRect(
-          renderableObject->position.x, renderableObject->position.y,
-          static_cast<float>(renderableObject->renderizer.getRect().width),
-          static_cast<float>(renderableObject->renderizer.getRect().height)));
+      sf::FloatRect(renderableObject->position.x, renderableObject->position.y,
+                    static_cast<float>(
+                        renderableObject->spriteComponent->getRect().width),
+                    static_cast<float>(
+                        renderableObject->spriteComponent->getRect().height)));
 }
 
 bool BasicCollider::isCollidingRect(const sf::FloatRect &a,
