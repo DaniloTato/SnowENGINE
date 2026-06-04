@@ -6,6 +6,7 @@
 #include <vector>
 
 struct GeneralContext;
+class SpriteComponent;
 
 class GameObject {
 public:
@@ -40,6 +41,9 @@ public:
 
   sf::Vector2f position;
   sf::Vector2f offset;
+
+  // Hybrid approach. Transitioning towards ECS
+  SpriteComponent *spriteComponent = nullptr;
 
   GameObject(const GameObject &) = delete;
   GameObject &operator=(const GameObject &) = delete;
