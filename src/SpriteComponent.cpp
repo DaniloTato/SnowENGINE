@@ -37,6 +37,8 @@ const sf::Sprite &SpriteComponent::getSprite() const { return sprite; }
 
 float SpriteComponent::getLayer() const { return layer; }
 
+float SpriteComponent::getParalax() const { return paralax; }
+
 WindowID SpriteComponent::getWindow() const { return window; }
 
 void SpriteComponent::setLayer(float newLayer) { layer = newLayer; }

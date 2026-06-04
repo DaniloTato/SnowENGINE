@@ -14,6 +14,7 @@ public:
   [[nodiscard]] const sf::Sprite &getSprite() const;
 
   [[nodiscard]] float getLayer() const;
+  [[nodiscard]] float getParalax() const;
   void setLayer(float newLayer);
 
   void setColor(sf::Color newColor);
