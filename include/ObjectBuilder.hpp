@@ -86,9 +86,11 @@ public:
     return *this;
   }
 
-  ObjectBuilder &withCameraComponent(Scene *scene, float zoom) {
+  ObjectBuilder &withCameraComponent(Scene *scene, float zoom,
+                                     WindowID windowDisplayedIn) {
     hasCamera = true;
     myScene = scene;
+    myWindow = windowDisplayedIn;
     cameraZoom = zoom;
     return *this;
   }
@@ -125,7 +127,7 @@ private:
     }
 
     if (hasCamera) {
-      auto camera = std::make_unique<CameraComponent>(myScene);
+      auto camera = std::make_unique<CameraComponent>(myScene, myWindow);
 
       camera->goTo(position);
       camera->zoomTo(cameraZoom);
@@ -173,6 +175,7 @@ private:
   bool hasCamera = false;
   float cameraZoom = 1.f;
   bool hasSprite = false;
+  WindowID myWindow;
   GameCamera *myCamera = nullptr;
   Scene *myScene = nullptr;
   std::vector<typename Scripter<T>::ScriptFunc> scripts;

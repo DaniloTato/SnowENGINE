@@ -13,7 +13,6 @@
 #include "terminalCreationScript.hpp"
 #include "tilePickerCreationScript.hpp"
 
-#include "CameraBuilder.hpp"
 #include "Helpers.hpp"
 #include "ObjectBuilder.hpp"
 
@@ -28,13 +27,13 @@ void MainScene::setup(Scene::Context ctx) {
 
   GameCamera *mainCamera =
       this->create(ObjectBuilder<GameCamera>(engine)
-                       .withCameraComponent(this, 1.f)
+                       .withCameraComponent(this, 1.f, mainWindow)
                        .inUpdateDomain(WindowManager::Set::MAIN)
                        .script(Scripts::cameraBehaviourScript));
 
   GameCamera *uiCamera =
       this->create(ObjectBuilder<GameCamera>(engine)
-                       .withCameraComponent(this, 1.f)
+                       .withCameraComponent(this, 1.f, mainWindow)
                        .inUpdateDomain(WindowManager::Set::MAIN));
 
   levelManager.initializeRenderContext(engine, *this, mainWindow, mainCamera);

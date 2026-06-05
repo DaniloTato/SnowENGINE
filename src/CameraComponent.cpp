@@ -4,7 +4,8 @@
 #include "SpriteComponent.hpp"
 #include <algorithm>
 
-CameraComponent::CameraComponent(Scene *scene) : scene(scene) {}
+CameraComponent::CameraComponent(Scene *scene, WindowID windowDisplayedIn)
+    : scene(scene), windowDisplayedIn(windowDisplayedIn) {}
 
 void CameraComponent::update() {
   std::erase_if(subscriptions, [this](GameObject::ID id) {

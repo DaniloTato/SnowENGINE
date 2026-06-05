@@ -26,7 +26,17 @@ WindowID WindowManager::create(Set set, unsigned int w, unsigned int h,
   return id;
 }
 
-void WindowManager::queueDestroy(WindowID id) { lifecycle.queueDestroy(id); }
+void WindowManager::queueDestroy(WindowID id) {
+  GameWindow *gw = fetchGameWindow(id);
+
+  if (!gw) {
+    std::cout
+        << "[WindowManager] [queueDestroy] failed to fetch window to close it.";
+  }
+
+  gw->getWindow()->close();
+  lifecycle.queueDestroy(id);
+}
 
 void WindowManager::applyQueues() { lifecycle.apply(windows); }
 

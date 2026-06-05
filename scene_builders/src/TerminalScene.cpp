@@ -1,6 +1,5 @@
 #include "TerminalScene.hpp"
 
-#include "CameraBuilder.hpp"
 #include "Constants.hpp"
 #include "GameTextBuilder.hpp"
 #include "GeneralContext.hpp"
@@ -15,7 +14,7 @@ void TerminalScene::setup(Scene::Context ctx) {
   windowManager.subscribe(terminalWindow, this);
 
   camera = create(ObjectBuilder<GameCamera>(engine)
-                      .withCameraComponent(this, 1.f)
+                      .withCameraComponent(this, 1.f, terminalWindow)
                       .inUpdateDomain(terminalWindow));
 
   text = create(GameTextBuilder("snowFont", engine)

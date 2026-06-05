@@ -1,6 +1,5 @@
 #include "terminalCreationScript.hpp"
 
-#include "CameraBuilder.hpp"
 #include "InputManager.hpp"
 
 #include "RegistryMacros.hpp"

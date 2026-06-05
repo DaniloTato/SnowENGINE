@@ -10,7 +10,7 @@ class GameObject;
 
 class CameraComponent {
 public:
-  explicit CameraComponent(Scene *scene);
+  explicit CameraComponent(Scene *scene, WindowID windowDisplayedIn);
 
   void subscribe(GameObject::ID id);
   void unsubscribe(GameObject::ID id);
@@ -40,5 +40,6 @@ private:
   float impactZoom = 0.f;
   sf::Vector2f followSpeed = {5.f, 2.5f};
   float zoomSpeed = 15.f;
+  WindowID windowDisplayedIn;
   std::vector<GameObject::ID> subscriptions;
 };

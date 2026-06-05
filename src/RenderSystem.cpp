@@ -8,7 +8,7 @@ RenderSystem::RenderSystem(WindowManager &windowManager)
 void RenderSystem::render(const CameraView &view) {
   for (const auto &command : view.getCommands()) {
 
-    if (!isVisible(command.position,
+    if (!isVisible(view.worldToScreen(command.position, command.paralax),
                    static_cast<sf::Vector2f>(command.textureRect.getSize()))) {
       continue;
     }
