@@ -6,7 +6,7 @@
 
 TangibleObject::TangibleObject(RenderizerParameters params,
                                const Animations &cachedAnimations)
-    : GameObject(UpdateDomain(params.window)) {
+    : GameObject(UpdateDomain(WindowManager::Set::MAIN)) {
   animator.setAnimations(cachedAnimations);
 }
 

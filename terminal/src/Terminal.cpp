@@ -9,8 +9,6 @@ static constexpr size_t MAX_LINES = 37;
 
 Terminal::Terminal() : snowlangIO(*this), snowlang(snowlangIO) {
 
-  snowlang.tileCamera = nullptr;
-
   history.emplace_back(TerminalLine{
       .text =
           R"([color=cyan][anim=sin]SNOWLANG[/anim] Developer Console[/color])",

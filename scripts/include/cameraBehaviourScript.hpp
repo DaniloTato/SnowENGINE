@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GameCamera.hpp"
 #include "GeneralContext.hpp"
+#include "ScriptRunner.hpp"
 
 namespace Scripts {
 
-void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx);
+void cameraBehaviourScript(ScriptRunner &obj, const GeneralContext &ctx);
 
 }

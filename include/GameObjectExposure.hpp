@@ -6,8 +6,6 @@
 
 #include <SFML/Graphics.hpp>
 
-class GameCamera;
-
 namespace GameObjectExposure {
 
 struct Descriptor;

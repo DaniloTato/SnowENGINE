@@ -1,5 +1,4 @@
 #include "Commands.hpp"
-#include "GameCamera.hpp"
 #include "GameObject.hpp"
 #include "RenderableObject.hpp"
 #include "RuntimeValue.hpp"
@@ -19,7 +18,6 @@ const std::unordered_map<std::string_view, ClassCheck> s_ClassChecks = {
     {"game_object", &checkType<GameObject>},
     {"script_runner", &checkType<ScriptRunner>},
     {"tangible_object", &checkType<TangibleObject>},
-    {"game_camera", &checkType<GameCamera>},
     {"renderable_object", &checkType<RenderableObject>},
 };
 

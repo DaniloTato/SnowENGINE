@@ -1,6 +1,7 @@
 #pragma once
 
 #include "RenderizerParameters.hpp"
+#include "WindowID.hpp"
 #include <SFML/Graphics.hpp>
 
 class SpriteComponent {
@@ -26,8 +27,6 @@ public:
   void toggleColorEvery(float time, const sf::Color &color1,
                         const sf::Color &color2);
 
-  [[nodiscard]] WindowID getWindow() const;
-
   void hide();
   void showSprite();
 
@@ -48,6 +47,4 @@ private:
 
   float showCountDown = 0.f;
   float colorCountDown = 0.f;
-
-  WindowID window;
 };

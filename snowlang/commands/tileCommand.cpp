@@ -28,11 +28,6 @@ RuntimeValue tileCommand(const CommandContext &ctx) {
     ctx.snowlang.engineRef->getLevelManager().queueDeleteTile(
         static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y));
   } else {
-    // MUST CHANGE. TIGHTLY COUPLED
-    if (!ctx.snowlang.tileCamera) {
-      throwError(SnowErr::Phase::Evaluator, "no Reference to tile camera.", ctx.cmd.span);
-    }
-
     ctx.snowlang.engineRef->getLevelManager().queueCreateTile(
         static_cast<int>(layer), static_cast<int>(x), static_cast<int>(y),
         sf::IntRect({

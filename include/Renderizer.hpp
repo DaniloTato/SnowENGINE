@@ -64,5 +64,5 @@ protected:
   bool hasCulling;
 
   static std::vector<RenderEntry> registry;
-  GameCamera *assignedCamera;
+  CameraComponent *assignedCamera;
 };

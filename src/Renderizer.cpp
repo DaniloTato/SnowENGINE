@@ -1,17 +1,22 @@
 #include "Renderizer.hpp"
+#include "CameraComponent.hpp"
 #include "Constants.hpp"
 #include "GameState.hpp"
 #include "Helpers.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/System/Vector2.hpp"
 
+// EAD CODE THAT NEEDS TO BE DELETED WHENEVER POLYRENDERIZER IS REFACTORED.
+
 std::vector<RenderEntry> Renderizer::registry;
 
 Renderizer::Renderizer(const RenderizerParameters &params)
-    : window(params.window), texture(params.texture), color(sf::Color::White),
+    : window(WindowID()), texture(params.texture), color(sf::Color::White),
       engine(params.engine), layer(params.layer), paralax(params.parallax),
       show(true), showCountDown(0.f), hasCulling(true),
-      assignedCamera(params.camera) {
+      assignedCamera(nullptr) {
+
+  // Camera does not work right now >:D
 
   if (texture) {
     sprite.setTexture(*texture);

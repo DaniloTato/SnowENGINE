@@ -1,9 +1,10 @@
 #include "CameraView.hpp"
 #include "Constants.hpp"
 
-CameraView::CameraView(sf::Vector2f position, float zoom,
+CameraView::CameraView(WindowID targetWindow, sf::Vector2f position, float zoom,
                        std::vector<RenderCommand> &&commands)
-    : position(position), zoom(zoom), commands(std::move(commands)) {}
+    : targetWindow(targetWindow), position(position), zoom(zoom),
+      commands(std::move(commands)) {}
 
 float CameraView::getZoom() const { return zoom; }
 
@@ -49,3 +50,5 @@ sf::Vector2f CameraView::screenToWorld(const sf::Vector2f &screenPos,
 const std::vector<RenderCommand> &CameraView::getCommands() const {
   return commands;
 }
+
+WindowID CameraView::getTargetWindow() const { return targetWindow; }

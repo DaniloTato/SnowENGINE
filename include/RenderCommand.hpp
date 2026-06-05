@@ -1,6 +1,5 @@
 #pragma once
 
-#include "WindowID.hpp"
 #include <SFML/Graphics.hpp>
 
 struct RenderCommand {
@@ -11,5 +10,4 @@ struct RenderCommand {
   sf::Vector2f scale = {1.f, 1.f};
   float layer = 0.f;
   float paralax = 1.f;
-  WindowID window;
 };

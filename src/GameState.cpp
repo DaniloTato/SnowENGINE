@@ -7,7 +7,7 @@
 #define ENUM_TO_STR =
 
 GameState::GameState()
-    : activeCameras({}), checkpoint({-1, -1}), playerHealth(3),
+    : checkpoint({-1, -1}), playerHealth(3),
       selectedWeapon(Bullet::Type::Normal) {}
 
 GameState &GameState::getInstance() {

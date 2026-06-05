@@ -7,7 +7,7 @@
 struct GeneralContext {
   TangibleObject *player;
   WindowID mainWindow;
-  GameCamera *mainCamera;
+  CameraComponent *mainCamera;
   Engine *engine;
   Scene *gameScene;
 };

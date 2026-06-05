@@ -10,16 +10,14 @@
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-RenderableObject *
-LevelManager::TileFactory::create(Scene &scene, const TileInfo &tile,
-                                  const RenderizerParameters &params,
-                                  int tileSize) {
-  auto *obj = scene.create(ObjectBuilder<RenderableObject>(params.engine)
+RenderableObject *LevelManager::TileFactory::create(
+    Scene &scene, const TileInfo &tile, Engine *engine, WindowID window,
+    CameraComponent *camera, float layer, float paralax, int tileSize) {
+  auto *obj = scene.create(ObjectBuilder<RenderableObject>(*engine)
                                .rectangle(tileSize, tileSize)
-                               .onWindow(params.window)
-                               .onCamera(params.camera)
-                               .layer(params.layer)
-                               .parallax(params.parallax));
+                               .onCamera(camera)
+                               .layer(layer)
+                               .parallax(paralax));
 
   obj->position = {float(tile.x * tileSize + 1), float(tile.y * tileSize + 1)};
 
@@ -120,9 +118,11 @@ void LevelManager::loadLayer(size_t layerNo, const json &layerJSON,
     info.textureRect = sf::IntRect(t["tex_x"].get<int>(), t["tex_y"].get<int>(),
                                    tileSize, tileSize);
 
-    info.object =
-        TileFactory::create(*renderContext.scene, info,
-                            makeRenderParams(layerNo), Constants::TILE_SIZE);
+    info.object = TileFactory::create(
+        *renderContext.scene, info, renderContext.engine, renderContext.window,
+        renderContext.camera,
+        static_cast<float>((layers[layerNo].name == "secret") ? -1 : layerNo),
+        layers[layerNo].paralax, Constants::TILE_SIZE);
 
     tileList.push_back(info);
 
@@ -146,9 +146,11 @@ void LevelManager::reloadLayer(size_t layerNo) {
 
   for (auto &t : tiles) {
     TileFactory::destroy(t.object);
-    t.object =
-        TileFactory::create(*renderContext.scene, t, makeRenderParams(layerNo),
-                            Constants::TILE_SIZE);
+    t.object = TileFactory::create(
+        *renderContext.scene, t, renderContext.engine, renderContext.window,
+        renderContext.camera,
+        static_cast<float>((layers[layerNo].name == "secret") ? -1 : layerNo),
+        layers[layerNo].paralax, Constants::TILE_SIZE);
   }
 }
 
@@ -194,9 +196,11 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
       t.textureRect = rect;
 
       // HARDCODED MAIN SCENE. MAGIC STRING
-      t.object =
-          TileFactory::create(*renderContext.scene, t,
-                              makeRenderParams(layerNo), Constants::TILE_SIZE);
+      t.object = TileFactory::create(
+          *renderContext.scene, t, renderContext.engine, renderContext.window,
+          renderContext.camera,
+          static_cast<float>((layers[layerNo].name == "secret") ? -1 : layerNo),
+          layers[layerNo].paralax, Constants::TILE_SIZE);
 
       return;
     }
@@ -211,9 +215,11 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
     levelLayout[unsignedY][unsignedX] = 1;
   }
 
-  info.object =
-      TileFactory::create(*renderContext.scene, info, makeRenderParams(layerNo),
-                          Constants::TILE_SIZE);
+  info.object = TileFactory::create(
+      *renderContext.scene, info, renderContext.engine, renderContext.window,
+      renderContext.camera,
+      static_cast<float>((layers[layerNo].name == "secret") ? -1 : layerNo),
+      layers[layerNo].paralax, Constants::TILE_SIZE);
 
   tiles.push_back(info);
 }
@@ -378,7 +384,7 @@ void LevelManager::ensureLevelLoaded() const {
 
 void LevelManager::initializeRenderContext(Engine &engine, Scene &scene,
                                            WindowID window,
-                                           GameCamera *camera) {
+                                           CameraComponent *camera) {
   renderContext.engine = &engine;
   renderContext.scene = &scene;
   renderContext.window = window;
@@ -393,9 +399,7 @@ RenderizerParameters LevelManager::makeRenderParams(size_t layerNo) const {
   }
 
   return RenderizerParameters{.engine = *renderContext.engine,
-                              .window = renderContext.window,
                               .texture = const_cast<sf::Texture *>(&tilesheet),
-                              .camera = renderContext.camera,
                               .layer = layerValue,
                               .parallax = layers[layerNo].paralax};
 }

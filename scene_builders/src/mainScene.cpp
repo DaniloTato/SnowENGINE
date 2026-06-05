@@ -25,26 +25,26 @@ void MainScene::setup(Scene::Context ctx) {
   WindowID mainWindow = windowManager.getMain();
   LevelManager &levelManager = engine.getLevelManager();
 
-  GameCamera *mainCamera =
-      this->create(ObjectBuilder<GameCamera>(engine)
+  ScriptRunner *mainCameraObject =
+      this->create(ObjectBuilder<ScriptRunner>(engine)
                        .withCameraComponent(this, 1.f, mainWindow)
                        .inUpdateDomain(WindowManager::Set::MAIN)
                        .script(Scripts::cameraBehaviourScript));
 
-  GameCamera *uiCamera =
-      this->create(ObjectBuilder<GameCamera>(engine)
+  ScriptRunner *uiCameraObject =
+      this->create(ObjectBuilder<ScriptRunner>(engine)
                        .withCameraComponent(this, 1.f, mainWindow)
                        .inUpdateDomain(WindowManager::Set::MAIN));
 
-  levelManager.initializeRenderContext(engine, *this, mainWindow, mainCamera);
+  levelManager.initializeRenderContext(engine, *this, mainWindow,
+                                       mainCameraObject->cameraComponent);
 
   levelManager.loadLevel(Helper::getPath("assets/levels/Level1.json"));
 
   auto *image = create(ObjectBuilder<TangibleObject>(engine)
                            .withTexture("todd")
                            .at(100, 100)
-                           .onWindow(mainWindow)
-                           .onCamera(mainCamera)
+                           .onCamera(mainCameraObject->cameraComponent)
                            .withEmptyAnimation(16, 16));
 
   image->scripter.addScript(Scripts::basicMovementScript);
@@ -52,17 +52,15 @@ void MainScene::setup(Scene::Context ctx) {
   this->create(ObjectBuilder<RenderableObject>(engine)
                    .rectangle(20, 20)
                    .at(200, 200)
-                   .onWindow(mainWindow)
-                   .onCamera(mainCamera));
+                   .onCamera(mainCameraObject->cameraComponent));
 
   this->create(
       GameTextBuilder("snowFont", engine)
           .at({0.f, 50.f})
-          .onWindow(mainWindow)
           .boundary(Constants::SCREEN_WIDTH)
           .alignment(GameText::Align::Center)
           .typewriter(0.1f)
-          .camera(uiCamera)
+          .camera(uiCameraObject->cameraComponent)
           .markup(
               R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])"));
 
@@ -80,7 +78,7 @@ void MainScene::setup(Scene::Context ctx) {
 
   GeneralContext generalContext{.player = image,
                                 .mainWindow = ctx.mainWindow,
-                                .mainCamera = mainCamera,
+                                .mainCamera = mainCameraObject->cameraComponent,
                                 .engine = &engine,
                                 .gameScene = this};
 

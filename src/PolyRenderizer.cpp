@@ -1,4 +1,5 @@
 #include "PolyRenderizer.hpp"
+#include "CameraComponent.hpp"
 #include "Engine.hpp"
 #include "GameObject.hpp"
 #include "Renderizer.hpp"

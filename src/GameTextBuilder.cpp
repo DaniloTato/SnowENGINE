@@ -5,21 +5,14 @@
 GameTextBuilder::GameTextBuilder(std::string_view fontTextureKey,
                                  Engine &engine)
     : params{.engine = engine,
-             .window = WindowID(),
              .texture = &TextureManager::getInstance().get(
                  std::string(fontTextureKey)),
-             .camera = nullptr,
              .layer = 0.f,
              .parallax = 1.f,
              .registerAsRectShape = false} {}
 
 GameTextBuilder &GameTextBuilder::at(sf::Vector2f p) {
   textPosition = p;
-  return *this;
-}
-
-GameTextBuilder &GameTextBuilder::onWindow(WindowID window) {
-  params.window = window;
   return *this;
 }
 
@@ -44,8 +37,7 @@ GameTextBuilder &GameTextBuilder::markup(const std::string &m) {
   return *this;
 }
 
-GameTextBuilder &GameTextBuilder::camera(GameCamera *camera) {
-  params.camera = camera;
+GameTextBuilder &GameTextBuilder::camera(CameraComponent *camera) {
   return *this;
 }
 

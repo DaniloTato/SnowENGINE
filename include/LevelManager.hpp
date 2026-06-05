@@ -1,5 +1,4 @@
 #pragma once
-#include "GameCamera.hpp"
 #include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
@@ -48,14 +47,15 @@ public:
     Engine *engine;
     Scene *scene;
     WindowID window;
-    GameCamera *camera;
+    CameraComponent *camera;
   };
 
   class TileFactory {
   public:
     static RenderableObject *create(Scene &scene, const TileInfo &tile,
-                                    const RenderizerParameters &params,
-                                    int tileSize);
+                                    Engine *engine, WindowID window,
+                                    CameraComponent *camera, float layer,
+                                    float paralax, int tileSize);
     static void destroy(RenderableObject *&obj);
   };
 
@@ -68,7 +68,7 @@ public:
   LevelManager &operator=(WindowManager &&) = delete;
 
   void initializeRenderContext(Engine &engine, Scene &scene, WindowID window,
-                               GameCamera *camera);
+                               CameraComponent *camera);
 
   void loadLevel(const std::string &path);
   void saveLevel(const std::string &path);

@@ -3,7 +3,7 @@
 #include "SpriteComponent.hpp"
 
 AnimatedObject::AnimatedObject(RenderizerParameters params)
-    : GameObject(UpdateDomain(params.window)) {}
+    : GameObject(UpdateDomain(WindowManager::Set::MAIN)) {}
 
 void AnimatedObject::update(const GeneralContext &ctx) {
   scripter.runScripts(*this, ctx);

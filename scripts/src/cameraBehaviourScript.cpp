@@ -2,7 +2,6 @@
 
 #include "CameraComponent.hpp"
 #include "Constants.hpp"
-#include "GameCamera.hpp"
 
 #include "RegistryMacros.hpp"
 #include "ScriptRegistry.hpp" // IWYU pragma: keep
@@ -10,7 +9,7 @@
 
 namespace Scripts {
 
-void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx) {
+void cameraBehaviourScript(ScriptRunner &obj, const GeneralContext &ctx) {
 
   if (!obj.cameraComponent)
     return;
@@ -30,4 +29,4 @@ void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx) {
 } // namespace Scripts
 
 REGISTER_SCRIPT("cameraBehaviourScript", Scripts::cameraBehaviourScript,
-                GameCamera);
+                ScriptRunner);

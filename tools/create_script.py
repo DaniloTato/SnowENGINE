@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 TARGETS = {
-    "GameCamera": {"include": "GameCamera.hpp", "var": "camera"},
     "GameObject": {"include": "GameObject.hpp", "var": "object"},
     "AnimatedObject": {"include": "AnimatedObject.hpp", "var": "animated"},
     "RenderableObject": {"include": "RenderableObject.hpp", "var": "renderable"},

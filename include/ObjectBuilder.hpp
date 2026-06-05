@@ -19,9 +19,7 @@ public:
   ObjectBuilder(Engine &engine)
       : objectUpdateDomain(WindowManager::Set::MAIN), position(0.f, 0.f),
         params{.engine = engine,
-               .window = WindowID(),
                .texture = nullptr,
-               .camera = nullptr,
                .layer = 0.f,
                .parallax = 1.f,
                .registerAsRectShape = false} {}
@@ -52,18 +50,8 @@ public:
     return *this;
   }
 
-  ObjectBuilder &onCamera(GameCamera *camera) {
-    params.camera = camera;
-    if (camera && camera->cameraComponent) {
-      myCamera = camera;
-    }
-    return *this;
-  }
-
-  ObjectBuilder &onWindow(WindowID window) {
-    hasSprite = true;
-
-    params.window = window;
+  ObjectBuilder &onCamera(CameraComponent *camera) {
+    myCamera = camera;
     return *this;
   }
 
@@ -107,9 +95,10 @@ public:
     if constexpr (std::is_same_v<T, TangibleObject>) {
       obj = std::make_unique<T>(params, animations);
 
-    } else if constexpr (std::is_same_v<T, ScriptRunner> ||
-                         std::is_same_v<T, GameCamera>) {
+    } else if constexpr (std::is_same_v<T, ScriptRunner>) {
       obj = std::make_unique<T>(objectUpdateDomain);
+    } else if constexpr (std::is_same_v<T, GameObject>) {
+      obj = std::make_unique<T>(objectUpdateDomain, position);
     } else {
       obj = std::make_unique<T>(params);
     }
@@ -123,11 +112,12 @@ private:
   void configure(T &obj) const {
 
     if (myCamera) {
-      myCamera->cameraComponent->subscribe(obj.getId());
+      myCamera->subscribe(obj.getId());
     }
 
     if (hasCamera) {
-      auto camera = std::make_unique<CameraComponent>(myScene, myWindow);
+      auto camera =
+          std::make_unique<CameraComponent>(myScene, myWindow, obj.position);
 
       camera->goTo(position);
       camera->zoomTo(cameraZoom);
@@ -157,7 +147,6 @@ private:
     if constexpr (std::is_same_v<T, AnimatedObject> ||
                   std::is_same_v<T, ScriptRunner> ||
                   std::is_same_v<T, RenderableObject> ||
-                  std::is_same_v<T, GameCamera> ||
                   std::is_same_v<T, TangibleObject>) {
 
       for (auto &script : scripts) {
@@ -176,7 +165,7 @@ private:
   float cameraZoom = 1.f;
   bool hasSprite = false;
   WindowID myWindow;
-  GameCamera *myCamera = nullptr;
+  CameraComponent *myCamera = nullptr;
   Scene *myScene = nullptr;
   std::vector<typename Scripter<T>::ScriptFunc> scripts;
   GameObject::UpdateDomain objectUpdateDomain;

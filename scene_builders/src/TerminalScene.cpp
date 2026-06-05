@@ -13,13 +13,13 @@ void TerminalScene::setup(Scene::Context ctx) {
                                         "Snowgun Terminal");
   windowManager.subscribe(terminalWindow, this);
 
-  camera = create(ObjectBuilder<GameCamera>(engine)
+  camera = create(ObjectBuilder<GameObject>(engine)
                       .withCameraComponent(this, 1.f, terminalWindow)
-                      .inUpdateDomain(terminalWindow));
+                      .inUpdateDomain(terminalWindow))
+               ->cameraComponent;
 
   text = create(GameTextBuilder("snowFont", engine)
                     .at({10.f, 10.f})
-                    .onWindow(terminalWindow)
                     .boundary(880.f)
                     .camera(camera)
                     .layer(Constants::UI_LAYER)

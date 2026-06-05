@@ -20,7 +20,7 @@ void RenderSystem::render(const CameraView &view) {
       rect.setFillColor(command.color);
       rect.setPosition(view.worldToScreen(command.position, command.paralax));
       rect.setScale(view.getZoom(), view.getZoom());
-      windowManager.drawOnWindow(command.window, rect);
+      windowManager.drawOnWindow(view.getTargetWindow(), rect);
       continue;
     }
 
@@ -34,7 +34,7 @@ void RenderSystem::render(const CameraView &view) {
 
     sprite.setScale(view.getZoom(), view.getZoom());
 
-    windowManager.drawOnWindow(command.window, sprite);
+    windowManager.drawOnWindow(view.getTargetWindow(), sprite);
   }
 }
 

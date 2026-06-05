@@ -41,7 +41,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
   }
 
   const WindowID main = windowManager.getMain();
-  CameraComponent *mainCamera = ctx.mainCamera->cameraComponent;
+  CameraComponent *mainCamera = ctx.mainCamera;
 
   if (inputManager.isJustPressed("tilePicker")) {
     if (!state.picker->isOpen()) {

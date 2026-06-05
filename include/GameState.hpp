@@ -1,12 +1,10 @@
 #pragma once
 
 #include "Bullet.hpp"
-#include "GameCamera.hpp"
 #include "GameObjectExposure.hpp"
 #include "GeneralContext.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <chrono>
-#include <vector>
 
 class GameState {
 public:
@@ -47,8 +45,6 @@ public:
 
 private:
   GameState();
-
-  std::vector<GameCamera *> activeCameras;
 
   std::chrono::high_resolution_clock::time_point lastFrameTime =
       std::chrono::high_resolution_clock::now();

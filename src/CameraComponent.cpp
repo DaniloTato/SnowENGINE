@@ -4,8 +4,9 @@
 #include "SpriteComponent.hpp"
 #include <algorithm>
 
-CameraComponent::CameraComponent(Scene *scene, WindowID windowDisplayedIn)
-    : scene(scene), windowDisplayedIn(windowDisplayedIn) {}
+CameraComponent::CameraComponent(Scene *scene, WindowID targetWindow,
+                                 sf::Vector2f &positionRef)
+    : scene(scene), positionRef(positionRef), targetWindow(targetWindow) {}
 
 void CameraComponent::update() {
   std::erase_if(subscriptions, [this](GameObject::ID id) {
@@ -14,10 +15,10 @@ void CameraComponent::update() {
 
   float dt = GameState::getInstance().dt();
   zoom += ((desiredZoom + impactZoom) - zoom) * zoomSpeed * dt;
-  position.x +=
-      ((desiredPosition.x + shakePosition.x) - position.x) * followSpeed.x * dt;
-  position.y +=
-      ((desiredPosition.y + shakePosition.y) - position.y) * followSpeed.y * dt;
+  positionRef.x += ((desiredPosition.x + shakePosition.x) - positionRef.x) *
+                   followSpeed.x * dt;
+  positionRef.y += ((desiredPosition.y + shakePosition.y) - positionRef.y) *
+                   followSpeed.y * dt;
 }
 
 CameraView CameraComponent::buildView() {
@@ -47,8 +48,7 @@ CameraView CameraComponent::buildView() {
                         .color = sprite->getColor(),
                         .scale = {zoom, zoom},
                         .layer = sprite->getLayer(),
-                        .paralax = sprite->getParalax(),
-                        .window = sprite->getWindow()});
+                        .paralax = sprite->getParalax()});
   }
 
   std::ranges::stable_sort(commands, std::greater<float>{},
@@ -56,7 +56,7 @@ CameraView CameraComponent::buildView() {
 
   std::cout << "commands size: " << commands.size() << "\n";
 
-  return {position, zoom, std::move(commands)};
+  return {targetWindow, positionRef, zoom, std::move(commands)};
 }
 
 void CameraComponent::subscribe(GameObject::ID id) {
@@ -71,7 +71,7 @@ void CameraComponent::unsubscribe(GameObject::ID id) {
 
 void CameraComponent::goTo(const sf::Vector2f &pos) { desiredPosition = pos; }
 
-void CameraComponent::goToDesired() { position = desiredPosition; }
+void CameraComponent::goToDesired() { positionRef = desiredPosition; }
 
 void CameraComponent::zoomTo(float newZoom) { desiredZoom = newZoom; }
 
@@ -89,7 +89,7 @@ float CameraComponent::getZoom() const { return zoom; }
 
 float CameraComponent::getDesiredZoom() const { return desiredZoom; }
 
-const sf::Vector2f &CameraComponent::getPosition() const { return position; }
+const sf::Vector2f &CameraComponent::getPosition() const { return positionRef; }
 
 const sf::Vector2f &CameraComponent::getDesiredPosition() const {
   return desiredPosition;

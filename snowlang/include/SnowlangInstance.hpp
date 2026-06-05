@@ -9,8 +9,6 @@
 
 #include "GameObjectExposure.hpp"
 
-#include "GameCamera.hpp"
-
 #include "ScheduledTask.hpp"
 #include <string>
 
@@ -61,7 +59,6 @@ public:
   Debug debug;
 
   // Quick fix for now. Correct Later
-  GameCamera *tileCamera;
   Engine *engineRef;
 };
 

@@ -2,8 +2,7 @@
 #include "GameState.hpp"
 
 SpriteComponent::SpriteComponent(const RenderizerParameters &params)
-    : texture(params.texture), layer(params.layer), paralax(params.parallax),
-      window(params.window) {
+    : texture(params.texture), layer(params.layer), paralax(params.parallax) {
 
   if (texture) {
     sprite.setTexture(*texture);
@@ -42,8 +41,6 @@ const sf::Color SpriteComponent::getColor() const { return color; }
 float SpriteComponent::getLayer() const { return layer; }
 
 float SpriteComponent::getParalax() const { return paralax; }
-
-WindowID SpriteComponent::getWindow() const { return window; }
 
 void SpriteComponent::setLayer(float newLayer) { layer = newLayer; }
 
