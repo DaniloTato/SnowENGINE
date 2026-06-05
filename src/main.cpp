@@ -42,7 +42,6 @@ int main() {
   WindowID mainWindow = windowManager.create(
       WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
       Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
-  windowManager.applyQueues();
   WindowLifecycleListener lifecycleListener(windowManager);
 
   windowManager.subscribe(mainWindow, &inputManager);

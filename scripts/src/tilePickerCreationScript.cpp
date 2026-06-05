@@ -1,4 +1,5 @@
 #include "tilePickerCreationScript.hpp"
+#include "CameraComponent.hpp"
 #include "Constants.hpp"
 #include "EnemyManager.hpp"
 #include "InputManager.hpp"
@@ -40,7 +41,7 @@ void tilePickerCreationScript(ScriptRunner &scriptRunner,
   }
 
   const WindowID main = windowManager.getMain();
-  GameCamera *mainCamera = ctx.mainCamera;
+  CameraComponent *mainCamera = ctx.mainCamera->cameraComponent;
 
   if (inputManager.isJustPressed("tilePicker")) {
     if (!state.picker->isOpen()) {

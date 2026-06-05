@@ -12,11 +12,8 @@ namespace Scripts {
 
 void cameraBehaviourScript(GameCamera &obj, const GeneralContext &ctx) {
 
-  std::cout << "[script] checking if cameraComponent exists" << "\n";
   if (!obj.cameraComponent)
     return;
-
-  std::cout << "doing behaviour" << "\n";
 
   CameraComponent &camera = *obj.cameraComponent;
 

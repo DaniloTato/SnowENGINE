@@ -19,15 +19,16 @@ void CameraComponent::update() {
       ((desiredPosition.y + shakePosition.y) - position.y) * followSpeed.y * dt;
 }
 
-CameraView CameraComponent::buildView() const {
+CameraView CameraComponent::buildView() {
   std::vector<RenderCommand> commands;
 
   for (auto id : subscriptions) {
     auto *obj = scene->findObjectById(id);
-    std::cout << "obj=" << obj << " sprite=" << obj->spriteComponent << "\n";
 
-    if (!obj)
+    if (!obj) {
+      unsubscribe(id);
       continue;
+    }
 
     if (!obj->spriteComponent)
       continue;
@@ -38,12 +39,6 @@ CameraView CameraComponent::buildView() const {
       continue;
 
     sf::Vector2f renderCommandPos = obj->position + obj->offset;
-
-    std::cout << "tex=" << sprite->getTexture() << " rect=("
-              << sprite->getRect().left << "," << sprite->getRect().top << ","
-              << sprite->getRect().width << "," << sprite->getRect().height
-              << ")"
-              << "\n";
 
     commands.push_back({.texture = sprite->getTexture(),
                         .position = renderCommandPos,
@@ -58,7 +53,7 @@ CameraView CameraComponent::buildView() const {
   std::ranges::stable_sort(commands, std::greater<float>{},
                            &RenderCommand::layer);
 
-  std::cout << "commands: " << commands.size() << "\n";
+  std::cout << "commands size: " << commands.size() << "\n";
 
   return {position, zoom, std::move(commands)};
 }
@@ -66,7 +61,6 @@ CameraView CameraComponent::buildView() const {
 void CameraComponent::subscribe(GameObject::ID id) {
   if (std::ranges::find(subscriptions, id) == subscriptions.end()) {
     subscriptions.push_back(id);
-    std::cout << "subscribed object on cam" << "\n";
   }
 }
 

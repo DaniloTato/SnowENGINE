@@ -17,7 +17,7 @@ public:
 
   void update();
 
-  [[nodiscard]] CameraView buildView() const;
+  [[nodiscard]] CameraView buildView();
 
   void goTo(const sf::Vector2f &pos);
   void goToDesired();

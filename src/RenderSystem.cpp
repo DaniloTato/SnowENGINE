@@ -1,7 +1,6 @@
 #include "RenderSystem.hpp"
 #include "CameraView.hpp"
 #include "Constants.hpp"
-#include <iostream>
 
 RenderSystem::RenderSystem(WindowManager &windowManager)
     : windowManager(windowManager) {}
@@ -35,15 +34,7 @@ void RenderSystem::render(const CameraView &view) {
 
     sprite.setScale(view.getZoom(), view.getZoom());
 
-    auto pos = sprite.getPosition();
-    auto bounds = sprite.getGlobalBounds();
-    std::cout << "pos=(" << pos.x << "," << pos.y << ") "
-              << "size=(" << bounds.getSize().x << "," << bounds.getSize().y
-              << ") "
-              << "tex=" << command.texture << "\n";
-
     windowManager.drawOnWindow(command.window, sprite);
-    std::cout << "rendering\n";
   }
 }
 

@@ -21,6 +21,7 @@ WindowID WindowManager::create(Set set, unsigned int w, unsigned int h,
   gw.setWindow(new sf::RenderWindow(sf::VideoMode(w, h), name));
 
   lifecycle.queueCreate(id, WindowEntry{.set = set, .window = gw});
+  applyQueues();
 
   return id;
 }
