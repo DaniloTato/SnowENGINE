@@ -20,37 +20,14 @@ WindowID WindowManager::create(Set set, unsigned int w, unsigned int h,
   GameWindow gw(nullptr, Constants::FRAME_RATE);
   gw.setWindow(new sf::RenderWindow(sf::VideoMode(w, h), name));
 
-  windows.emplace(id, WindowEntry{.set = set, .window = gw});
+  lifecycle.queueCreate(id, WindowEntry{.set = set, .window = gw});
 
   return id;
 }
 
-void WindowManager::queueDestroy(WindowID id) { pendingDestroy.push_back(id); }
+void WindowManager::queueDestroy(WindowID id) { lifecycle.queueDestroy(id); }
 
-void WindowManager::applyDestroyQueue() {
-  for (auto id : pendingDestroy) {
-    destroy(id);
-  }
-  pendingDestroy.clear();
-}
-
-void WindowManager::destroy(WindowID id) {
-  auto it = windows.find(id);
-  if (it == windows.end())
-    return;
-
-  // Maybe fetch Game Window should return a iterator
-  auto *win = it->second.window.getWindow();
-
-  Renderizer::unregisterByWindow(id);
-
-  if (win && win->isOpen()) {
-    win->close();
-  }
-
-  delete win;
-  windows.erase(it);
-}
+void WindowManager::applyQueues() { lifecycle.apply(windows); }
 
 const std::unordered_map<WindowID, WindowManager::WindowEntry> &
 WindowManager::getAll() const {
@@ -167,35 +144,48 @@ void WindowManager::checkRenderFlag(WindowID id) {
   }
 }
 
-void WindowManager::drawOnWindow(WindowID id, const sf::Sprite &toDraw) {
+void WindowManager::drawOnWindow(WindowID id, const sf::Drawable &drawable) {
   if (id.isNull()) {
+    std::cout << "[WindowManager] [drawOnWindow] tried to draw over window "
+                 "with NULL ID.\n";
+  }
+  auto *gw = fetchGameWindow(id);
+  if (!gw) {
+    std::cout << "[WindowManager] [drawOnWindow] valid id fetched nullptr of "
+                 "GameWindow\n";
     return;
   }
-
-  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
-
-  window->draw(toDraw);
-}
-
-void WindowManager::drawOnWindow(WindowID id,
-                                 const sf::RectangleShape &toDraw) {
-  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
-  window->draw(toDraw);
-}
-
-void WindowManager::drawOnWindow(WindowID id, const sf::CircleShape &toDraw) {
-  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
-  window->draw(toDraw);
-}
-
-void WindowManager::drawOnWindow(WindowID id, const sf::Text &toDraw) {
-  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
-  window->draw(toDraw);
+  auto *window = gw->getWindow();
+  if (!window) {
+    std::cout << "[WindowManager] [drawOnWindow] valid gameWindow holds null "
+                 "(potentially destroyed) "
+                 "WindowInstance\n";
+    return;
+  }
+  window->draw(drawable);
 }
 
 void WindowManager::drawOnWindow(WindowID id, const sf::Vertex *vertices,
                                  std::size_t count, sf::PrimitiveType type) {
-  sf::RenderWindow *window = fetchGameWindow(id)->getWindow();
+  if (id.isNull()) {
+    std::cout
+        << "[WindowManager] [drawOnWindow(lines)] tried to draw over window "
+           "with NULL ID.\n";
+  }
+  auto *gw = fetchGameWindow(id);
+  if (!gw) {
+    std::cout << "[WindowManager] [drawOnWindow(lines)] valid id fetched "
+                 "nullptr of GameWindow\n";
+    return;
+  }
+  auto *window = gw->getWindow();
+  if (!window) {
+    std::cout
+        << "[WindowManager] [drawOnWindow(lines)] valid gameWindow holds null "
+           "(potentially destroyed) "
+           "WindowInstance\n";
+    return;
+  }
   window->draw(vertices, count, type);
 }
 

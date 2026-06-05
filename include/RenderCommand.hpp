@@ -12,5 +12,4 @@ struct RenderCommand {
   float layer = 0.f;
   float paralax = 1.f;
   WindowID window;
-  bool isRectangle = false;
 };

@@ -10,7 +10,8 @@ public:
   void render(const CameraView &view);
 
 private:
-  [[nodiscard]] bool isVisible(const sf::Sprite &sprite) const;
+  [[nodiscard]] bool isVisible(const sf::Vector2f &pos,
+                               const sf::Vector2f &size) const;
 
 private:
   WindowManager &windowManager;

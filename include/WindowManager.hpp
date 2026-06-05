@@ -5,6 +5,7 @@
 #include <string>
 
 #include "GameWindow.hpp"
+#include "MapLifecycle.hpp"
 #include "WindowID.hpp"
 
 class IEventListener;
@@ -20,14 +21,13 @@ public:
 
 private:
   std::unordered_map<WindowID, WindowEntry> windows;
+  MapLifecycle<WindowID, WindowEntry> lifecycle;
   size_t nextId = 0;
 
   [[nodiscard]] GameWindow *fetchGameWindow(WindowID id);
   [[nodiscard]] const GameWindow *fetchGameWindow(WindowID id) const;
-  void destroy(WindowID id);
 
   std::unordered_map<WindowID, std::vector<IEventListener *>> listeners;
-  std::vector<WindowID> pendingDestroy;
 
 public:
   WindowManager() = default;
@@ -42,17 +42,14 @@ public:
 
   void queueDestroy(WindowID id);
 
-  void applyDestroyQueue();
+  void applyQueues();
 
   [[nodiscard]] const std::unordered_map<WindowID, WindowEntry> &getAll() const;
 
   std::vector<WindowID> getByDomain(Set set);
   [[nodiscard]] Set getDomainOfWindow(WindowID id) const;
 
-  void drawOnWindow(WindowID id, const sf::Sprite &toDraw);
-  void drawOnWindow(WindowID id, const sf::RectangleShape &toDraw);
-  void drawOnWindow(WindowID id, const sf::CircleShape &toDraw);
-  void drawOnWindow(WindowID id, const sf::Text &toDraw);
+  void drawOnWindow(WindowID id, const sf::Drawable &toDraw);
   void drawOnWindow(WindowID id, const sf::Vertex *vertices, std::size_t count,
                     sf::PrimitiveType type);
 

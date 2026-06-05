@@ -33,7 +33,9 @@ void MainScene::setup(Scene::Context ctx) {
                        .script(Scripts::cameraBehaviourScript));
 
   GameCamera *uiCamera =
-      this->create(CameraBuilder().updateDomain(WindowManager::Set::MAIN));
+      this->create(ObjectBuilder<GameCamera>(engine)
+                       .withCameraComponent(this, 1.f)
+                       .inUpdateDomain(WindowManager::Set::MAIN));
 
   levelManager.initializeRenderContext(engine, *this, mainWindow, mainCamera);
 

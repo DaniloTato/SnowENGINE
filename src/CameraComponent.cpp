@@ -24,12 +24,7 @@ CameraView CameraComponent::buildView() const {
 
   for (auto id : subscriptions) {
     auto *obj = scene->findObjectById(id);
-
-    std::cout << "obj=" << obj
-
-              << " sprite=" << obj->spriteComponent
-
-              << "\n";
+    std::cout << "obj=" << obj << " sprite=" << obj->spriteComponent << "\n";
 
     if (!obj)
       continue;
@@ -43,6 +38,12 @@ CameraView CameraComponent::buildView() const {
       continue;
 
     sf::Vector2f renderCommandPos = obj->position + obj->offset;
+
+    std::cout << "tex=" << sprite->getTexture() << " rect=("
+              << sprite->getRect().left << "," << sprite->getRect().top << ","
+              << sprite->getRect().width << "," << sprite->getRect().height
+              << ")"
+              << "\n";
 
     commands.push_back({.texture = sprite->getTexture(),
                         .position = renderCommandPos,

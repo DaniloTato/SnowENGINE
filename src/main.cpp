@@ -42,6 +42,7 @@ int main() {
   WindowID mainWindow = windowManager.create(
       WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
       Constants::SCREEN_HEIGHT, Constants::MAIN_WINDOW_NAME);
+  windowManager.applyQueues();
   WindowLifecycleListener lifecycleListener(windowManager);
 
   windowManager.subscribe(mainWindow, &inputManager);
@@ -76,7 +77,6 @@ int main() {
     EnemyManager::getInstance().applyQueues();
     CollectableManager::getInstance().applyQueues();
     BulletManager::getInstance().update();
-    windowManager.applyDestroyQueue();
 
     for (const auto &[id, entry] : windows) {
 
@@ -92,6 +92,9 @@ int main() {
     for (const auto &[id, entry] : windows) {
       windowManager.checkRenderFlag(id);
     }
+
+    // Position is to avoid fetching an already deleted window on last frame.
+    windowManager.applyQueues();
 
     sf::sleep(sf::milliseconds(1));
   }
