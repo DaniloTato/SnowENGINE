@@ -7,7 +7,12 @@
 #include "ScriptRunner.hpp"
 #include "SpriteComponent.hpp"
 #include "TangibleObject.hpp"
+#include "TextComponent.hpp"
 #include "TextureManager.hpp"
+
+#include "Constants.hpp"
+#include "FontAtlas.hpp"
+#include "TextProperties.hpp"
 
 #include <memory>
 #include <type_traits>
@@ -30,17 +35,56 @@ public:
   }
 
   ObjectBuilder &rectangle(int width, int height) {
-    hasSprite = true;
-
     params.registerAsRectShape = true;
     rectProportions = {0, 0, width, height};
+    wasRectModified = true;
+    return *this;
+  }
+
+  ObjectBuilder &withTextureRect(const sf::IntRect &rect) {
+    rectProportions = rect;
+    wasRectModified = true;
+    return *this;
+  }
+
+  ObjectBuilder &withText(std::string markup) {
+    hasText = true;
+    myTextMarkup = std::move(markup);
+    return *this;
+  }
+
+  ObjectBuilder &textBoundary(float b) {
+    hasText = true;
+    myTextBoundary = b;
+    return *this;
+  }
+
+  ObjectBuilder &textAlignment(TextAlign a) {
+    hasText = true;
+    myTextAlignment = a;
+    return *this;
+  }
+
+  ObjectBuilder &textTypewriter(float speed) {
+    hasText = true;
+    useTypewriter = true;
+    textTypewriterSpeed = speed;
+    return *this;
+  }
+
+  ObjectBuilder &textFont(FontAtlas atlas) {
+    hasText = true;
+    myTextFontAtlas = atlas;
     return *this;
   }
 
   ObjectBuilder &withTexture(std::string_view textureKey) {
-    hasSprite = true;
-
     params.texture = &TextureManager::getInstance().get(textureKey);
+    return *this;
+  }
+
+  ObjectBuilder &withTexture(sf::Texture &texture) {
+    params.texture = &texture;
     return *this;
   }
 
@@ -56,16 +100,17 @@ public:
   }
 
   ObjectBuilder &layer(float l) {
-    hasSprite = true;
-
     params.layer = l;
     return *this;
   }
 
   ObjectBuilder &parallax(float p) {
-    hasSprite = true;
-
     params.parallax = p;
+    return *this;
+  }
+
+  ObjectBuilder &withSprite() {
+    hasSprite = true;
     return *this;
   }
 
@@ -111,6 +156,30 @@ public:
 private:
   void configure(T &obj) const {
 
+    if (hasText) {
+      auto textComponent = std::make_unique<TextComponent>();
+
+      textComponent->markup = myTextMarkup;
+      textComponent->fontAtlas = myTextFontAtlas;
+      textComponent->alignment = myTextAlignment;
+      textComponent->boundary = myTextBoundary;
+
+      if (useTypewriter) {
+        textComponent->effect = TextEffect::Typewriter;
+
+        textComponent->typeDelay = textTypewriterSpeed;
+      }
+
+      auto renderComponent =
+          std::make_unique<TextRenderComponent>(&obj, params.texture);
+
+      obj.textComponent = textComponent.release();
+
+      obj.textRenderComponent = renderComponent.release();
+
+      obj.renderProviders.push_back(obj.textRenderComponent);
+    }
+
     if (myCamera) {
       myCamera->subscribe(obj.getId());
     }
@@ -126,13 +195,13 @@ private:
     }
 
     if (hasSprite) {
-      auto sprite = std::make_unique<SpriteComponent>(params);
+      auto sprite = std::make_unique<SpriteComponent>(&obj, params);
 
-      if (params.registerAsRectShape) {
+      if (wasRectModified) {
         sprite->setRect(rectProportions, 1);
       }
-
       obj.spriteComponent = sprite.release();
+      obj.renderProviders.push_back(obj.spriteComponent);
     }
 
     if constexpr (std::is_same_v<T, AnimatedObject> ||
@@ -170,7 +239,18 @@ private:
   std::vector<typename Scripter<T>::ScriptFunc> scripts;
   GameObject::UpdateDomain objectUpdateDomain;
   sf::IntRect rectProportions;
+  bool wasRectModified = false;
   sf::Vector2f position;
   RenderizerParameters params;
   Animations animations;
+
+  // bs text related stuff
+
+  bool hasText = false;
+  std::string myTextMarkup;
+  FontAtlas myTextFontAtlas = Constants::DEFAULT_FONT_ATLAS;
+  TextAlign myTextAlignment = TextAlign::Left;
+  float myTextBoundary = 100000.f;
+  bool useTypewriter = false;
+  float textTypewriterSpeed = 0.04f;
 };

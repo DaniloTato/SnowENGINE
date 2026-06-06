@@ -6,8 +6,6 @@
 #include "ScriptRunner.hpp"
 #include "TangibleObject.hpp"
 
-#include "GameTextBuilder.hpp"
-
 #include "basicMovementScript.hpp"
 #include "cameraBehaviourScript.hpp"
 #include "terminalCreationScript.hpp"
@@ -43,6 +41,7 @@ void MainScene::setup(Scene::Context ctx) {
 
   auto *image = create(ObjectBuilder<TangibleObject>(engine)
                            .withTexture("todd")
+                           .withSprite()
                            .at(100, 100)
                            .onCamera(mainCameraObject->cameraComponent)
                            .withEmptyAnimation(16, 16));
@@ -51,18 +50,20 @@ void MainScene::setup(Scene::Context ctx) {
 
   this->create(ObjectBuilder<RenderableObject>(engine)
                    .rectangle(20, 20)
+                   .withSprite()
                    .at(200, 200)
                    .onCamera(mainCameraObject->cameraComponent));
 
   this->create(
-      GameTextBuilder("snowFont", engine)
-          .at({0.f, 50.f})
-          .boundary(Constants::SCREEN_WIDTH)
-          .alignment(GameText::Align::Center)
-          .typewriter(0.1f)
-          .camera(uiCameraObject->cameraComponent)
-          .markup(
-              R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])"));
+      ObjectBuilder<GameObject>(engine)
+          .at(0.f, 50.f)
+          .withTexture("snowFont")
+          .withText(
+              R"([anim=sin][color=yellow]Hello[/color][/anim] [anim=shake][color=white]World[/color][/anim])")
+          .textBoundary(Constants::SCREEN_WIDTH)
+          .textAlignment(TextAlign::Center)
+          .textTypewriter(0.1f)
+          .onCamera(uiCameraObject->cameraComponent));
 
   auto *sr = this->create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
       GameObject::UpdateDomain{

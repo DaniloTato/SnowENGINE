@@ -1,12 +1,17 @@
 #pragma once
 
+#include "RenderProvider.hpp"
 #include "RenderizerParameters.hpp"
-#include "WindowID.hpp"
 #include <SFML/Graphics.hpp>
 
-class SpriteComponent {
+class GameObject;
+
+class SpriteComponent : public RenderProvider {
 public:
-  explicit SpriteComponent(const RenderizerParameters &params);
+  explicit SpriteComponent(GameObject *owner,
+                           const RenderizerParameters &params);
+
+  void appendRenderCommands(std::vector<RenderCommand> &out) const override;
 
   void setRect(const sf::IntRect &newRect, int direction);
 
@@ -33,6 +38,7 @@ public:
   [[nodiscard]] bool shouldRender() const;
 
 private:
+  GameObject *owner;
   sf::Texture *texture = nullptr;
   sf::Sprite sprite;
 

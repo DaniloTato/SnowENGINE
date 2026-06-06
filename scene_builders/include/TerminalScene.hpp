@@ -1,6 +1,5 @@
 #pragma once
 
-#include "GameText.hpp"
 #include "RegistryMacros.hpp"
 #include "Scene.hpp"
 #include "SceneBuilderRegistry.hpp"
@@ -15,7 +14,7 @@ public:
 private:
   Terminal terminal;
   CameraComponent *camera = nullptr;
-  GameText *text = nullptr;
+  GameObject *text = nullptr;
   WindowID terminalWindow;
   std::string lastMarkup;
 };

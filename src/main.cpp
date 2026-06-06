@@ -4,7 +4,6 @@
 /*Engine Objects*/
 #include "BulletManager.hpp"
 #include "CollectableManager.hpp"
-#include "DialogueManager.hpp"
 #include "EnemyManager.hpp"
 #include "Engine.hpp"
 #include "GameLoader.hpp"
@@ -37,7 +36,6 @@ int main() {
   SceneManager &sceneManager = engine.getSceneManager();
   LevelManager &levelManager = engine.getLevelManager();
   WindowManager &windowManager = engine.getWindowManager();
-  DialogueManager &dialogueManager = engine.getDialogueManager();
 
   WindowID mainWindow = windowManager.create(
       WindowManager::Set::MAIN, Constants::SCREEN_WIDTH,
@@ -71,7 +69,6 @@ int main() {
 
     // now we dont block instances of managers when transitioning scenes.
     levelManager.applyQueuedTileChanges();
-    dialogueManager.applyQueues();
     BulletManager::getInstance().applyQueues();
     EnemyManager::getInstance().applyQueues();
     CollectableManager::getInstance().applyQueues();

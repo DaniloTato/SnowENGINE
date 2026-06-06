@@ -1,7 +1,6 @@
 #include "TerminalScene.hpp"
 
 #include "Constants.hpp"
-#include "GameTextBuilder.hpp"
 #include "GeneralContext.hpp"
 #include "ObjectBuilder.hpp"
 
@@ -18,12 +17,13 @@ void TerminalScene::setup(Scene::Context ctx) {
                       .inUpdateDomain(terminalWindow))
                ->cameraComponent;
 
-  text = create(GameTextBuilder("snowFont", engine)
-                    .at({10.f, 10.f})
-                    .boundary(880.f)
-                    .camera(camera)
+  text = create(ObjectBuilder<GameObject>(engine)
+                    .withTexture("snowFont")
+                    .at(10.f, 10.f)
+                    .textBoundary(880.f)
+                    .onCamera(camera)
                     .layer(Constants::UI_LAYER)
-                    .markup(""));
+                    .withText(""));
 }
 
 void TerminalScene::update(const GeneralContext &ctx) {
@@ -38,7 +38,11 @@ void TerminalScene::update(const GeneralContext &ctx) {
 
   if (lastMarkup != terminal.buildMarkup()) {
     lastMarkup = terminal.buildMarkup();
-    text->loadFromMarkup(lastMarkup);
+    if (text->textComponent) {
+      text->textComponent->setMarkup(lastMarkup);
+    } else {
+      std::cout << "[TerminalScene] holds a text with no textComponent\n";
+    }
   }
 }
 

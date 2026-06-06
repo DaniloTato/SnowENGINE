@@ -44,6 +44,8 @@
 
 - Create Base ID<Type> Object tpo use as ID<WindowInstance> ID<GameObject>
 
+- Reimplement DialogueManager
+
 _PIORITY_
 
 - Remove static gameObjectRegistry from GameObject class. `DONE`
@@ -62,4 +64,6 @@ _PIORITY_
   - ScriptComponent?
   - etc.
 
-- Make WindowID part of the CameraComponent, not part of SpriteComponent
+- Make WindowID part of the CameraComponent, not part of SpriteComponent `DONE`
+
+- Remove Object Builder template use whenever no more GameObject subclasses exist.

@@ -27,6 +27,7 @@ struct TileInfo {
   int x, y;
   sf::IntRect textureRect;
   RenderableObject *object = nullptr;
+  sf::Texture *tilesheet = nullptr;
 };
 
 struct LayerInfo {
@@ -106,8 +107,6 @@ private:
   void loadLayer(size_t layerNo, const nlohmann::json &layerJSON, int tileSize);
 
   void ensureLevelLoaded() const;
-
-  RenderizerParameters makeRenderParams(size_t layerNo) const;
 
   bool isLevelLoaded;
 

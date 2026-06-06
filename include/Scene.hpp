@@ -2,6 +2,7 @@
 
 #include "GameObject.hpp"
 #include "RenderSystem.hpp"
+#include "TextSystem.hpp"
 #include "VectorLifecycle.hpp"
 #include "WindowID.hpp"
 #include <memory>
@@ -41,6 +42,9 @@ protected:
   std::vector<std::unique_ptr<GameObject>> objects;
   std::unordered_map<GameObject::ID, GameObject *> objectIndex;
   VectorLifecycle<GameObject> lifecycle;
+
+  // Systems
+  TextSystem textSystem;
 };
 
 template <typename Builder>

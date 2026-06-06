@@ -8,6 +8,9 @@
 struct GeneralContext;
 class SpriteComponent;
 class CameraComponent;
+class RenderProvider;
+class TextRenderComponent;
+class TextComponent;
 
 class GameObject {
 public:
@@ -50,8 +53,14 @@ public:
   sf::Vector2f offset;
 
   // Hybrid approach. Transitioning towards ECS
-  SpriteComponent *spriteComponent = nullptr;
+
+  // Right now it can only hold one sprite component.
+  // Next, let's move towards vector<RenderPrivoder>
+  std::vector<RenderProvider *> renderProviders;
   CameraComponent *cameraComponent = nullptr;
+  SpriteComponent *spriteComponent = nullptr;
+  TextRenderComponent *textRenderComponent = nullptr;
+  TextComponent *textComponent = nullptr;
 
   GameObject(const GameObject &) = delete;
   GameObject &operator=(const GameObject &) = delete;

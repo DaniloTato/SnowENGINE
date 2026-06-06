@@ -1,12 +1,21 @@
 #include "Scene.hpp"
 #include "CameraComponent.hpp"
 #include "GameObject.hpp"
+#include "GameState.hpp"
+#include "GeneralContext.hpp"
 
 void Scene::update(const GeneralContext &ctx) {
 
   for (auto &obj : objects) {
     if (!obj->isPendingDestroy()) {
       obj->update(ctx);
+    }
+  }
+
+  for (auto &obj : objects) {
+    if (obj->textComponent && obj->textRenderComponent) {
+      textSystem.update(*obj->textComponent, *obj->textRenderComponent,
+                        GameState::getInstance().dt());
     }
   }
 

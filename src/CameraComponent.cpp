@@ -32,29 +32,19 @@ CameraView CameraComponent::buildView() {
       continue;
     }
 
-    if (!obj->spriteComponent)
-      continue;
-
-    auto *sprite = obj->spriteComponent;
-
-    if (!sprite->shouldRender())
-      continue;
-
-    sf::Vector2f renderCommandPos = obj->position + obj->offset;
-
-    commands.push_back({.texture = sprite->getTexture(),
-                        .position = renderCommandPos,
-                        .textureRect = sprite->getRect(),
-                        .color = sprite->getColor(),
-                        .scale = {zoom, zoom},
-                        .layer = sprite->getLayer(),
-                        .paralax = sprite->getParalax()});
+    for (auto &provider : obj->renderProviders) {
+      if (!provider) {
+        std::cout << "[CameraComponent] [buildView] caught null provider"
+                  << "\n";
+        continue;
+      }
+      // We could catch culling from here.
+      provider->appendRenderCommands(commands);
+    }
   }
 
   std::ranges::stable_sort(commands, std::greater<float>{},
                            &RenderCommand::layer);
-
-  std::cout << "commands size: " << commands.size() << "\n";
 
   return {targetWindow, positionRef, zoom, std::move(commands)};
 }

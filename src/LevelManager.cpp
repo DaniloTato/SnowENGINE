@@ -14,7 +14,9 @@ RenderableObject *LevelManager::TileFactory::create(
     Scene &scene, const TileInfo &tile, Engine *engine, WindowID window,
     CameraComponent *camera, float layer, float paralax, int tileSize) {
   auto *obj = scene.create(ObjectBuilder<RenderableObject>(*engine)
-                               .rectangle(tileSize, tileSize)
+                               .withSprite()
+                               .withTexture(*tile.tilesheet)
+                               .withTextureRect(tile.textureRect)
                                .onCamera(camera)
                                .layer(layer)
                                .parallax(paralax));
@@ -112,6 +114,8 @@ void LevelManager::loadLayer(size_t layerNo, const json &layerJSON,
     info.x = t["x"].get<int>();
     info.y = t["y"].get<int>();
 
+    info.tilesheet = &tilesheet;
+
     size_t unsignedInfoX = info.x;
     size_t unsignedInfoY = info.y;
 
@@ -207,6 +211,7 @@ void LevelManager::createTile(int layerNo, int x, int y, sf::IntRect rect) {
   }
 
   TileInfo info;
+  info.tilesheet = &tilesheet;
   info.x = x;
   info.y = y;
   info.textureRect = rect;
@@ -389,17 +394,4 @@ void LevelManager::initializeRenderContext(Engine &engine, Scene &scene,
   renderContext.scene = &scene;
   renderContext.window = window;
   renderContext.camera = camera;
-}
-
-RenderizerParameters LevelManager::makeRenderParams(size_t layerNo) const {
-
-  float layerValue = static_cast<float>(layerNo);
-  if (layers[layerNo].name == "secret") {
-    layerValue = -1;
-  }
-
-  return RenderizerParameters{.engine = *renderContext.engine,
-                              .texture = const_cast<sf::Texture *>(&tilesheet),
-                              .layer = layerValue,
-                              .parallax = layers[layerNo].paralax};
 }

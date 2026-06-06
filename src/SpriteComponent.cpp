@@ -1,8 +1,10 @@
 #include "SpriteComponent.hpp"
 #include "GameState.hpp"
 
-SpriteComponent::SpriteComponent(const RenderizerParameters &params)
-    : texture(params.texture), layer(params.layer), paralax(params.parallax) {
+SpriteComponent::SpriteComponent(GameObject *owner,
+                                 const RenderizerParameters &params)
+    : owner(owner), texture(params.texture), layer(params.layer),
+      paralax(params.parallax) {
 
   if (texture) {
     sprite.setTexture(*texture);
@@ -81,4 +83,14 @@ void SpriteComponent::toggleColorEvery(float time, const sf::Color &color1,
 
     colorCountDown = time;
   }
+}
+
+void SpriteComponent::appendRenderCommands(
+    std::vector<RenderCommand> &out) const {
+  out.push_back({.texture = texture,
+                 .position = owner->position + owner->offset,
+                 .textureRect = rect,
+                 .color = color,
+                 .layer = layer,
+                 .paralax = paralax});
 }
