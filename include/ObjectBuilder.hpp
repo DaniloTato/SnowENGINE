@@ -215,7 +215,6 @@ private:
 
     if constexpr (std::is_same_v<T, AnimatedObject> ||
                   std::is_same_v<T, ScriptRunner> ||
-                  std::is_same_v<T, RenderableObject> ||
                   std::is_same_v<T, TangibleObject>) {
 
       for (auto &script : scripts) {

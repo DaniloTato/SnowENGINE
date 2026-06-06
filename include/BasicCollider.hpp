@@ -6,7 +6,6 @@
 #include <vector>
 
 class TangibleObject;
-class RenderableObject;
 
 class BasicCollider {
 
@@ -30,9 +29,6 @@ public:
   static bool objectsColliding(TangibleObject *object1,
                                TangibleObject *object2);
   static bool isCollidingRect(const sf::FloatRect &a, const sf::FloatRect &b);
-  static bool
-  tangibleAndRenderableCollision(TangibleObject *tangibleObject,
-                                 RenderableObject *renderableObject);
 
 private:
   sf::Vector2f size = {16.f, 16.f};

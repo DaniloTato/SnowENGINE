@@ -24,15 +24,15 @@ void MainScene::setup(Scene::Context ctx) {
   LevelManager &levelManager = engine.getLevelManager();
 
   ScriptRunner *mainCameraObject =
-      this->create(ObjectBuilder<ScriptRunner>(engine)
-                       .withCameraComponent(this, 1.f, mainWindow)
-                       .inUpdateDomain(WindowManager::Set::MAIN)
-                       .script(Scripts::cameraBehaviourScript));
+      create(ObjectBuilder<ScriptRunner>(engine)
+                 .withCameraComponent(this, 1.f, mainWindow)
+                 .inUpdateDomain(WindowManager::Set::MAIN)
+                 .script(Scripts::cameraBehaviourScript));
 
   ScriptRunner *uiCameraObject =
-      this->create(ObjectBuilder<ScriptRunner>(engine)
-                       .withCameraComponent(this, 1.f, mainWindow)
-                       .inUpdateDomain(WindowManager::Set::MAIN));
+      create(ObjectBuilder<ScriptRunner>(engine)
+                 .withCameraComponent(this, 1.f, mainWindow)
+                 .inUpdateDomain(WindowManager::Set::MAIN));
 
   levelManager.initializeRenderContext(engine, *this, mainWindow,
                                        mainCameraObject->cameraComponent);
@@ -48,13 +48,13 @@ void MainScene::setup(Scene::Context ctx) {
 
   image->scripter.addScript(Scripts::basicMovementScript);
 
-  this->create(ObjectBuilder<RenderableObject>(engine)
-                   .rectangle(20, 20)
-                   .withSprite()
-                   .at(200, 200)
-                   .onCamera(mainCameraObject->cameraComponent));
+  create(ObjectBuilder<GameObject>(engine)
+             .rectangle(20, 20)
+             .withSprite()
+             .at(200, 200)
+             .onCamera(mainCameraObject->cameraComponent));
 
-  this->create(
+  create(
       ObjectBuilder<GameObject>(engine)
           .at(0.f, 50.f)
           .withTexture("snowFont")
@@ -65,7 +65,7 @@ void MainScene::setup(Scene::Context ctx) {
           .textTypewriter(0.1f)
           .onCamera(uiCameraObject->cameraComponent));
 
-  auto *sr = this->create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
+  auto *sr = create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
       GameObject::UpdateDomain{
           {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}}));
 

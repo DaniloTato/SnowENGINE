@@ -4,7 +4,6 @@ from pathlib import Path
 TARGETS = {
     "GameObject": {"include": "GameObject.hpp", "var": "object"},
     "AnimatedObject": {"include": "AnimatedObject.hpp", "var": "animated"},
-    "RenderableObject": {"include": "RenderableObject.hpp", "var": "renderable"},
     "TangibleObject": {"include": "TangibleObject.hpp", "var": "tangible"},
     "ScriptRunner": {"include": "ScriptRunner.hpp", "var": "runner"},
 }

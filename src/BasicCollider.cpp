@@ -2,7 +2,6 @@
 #include "Constants.hpp"
 #include "LevelManager.hpp"
 #include "SFML/System/Vector2.hpp"
-#include "SpriteComponent.hpp"
 #include "TangibleObject.hpp"
 #include <cmath>
 
@@ -11,17 +10,6 @@ bool BasicCollider::objectsColliding(TangibleObject *object1,
   // maybe add dependecy collider-gameObject?
   return isCollidingRect(object1->collider.getCollisionRect(object1->position),
                          object2->collider.getCollisionRect(object2->position));
-}
-
-bool BasicCollider::tangibleAndRenderableCollision(
-    TangibleObject *tangibleObject, RenderableObject *renderableObject) {
-  return isCollidingRect(
-      tangibleObject->collider.getCollisionRect(tangibleObject->position),
-      sf::FloatRect(renderableObject->position.x, renderableObject->position.y,
-                    static_cast<float>(
-                        renderableObject->spriteComponent->getRect().width),
-                    static_cast<float>(
-                        renderableObject->spriteComponent->getRect().height)));
 }
 
 bool BasicCollider::isCollidingRect(const sf::FloatRect &a,

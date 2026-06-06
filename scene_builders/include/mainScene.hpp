@@ -2,7 +2,7 @@
 
 #include "RegistryMacros.hpp"
 #include "Scene.hpp"
-#include "SceneBuilderRegistry.hpp"
+#include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
 
 class MainScene : public Scene {
 public:

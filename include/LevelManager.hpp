@@ -1,5 +1,4 @@
 #pragma once
-#include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include "SFML/Graphics/Texture.hpp"
 #include "Scene.hpp"
@@ -26,7 +25,7 @@ struct TileDeletionRequest {
 struct TileInfo {
   int x, y;
   sf::IntRect textureRect;
-  RenderableObject *object = nullptr;
+  GameObject *object = nullptr;
   sf::Texture *tilesheet = nullptr;
 };
 
@@ -53,11 +52,11 @@ public:
 
   class TileFactory {
   public:
-    static RenderableObject *create(Scene &scene, const TileInfo &tile,
-                                    Engine *engine, WindowID window,
-                                    CameraComponent *camera, float layer,
-                                    float paralax, int tileSize);
-    static void destroy(RenderableObject *&obj);
+    static GameObject *create(Scene &scene, const TileInfo &tile,
+                              Engine *engine, WindowID window,
+                              CameraComponent *camera, float layer,
+                              float paralax, int tileSize);
+    static void destroy(GameObject *&obj);
   };
 
   using LevelLayout2D = const std::vector<std::vector<int>>;

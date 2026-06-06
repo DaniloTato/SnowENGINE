@@ -3,17 +3,16 @@
 #include "Constants.hpp"
 #include "Helpers.hpp"
 #include "ObjectBuilder.hpp"
-#include "RenderableObject.hpp"
 #include "SFML/Graphics/Rect.hpp"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
-RenderableObject *LevelManager::TileFactory::create(
+GameObject *LevelManager::TileFactory::create(
     Scene &scene, const TileInfo &tile, Engine *engine, WindowID window,
     CameraComponent *camera, float layer, float paralax, int tileSize) {
-  auto *obj = scene.create(ObjectBuilder<RenderableObject>(*engine)
+  auto *obj = scene.create(ObjectBuilder<GameObject>(*engine)
                                .withSprite()
                                .withTexture(*tile.tilesheet)
                                .withTextureRect(tile.textureRect)
@@ -30,7 +29,7 @@ RenderableObject *LevelManager::TileFactory::create(
   return obj;
 }
 
-void LevelManager::TileFactory::destroy(RenderableObject *&obj) {
+void LevelManager::TileFactory::destroy(GameObject *&obj) {
   if (obj) {
     obj->destroyLater();
     obj = nullptr;
@@ -371,7 +370,7 @@ void LevelManager::setSecretLayerOppacity(float oppacity) {
   if (it != layers.end()) {
     LayerInfo &secretLayer = *it;
     for (auto &tile : secretLayer.tiles) {
-      RenderableObject *obj = tile.object;
+      GameObject *obj = tile.object;
       if (obj && obj->spriteComponent) {
         obj->spriteComponent->setColor(
             sf::Color(255, 255, 255, static_cast<sf::Uint8>(oppacity)));

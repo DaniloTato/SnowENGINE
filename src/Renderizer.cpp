@@ -3,6 +3,7 @@
 #include "Constants.hpp"
 #include "GameState.hpp"
 #include "Helpers.hpp"
+#include "RenderizerParameters.hpp"
 #include "SFML/Graphics/RectangleShape.hpp"
 #include "SFML/System/Vector2.hpp"
 

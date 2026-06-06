@@ -2,7 +2,7 @@
 
 #include "RegistryMacros.hpp"
 #include "Scene.hpp"
-#include "SceneBuilderRegistry.hpp"
+#include "SceneBuilderRegistry.hpp" // IWYU pragma: keep
 #include "Terminal.hpp"
 
 class TerminalScene : public Scene, public IEventListener {

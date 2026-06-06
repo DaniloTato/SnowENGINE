@@ -1,6 +1,5 @@
 #include "Commands.hpp"
 #include "GameObject.hpp"
-#include "RenderableObject.hpp"
 #include "RuntimeValue.hpp"
 #include "ScriptRunner.hpp"
 #include "SnowlangInstance.hpp"
@@ -18,7 +17,6 @@ const std::unordered_map<std::string_view, ClassCheck> s_ClassChecks = {
     {"game_object", &checkType<GameObject>},
     {"script_runner", &checkType<ScriptRunner>},
     {"tangible_object", &checkType<TangibleObject>},
-    {"renderable_object", &checkType<RenderableObject>},
 };
 
 } // namespace
