@@ -46,6 +46,10 @@
 
 - Reimplement DialogueManager
 
+- Add Animation Registry.
+
+- Remove AddAnimations method from particleManger
+
 _PIORITY_
 
 - Remove static gameObjectRegistry from GameObject class. `DONE`
@@ -67,3 +71,5 @@ _PIORITY_
 - Make WindowID part of the CameraComponent, not part of SpriteComponent `DONE`
 
 - Remove Object Builder template use whenever no more GameObject subclasses exist.
+
+- Make Scene.render() trigger only when UpdateDomain asks it.

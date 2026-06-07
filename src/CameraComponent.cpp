@@ -40,6 +40,11 @@ CameraView CameraComponent::buildView() {
       }
       // We could catch culling from here.
       provider->appendRenderCommands(commands);
+
+      if (linkedParticleManager) {
+        linkedParticleManager->particleRenderComponent.appendRenderCommands(
+            commands);
+      }
     }
   }
 
@@ -57,6 +62,10 @@ void CameraComponent::subscribe(GameObject::ID id) {
 
 void CameraComponent::unsubscribe(GameObject::ID id) {
   std::erase(subscriptions, id);
+}
+
+void CameraComponent::linkParticleManager(ParticleManager &particleManager) {
+  linkedParticleManager = &particleManager;
 }
 
 void CameraComponent::goTo(const sf::Vector2f &pos) { desiredPosition = pos; }

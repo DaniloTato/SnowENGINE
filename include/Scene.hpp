@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameObject.hpp"
+#include "ParticleManager.hpp"
 #include "RenderSystem.hpp"
 #include "TextSystem.hpp"
 #include "VectorLifecycle.hpp"
@@ -45,6 +46,7 @@ protected:
 
   // Systems
   TextSystem textSystem;
+  ParticleManager particleManager;
 };
 
 template <typename Builder>

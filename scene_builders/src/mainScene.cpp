@@ -16,18 +16,22 @@
 
 void MainScene::setup(Scene::Context ctx) {
 
-  std::cout << "mainScene setup run\n";
-
   Engine &engine = *ctx.engine;
   WindowManager &windowManager = engine.getWindowManager();
   WindowID mainWindow = windowManager.getMain();
   LevelManager &levelManager = engine.getLevelManager();
+
+  particleManager.loadAnimations(Animator::getAsepriteJSONAnimations(
+      Helper::getPath("assets/animations/particles.json")));
 
   ScriptRunner *mainCameraObject =
       create(ObjectBuilder<ScriptRunner>(engine)
                  .withCameraComponent(this, 1.f, mainWindow)
                  .inUpdateDomain(WindowManager::Set::MAIN)
                  .script(Scripts::cameraBehaviourScript));
+  if (mainCameraObject->cameraComponent) {
+    mainCameraObject->cameraComponent->linkParticleManager(particleManager);
+  }
 
   ScriptRunner *uiCameraObject =
       create(ObjectBuilder<ScriptRunner>(engine)
@@ -66,19 +70,18 @@ void MainScene::setup(Scene::Context ctx) {
           .onCamera(uiCameraObject->cameraComponent));
 
   auto *sr = create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
-      GameObject::UpdateDomain{
-          {WindowManager::Set::MAIN, WindowManager::Set::TERMINAL}}));
+      GameObject::UpdateDomain{GameObject::UpdateDomain::Universal}));
 
   sr->scripter.addScript(Scripts::terminalCreationScript);
 
   auto *sr2 = this->create(ObjectBuilder<ScriptRunner>(engine).inUpdateDomain(
-      GameObject::UpdateDomain{
-          {WindowManager::Set::MAIN, WindowManager::Set::DEVUI}}));
+      GameObject::UpdateDomain::Universal));
 
   sr2->scripter.addScript(Scripts::tilePickerCreationScript);
 
   GeneralContext generalContext{.player = image,
                                 .mainWindow = ctx.mainWindow,
+                                .particleManager = &particleManager,
                                 .mainCamera = mainCameraObject->cameraComponent,
                                 .engine = &engine,
                                 .gameScene = this};

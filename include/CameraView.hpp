@@ -23,4 +23,6 @@ public:
   [[nodiscard]] sf::Vector2f screenToWorld(const sf::Vector2f &screenPos,
                                            float paralax) const;
   [[nodiscard]] WindowID getTargetWindow() const;
+  void mergeViewCommands(const CameraView &toMerge);
+  void addCommands(const std::vector<RenderCommand> &toAdd);
 };

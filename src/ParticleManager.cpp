@@ -3,51 +3,22 @@
 #include "ColorPalette.hpp"
 #include "GameState.hpp"
 #include "Helpers.hpp"
-#include "OldRenderCommand.hpp"
-#include "PolyRenderizer.hpp"
+#include "TextureManager.hpp"
 #include <cmath>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 
-ParticleManager::ParticleManager()
-    : GameObject(UpdateDomain{WindowManager::Set::MAIN}) {}
+// Horrible creation of particles with no clear typing.
 
-/* HARDCODED PARTICLE ANIMATIONS PATH */
-
-ParticleManager &ParticleManager::getInstance() {
-  static ParticleManager instance;
-  return instance;
-}
-
-void ParticleManager::attachPolyRederizer(PolyRenderizer *polyRenderizer) {
-  attachedRenderizer = polyRenderizer;
-  Renderizer::registerPair(this, polyRenderizer, false);
-}
+ParticleManager::~ParticleManager() { destroyAll(); }
 
 void ParticleManager::loadAnimations(Animations &&anim) {
   cachedAnimations = std::move(anim);
 }
 
-void ParticleManager::update(const GeneralContext &ctx) {
-  updateParticles();
-  updateRenderCommandBuffer();
-
-  static bool notified = false;
-
-  if (attachedRenderizer) {
-    attachedRenderizer->updateRenderCommands(renderCommandBuffer);
-  } else {
-    if (!notified) {
-      std::cout << "[ParticleManager] Warning: No Renderizer Attached.\n";
-    }
-    notified = true;
-  }
-}
-
 void ParticleManager::emitSnow(const sf::Vector2f &pos) {
   Particle p;
-  p.type = Type::Snow;
+  p.type = Particle::Type::Snow;
   p.pos = pos;
 
   p.vel = {(float)(rand() % 20 - 10) * 0.1f, 30.f};
@@ -71,12 +42,14 @@ void ParticleManager::emitSnow(const sf::Vector2f &pos) {
   p.maxLifetime = 7.f;
   p.lifetime = p.maxLifetime;
 
+  p.texture = &TextureManager::getInstance().get("particles");
+
   particles.push_back(std::move(p));
 }
 
 void ParticleManager::emitDust(const sf::Vector2f &pos) {
   Particle p;
-  p.type = Type::Dust;
+  p.type = Particle::Type::Dust;
   p.pos = pos;
 
   p.vel = {(float)(rand() % 50 - 25), (float)(-(rand() % 50))};
@@ -94,13 +67,15 @@ void ParticleManager::emitDust(const sf::Vector2f &pos) {
   p.maxLifetime = 1.5f;
   p.lifetime = p.maxLifetime;
 
+  p.texture = &TextureManager::getInstance().get("particles");
+
   particles.push_back(std::move(p));
 }
 
 void ParticleManager::emitExplosion(const sf::Vector2f &pos, int count) {
   for (int i = 0; i < count; i++) {
     Particle p;
-    p.type = Type::Explosion;
+    p.type = Particle::Type::Explosion;
     p.pos = pos + sf::Vector2f(Helper::randRange(-16, 16),
                                Helper::randRange(-16, 16));
 
@@ -115,6 +90,8 @@ void ParticleManager::emitExplosion(const sf::Vector2f &pos, int count) {
     p.maxLifetime = 0.6f;
     p.lifetime = p.maxLifetime;
 
+    p.texture = &TextureManager::getInstance().get("particles");
+
     particles.push_back(std::move(p));
   }
 }
@@ -128,7 +105,7 @@ void ParticleManager::emitMediumExplosion(const sf::Vector2f &pos, int count,
     sf::Vector2f offset(std::cos(angle) * r, std::sin(angle) * r);
 
     Particle p;
-    p.type = Type::Explosion;
+    p.type = Particle::Type::Explosion;
     p.pos = pos + offset;
 
     p.color = ColorPalette::White;
@@ -145,6 +122,8 @@ void ParticleManager::emitMediumExplosion(const sf::Vector2f &pos, int count,
     p.maxLifetime = 2.f;
     p.lifetime = p.maxLifetime;
 
+    p.texture = &TextureManager::getInstance().get("particles");
+
     particles.push_back(std::move(p));
   }
 }
@@ -152,7 +131,7 @@ void ParticleManager::emitMediumExplosion(const sf::Vector2f &pos, int count,
 void ParticleManager::emitStars(const sf::Vector2f &pos, int count) {
   for (int i = 0; i < count; i++) {
     Particle p;
-    p.type = Type::Stars;
+    p.type = Particle::Type::Stars;
     p.pos = pos;
     p.vel = sf::Vector2f(Helper::randRange(-100, 100),
                          Helper::randRange(-100, 100));
@@ -167,6 +146,8 @@ void ParticleManager::emitStars(const sf::Vector2f &pos, int count) {
     p.maxLifetime = 1.f;
     p.lifetime = p.maxLifetime;
 
+    p.texture = &TextureManager::getInstance().get("particles");
+
     particles.push_back(std::move(p));
   }
 }
@@ -174,7 +155,7 @@ void ParticleManager::emitStars(const sf::Vector2f &pos, int count) {
 void ParticleManager::emitHearts(const sf::Vector2f &pos, int count) {
   for (int i = 0; i < count; i++) {
     Particle p;
-    p.type = Type::Heart;
+    p.type = Particle::Type::Heart;
     p.pos = pos;
     p.vel = sf::Vector2f(Helper::randRange(-100, 100),
                          Helper::randRange(-100, 100));
@@ -189,6 +170,8 @@ void ParticleManager::emitHearts(const sf::Vector2f &pos, int count) {
     p.maxLifetime = 3.f;
     p.lifetime = p.maxLifetime;
 
+    p.texture = &TextureManager::getInstance().get("particles");
+
     particles.push_back(std::move(p));
   }
 }
@@ -196,7 +179,7 @@ void ParticleManager::emitHearts(const sf::Vector2f &pos, int count) {
 void ParticleManager::emitCross(const sf::Vector2f &pos, int count) {
   for (int i = 0; i < count; i++) {
     Particle p;
-    p.type = Type::Cross;
+    p.type = Particle::Type::Cross;
     p.pos = pos;
     p.vel = sf::Vector2f(Helper::randRange(-100, 100),
                          Helper::randRange(-100, 100));
@@ -211,6 +194,8 @@ void ParticleManager::emitCross(const sf::Vector2f &pos, int count) {
     p.maxLifetime = 1.f;
     p.lifetime = p.maxLifetime;
 
+    p.texture = &TextureManager::getInstance().get("particles");
+
     particles.push_back(std::move(p));
   }
 }
@@ -218,7 +203,7 @@ void ParticleManager::emitCross(const sf::Vector2f &pos, int count) {
 void ParticleManager::emitSmoke(const sf::Vector2f &pos, int count) {
   for (int i = 0; i < count; i++) {
     Particle p;
-    p.type = Type::Smoke;
+    p.type = Particle::Type::Smoke;
     p.pos = pos;
 
     p.vel = {Helper::randRange(-10.f, 10.f), Helper::randRange(-20.f, -40.f)};
@@ -240,6 +225,8 @@ void ParticleManager::emitSmoke(const sf::Vector2f &pos, int count) {
 
     p.maxLifetime = Helper::randRange(1.5f, 3.f);
     p.lifetime = p.maxLifetime;
+
+    p.texture = &TextureManager::getInstance().get("particles");
 
     particles.push_back(std::move(p));
   }
@@ -270,14 +257,15 @@ void ParticleManager::updateParticles() {
     p.vel.y += p.gravity * dt;
     p.pos += p.vel * dt;
 
-    if (p.type == Type::Snow || p.type == Type::Smoke) {
+    if (p.type == Particle::Type::Snow || p.type == Particle::Type::Smoke) {
       float offset =
           std::sin((p.maxLifetime - p.lifetime) * p.sinFrequency + p.sinPhase) *
           p.sinAmplitude;
       p.pos.x += offset * dt * 60.f;
     }
 
-    if (p.type == Type::Explosion || p.type == Type::Smoke) {
+    if (p.type == Particle::Type::Explosion ||
+        p.type == Particle::Type::Smoke) {
       float alpha = p.lifetime / p.maxLifetime;
       p.color.a = static_cast<sf::Uint8>(255 * alpha);
     }
@@ -288,37 +276,4 @@ void ParticleManager::updateParticles() {
   });
 }
 
-void ParticleManager::updateRenderCommandBuffer() {
-
-  renderCommandBuffer.clear();
-
-  for (auto &p : particles) {
-
-    OldRenderCommand cmd;
-    cmd.rect = p.texRect;
-    cmd.pos = p.pos;
-    cmd.color = p.color;
-    cmd.overrideParalax = p.parallax;
-
-    if (p.shakeIntensity > 0.f) {
-      float t = (p.maxLifetime - p.lifetime) * 30.f;
-      cmd.pos.x += std::sin(t * 2.7f) * p.shakeIntensity;
-      cmd.pos.y += std::cos(t * 3.7f) * p.shakeIntensity;
-    }
-
-    renderCommandBuffer.push_back(cmd);
-  }
-}
-
 void ParticleManager::destroyAll() { particles.clear(); }
-
-void ParticleManager::onSceneUnload() {
-  destroyAll();
-
-  renderCommandBuffer.clear();
-
-  delete attachedRenderizer;
-  attachedRenderizer = nullptr;
-
-  wind = {0.f, 0.f};
-}

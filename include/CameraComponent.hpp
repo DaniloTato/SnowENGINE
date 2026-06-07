@@ -2,6 +2,7 @@
 
 #include "CameraView.hpp"
 #include "GameObject.hpp"
+#include "ParticleManager.hpp"
 
 #include <vector>
 
@@ -15,6 +16,7 @@ public:
 
   void subscribe(GameObject::ID id);
   void unsubscribe(GameObject::ID id);
+  void linkParticleManager(ParticleManager &particleManager);
 
   void update();
 
@@ -43,4 +45,5 @@ private:
   float zoomSpeed = 15.f;
   WindowID targetWindow;
   std::vector<GameObject::ID> subscriptions;
+  ParticleManager *linkedParticleManager;
 };

@@ -32,14 +32,18 @@ void Scene::update(const GeneralContext &ctx) {
     }
   }
 
+  particleManager.updateParticles();
+
   lifecycle.apply(objects);
 }
 
 void Scene::render(RenderSystem &renderer) {
   for (const auto &obj : objects) {
-    if (!obj->cameraComponent)
+    if (!obj->cameraComponent) {
       continue;
+    }
     CameraView view = obj->cameraComponent->buildView();
+
     renderer.render(view);
   }
 }

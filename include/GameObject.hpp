@@ -18,6 +18,8 @@ public:
     std::vector<WindowID> windows;
     std::vector<WindowManager::Set> domains;
 
+    static const UpdateDomain Universal;
+
     bool matches(WindowManager &wm, WindowID id) const;
 
     UpdateDomain(WindowID id) : windows({id}) {}

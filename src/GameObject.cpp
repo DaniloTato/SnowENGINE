@@ -3,6 +3,10 @@
 
 unsigned int GameObject::nextId = 0;
 
+const GameObject::UpdateDomain GameObject::UpdateDomain::Universal{
+    {WindowManager::Set::MAIN, WindowManager::Set::DEVUI,
+     WindowManager::Set::TERMINAL}};
+
 bool GameObject::UpdateDomain::matches(WindowManager &wm, WindowID id) const {
 
   if (std::ranges::find(windows, id) != windows.end()) {

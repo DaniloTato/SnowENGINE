@@ -52,3 +52,12 @@ const std::vector<RenderCommand> &CameraView::getCommands() const {
 }
 
 WindowID CameraView::getTargetWindow() const { return targetWindow; }
+
+void CameraView::mergeViewCommands(const CameraView &addition) {
+  commands.insert(commands.end(), addition.getCommands().begin(),
+                  addition.getCommands().end());
+}
+
+void CameraView::addCommands(const std::vector<RenderCommand> &toAdd) {
+  commands.insert(commands.end(), toAdd.begin(), toAdd.end());
+}

@@ -7,6 +7,7 @@
 struct GeneralContext {
   TangibleObject *player;
   WindowID mainWindow;
+  ParticleManager *particleManager;
   CameraComponent *mainCamera;
   Engine *engine;
   Scene *gameScene;
@@ -17,6 +18,7 @@ struct EmptyContext : public GeneralContext {
       : GeneralContext{
             .player = nullptr,
             .mainWindow = WindowID(),
+            .particleManager = nullptr,
             .mainCamera = nullptr,
             .engine = nullptr,
             .gameScene = nullptr,
