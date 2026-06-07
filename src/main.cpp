@@ -10,7 +10,6 @@
 #include "GameState.hpp"
 #include "InputManager.hpp"
 #include "LevelManager.hpp"
-#include "Renderizer.hpp"
 #include "SceneManager.hpp"
 #include "WindowLifecycleListener.hpp"
 

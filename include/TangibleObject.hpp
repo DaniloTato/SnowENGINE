@@ -3,7 +3,7 @@
 #include "BasicCollider.hpp"
 #include "GameObject.hpp"
 #include "PhysicsComponent.hpp"
-#include "Renderizer.hpp"
+#include "RenderizerParameters.hpp"
 #include "Scripter.hpp"
 #include <SFML/Audio.hpp>
 #include <optional>

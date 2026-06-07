@@ -4,7 +4,7 @@
 #include "TangibleObject.hpp"
 
 #include "Helpers.hpp"
-#include "NamedScript.hpp" // IWYU pragma: keep
+#include "NamedScript.hpp"
 #include "RegistryMacros.hpp"
 #include "ScriptRegistry.hpp" // IWYU pragma: keep
 #include "Scripter.hpp"

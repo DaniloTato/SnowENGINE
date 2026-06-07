@@ -50,6 +50,8 @@
 
 - Remove AddAnimations method from particleManger
 
+- Rename RenderizerParameters to a more appropiate name.
+
 _PIORITY_
 
 - Remove static gameObjectRegistry from GameObject class. `DONE`
